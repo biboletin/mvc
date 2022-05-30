@@ -1,0 +1,5 @@
+.code/
+.idea/
+.env
+.php-cs-fixer.cache
+.composer.lock

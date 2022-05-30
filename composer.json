@@ -1,0 +1,32 @@
+{
+    "name": "biboletin/mvc",
+    "description": "Simple MVC framework",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Biboletin\\Mvc\\": "src/",
+            "Biboletin\\Mvc\\Core\\": "src/Core/",
+            "Biboletin\\Mvc\\Core\\Behaviours\\": "src/Core/Behaviours/",
+            "Biboletin\\Mvc\\Core\\Creators\\": "src/Core/Creators/",
+            "Biboletin\\Mvc\\Core\\Structurals\\": "src/Core/Structurals/",
+            "Biboletin\\Mvc\\Core\\Http\\": "src/Core/Http/",
+            "Biboletin\\Mvc\\Helpers\\": "src/Helpers/",
+            "App\\Controllers\\": "app/Controllers/",
+            "App\\Models\\": "app/Models/",
+            "App\\Views\\": "app/Views/"
+        },
+        "files": ["src/functions/functions.php"]
+    },
+    "authors": [
+        {
+            "name": "biboletin",
+            "email": "shady_fan@abv.bg"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "vlucas/phpdotenv": "5.4.x-dev",
+        "psr/http-message": "1.0.x-dev"
+    }
+}

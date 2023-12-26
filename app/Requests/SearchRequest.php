@@ -6,5 +6,4 @@ use Biboletin\Mvc\Request;
 
 class SearchRequest extends Request
 {
-    
 }

@@ -10,7 +10,6 @@
             "Biboletin\\Mvc\\Core\\Behaviours\\": "src/Core/Behaviours/",
             "Biboletin\\Mvc\\Core\\Creators\\": "src/Core/Creators/",
             "Biboletin\\Mvc\\Core\\Structurals\\": "src/Core/Structurals/",
-            "Biboletin\\Mvc\\Core\\Http\\": "src/Core/Http/",
             "Biboletin\\Mvc\\Helpers\\": "src/Helpers/",
             "App\\Controllers\\": "app/Controllers/",
             "App\\Models\\": "app/Models/",

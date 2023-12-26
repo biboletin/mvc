@@ -4,23 +4,56 @@ namespace Biboletin\Mvc;
 
 use Biboletin\Mvc\Core\BaseRouter;
 
+/**
+ *
+ */
 class Router extends BaseRouter
 {
+    /**
+     *
+     */
     public function __construct()
     {
         parent::__construct();
     }
 
-    public function get($path = '', $class = [])
+    /**
+     * @param string $path
+     * @param array  $class
+     *
+     * @return void
+     */
+    public function get(string $path = '', array $class = [])
     {
     }
-    public function post($path = '', $class = [])
+
+    /**
+     * @param string $path
+     * @param array  $class
+     *
+     * @return void
+     */
+    public function post(string $path = '', array $class = [])
     {
     }
-    public function put($path = '', $class = [])
+
+    /**
+     * @param string $path
+     * @param array  $class
+     *
+     * @return void
+     */
+    public function put(string $path = '', array $class = [])
     {
     }
-    public function delete($path = '', $class = [])
+
+    /**
+     * @param string $path
+     * @param array  $class
+     *
+     * @return void
+     */
+    public function delete(string $path = '', array $class = [])
     {
     }
 }

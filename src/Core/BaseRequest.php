@@ -2,28 +2,57 @@
 
 namespace Biboletin\Mvc\Core;
 
-use Psr\Http\Message\RequestInterface;
-use Biboletin\Mvc\Core\Http\BaseRequestTrait;
-use Biboletin\Mvc\Core\Http\BaseMessageTrait;
-
-use function strtolower;
-
-class BaseRequest implements RequestInterface
+/**
+ * Base request class
+ */
+class BaseRequest
 {
-    use BaseRequestTrait;
-    use BaseMessageTrait;
+    /**
+     * @var array
+     */
+    private array $get;
+    /**
+     * @var array
+     */
+    private array $post;
+    /**
+     * @var array
+     */
+    private array $server;
+    /**
+     * @var array
+     */
+    private array $session;
+    /**
+     * @var array
+     */
+    private array $cookie;
+    /**
+     * @var string
+     */
+    private string $method;
+    /**
+     * IP address of the client
+     *
+     * @var string
+     */
+    private string $ip;
 
-    public function __construct(
-        string $method = '',
-        $uri = '',
-        array $headers = [],
-        $body = null,
-        string $version = '1.1'
-    ) {
-        $this->method = strtolower($method);
-        $this->version = $version;
-        $this->setUri($uri);
-        $this->setHeaders($headers);
-        $this->setBody($body);
+    /**
+     *
+     */
+    public function __construct()
+    {
+        $this->get = sanitizeGlobalVariable($_GET);
+        $this->post = sanitizeGlobalVariable($_POST);
+        $this->server = sanitizeGlobalVariable($_SERVER);
+        $this->session = sanitizeGlobalVariable($_SESSION);
+        $this->cookie = sanitizeGlobalVariable($_COOKIE);
+        $this->ip = $this->server['REMOTE_ADDR'];
+    }
+
+    protected function ip()
+    {
+        return $this->ip;
     }
 }

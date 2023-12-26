@@ -10,4 +10,12 @@ abstract class BaseRouter
     {
         $this->routes = [];
     }
+
+    protected function set(string $method, string $path, $callable): void
+    {
+    }
+
+    protected function group($route, $fn): void
+    {
+    }
 }

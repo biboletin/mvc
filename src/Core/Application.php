@@ -2,25 +2,36 @@
 
 namespace Biboletin\Mvc\Core;
 
+/**
+ *
+ */
 abstract class Application
 {
+    /**
+     *
+     */
     public function __construct()
     {
     }
 
-    public function init()
+    /**
+     * @return void
+     */
+    public function init(): void
     {
     }
 
-    public function run()
+    /**
+     * @return void
+     */
+    public function run(): void
     {
     }
 
-    public function resolve()
-    {
-    }
-
-    public function handle()
+    /**
+     * @return void
+     */
+    public function register(): void
     {
     }
 }

@@ -7,15 +7,7 @@ use Biboletin\Mvc\Core\Application;
 
 class App extends Application
 {
-    private function config()
+    public function __construct()
     {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-        $dotenv->load();
-        return true;
-    }
-
-    public function run()
-    {
-        $this->config();
     }
 }

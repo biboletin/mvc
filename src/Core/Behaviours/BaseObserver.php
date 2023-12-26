@@ -2,6 +2,13 @@
 
 namespace Biboletin\Mvc\Core\Behaviours;
 
-class BaseObserver
+use SplObserver;
+use SplSubject;
+
+class BaseObserver implements SplObserver
 {
+    public function update(SplSubject $subject): void
+    {
+        // TODO: Implement update() method.
+    }
 }

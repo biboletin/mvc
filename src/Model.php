@@ -2,6 +2,8 @@
 
 namespace Biboletin\Mvc;
 
-class Model
+use Biboletin\Mvc\Core\Database;
+
+class Model extends Database
 {
 }

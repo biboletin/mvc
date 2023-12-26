@@ -1,8 +1,8 @@
 <?php
 
-namespace Biboletin\Mvc;
+namespace Biboletin\Mvc\Core;
 
-class Controller
+class Database
 {
     public function __construct()
     {

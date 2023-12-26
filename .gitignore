@@ -1,5 +1,6 @@
 .code/
 .idea/
+vendor/
 .env
 .php-cs-fixer.cache
 .composer.lock

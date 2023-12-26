@@ -2,6 +2,6 @@
 
 namespace App\Models;
 
-class IndexModel{
-    
+class IndexModel
+{
 }

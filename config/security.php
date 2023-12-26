@@ -3,6 +3,7 @@
 /**
  * Security configuration
  */
+
 return [
 
 ];

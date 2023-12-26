@@ -3,6 +3,7 @@
 /**
  * Session configuration
  */
+
 return [
 
 ];

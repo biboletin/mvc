@@ -25,7 +25,7 @@ final class Registry
      * Set key => val in container
      *
      * @param string $key
-     * @param        $value
+     * @param $value
      *
      * @return void
      */
@@ -38,7 +38,7 @@ final class Registry
      * Get value by key if key is stored in container
      *
      * @param string $key
-     * @param        $default
+     * @param $default
      *
      * @return mixed|null
      */

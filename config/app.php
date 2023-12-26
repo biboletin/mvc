@@ -3,6 +3,7 @@
 /**
  * Application configuration
  */
+
 return [
     '' => '',
 ];

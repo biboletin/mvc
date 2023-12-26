@@ -3,6 +3,7 @@
 /**
  * Database configuration
  */
+
 return [
 
 ];

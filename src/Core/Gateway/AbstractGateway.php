@@ -8,7 +8,6 @@ class AbstractGateway implements GatewayInterface
 
     public function __construct()
     {
-
     }
 
     public function __destruct()

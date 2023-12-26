@@ -3,6 +3,7 @@
 /**
  * Mail configuration
  */
+
 return [
 
 ];

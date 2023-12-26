@@ -5,5 +5,6 @@
  */
 
 return [
-
+    'driver' => 'mysql',
+    'port' => 3306,
 ];

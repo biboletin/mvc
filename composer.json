@@ -25,7 +25,6 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "vlucas/phpdotenv": "5.4.x-dev",
-        "psr/http-message": "1.0.x-dev"
+        "vlucas/phpdotenv": "5.4.x-dev"
     }
 }

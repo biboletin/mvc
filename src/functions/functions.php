@@ -1,15 +1,16 @@
 <?php
 
 use Biboletin\Mvc\App;
+use Biboletin\Mvc\Config;
 use Biboletin\Mvc\Router;
 use Biboletin\Mvc\View;
 
 /**
  * Sanitize global variables
  *
- * @param array $variable
+ * @param array<string> $variable
  *
- * @return array
+ * @return array<string>
  */
 function sanitizeGlobalVariable(array $variable): array
 {
@@ -36,12 +37,12 @@ function view(string $view): void
 }
 
 /**
- * @param string $route
- * @param ...$params
+ * @param string      $route
+ * @param string|null ...$params
  *
  * @return void
  */
-function route(string $route, ...$params): void
+function route(string $route, ?string ...$params): void
 {
     $router = new Router();
 }
@@ -52,4 +53,17 @@ function route(string $route, ...$params): void
 function app(): App
 {
     return new App();
+}
+
+/**
+ * @param string      $key
+ * @param string|null $default
+ *
+ * @return string
+ */
+function config(string $key, ?string $default = null): string
+{
+    $config = new Config();
+
+    return $config->get($key, $default);
 }

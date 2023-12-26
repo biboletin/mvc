@@ -7,7 +7,4 @@ use Biboletin\Mvc\Core\Application;
 
 class App extends Application
 {
-    public function __construct()
-    {
-    }
 }

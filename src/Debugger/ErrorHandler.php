@@ -1,8 +1,8 @@
 <?php
 
-namespace Biboletin\Mvc;
+namespace Biboletin\Mvc\Debugger;
 
-class Cache
+class ErrorHandler
 {
     public function __construct()
     {

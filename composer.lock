@@ -4,28 +4,28 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bd621d20f8fee18c13c34121bed90017",
+    "content-hash": "ad1128e603590a1e2a7b7a8fd393f228",
     "packages": [
         {
             "name": "graham-campbell/result-type",
-            "version": "1.0.x-dev",
+            "version": "1.1.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GrahamCampbell/Result-Type.git",
-                "reference": "ec4daa4b45faf6a683c9c0acf92fe1377d695a54"
+                "reference": "fbd48bce38f73f8a4ec8583362e732e4095e5862"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GrahamCampbell/Result-Type/zipball/ec4daa4b45faf6a683c9c0acf92fe1377d695a54",
-                "reference": "ec4daa4b45faf6a683c9c0acf92fe1377d695a54",
+                "url": "https://api.github.com/repos/GrahamCampbell/Result-Type/zipball/fbd48bce38f73f8a4ec8583362e732e4095e5862",
+                "reference": "fbd48bce38f73f8a4ec8583362e732e4095e5862",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.0 || ^8.0",
-                "phpoption/phpoption": "^1.8"
+                "php": "^7.2.5 || ^8.0",
+                "phpoption/phpoption": "^1.9.2"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.5.14 || ^7.5.20 || ^8.5.19 || ^9.5.8"
+                "phpunit/phpunit": "^8.5.34 || ^9.6.13 || ^10.4.2"
             },
             "default-branch": true,
             "type": "library",
@@ -55,7 +55,7 @@
             ],
             "support": {
                 "issues": "https://github.com/GrahamCampbell/Result-Type/issues",
-                "source": "https://github.com/GrahamCampbell/Result-Type/tree/1.0"
+                "source": "https://github.com/GrahamCampbell/Result-Type/tree/v1.1.2"
             },
             "funding": [
                 {
@@ -67,7 +67,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-02-07T10:52:05+00:00"
+            "time": "2023-11-12T22:16:48+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -75,26 +75,30 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/php-option.git",
-                "reference": "5f59b1b59025b3c66cf1ca0898247d9de39c6200"
+                "reference": "416ca2ac2a84555b785a98002d613fe13d1d1c2f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/5f59b1b59025b3c66cf1ca0898247d9de39c6200",
-                "reference": "5f59b1b59025b3c66cf1ca0898247d9de39c6200",
+                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/416ca2ac2a84555b785a98002d613fe13d1d1c2f",
+                "reference": "416ca2ac2a84555b785a98002d613fe13d1d1c2f",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.0 || ^8.0"
+                "php": "^7.2.5 || ^8.0"
             },
             "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.4.1",
-                "phpunit/phpunit": "^6.5.14 || ^7.5.20 || ^8.5.19 || ^9.5.8"
+                "bamarni/composer-bin-plugin": "^1.8.2",
+                "phpunit/phpunit": "^8.5.34 || ^9.6.13 || ^10.4.2"
             },
             "default-branch": true,
             "type": "library",
             "extra": {
+                "bamarni-bin": {
+                    "bin-links": true,
+                    "forward-command": false
+                },
                 "branch-alias": {
-                    "dev-master": "1.8-dev"
+                    "dev-master": "1.9-dev"
                 }
             },
             "autoload": {
@@ -139,74 +143,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-12-13T23:19:03+00:00"
-        },
-        {
-            "name": "psr/http-message",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/http-message.git",
-                "reference": "efd67d1dc14a7ef4fc4e518e7dee91c271d524e4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-message/zipball/efd67d1dc14a7ef4fc4e518e7dee91c271d524e4",
-                "reference": "efd67d1dc14a7ef4fc4e518e7dee91c271d524e4",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "default-branch": true,
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Psr\\Http\\Message\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
-                }
-            ],
-            "description": "Common interface for HTTP messages",
-            "homepage": "https://github.com/php-fig/http-message",
-            "keywords": [
-                "http",
-                "http-message",
-                "psr",
-                "psr-7",
-                "request",
-                "response"
-            ],
-            "support": {
-                "source": "https://github.com/php-fig/http-message/tree/master"
-            },
-            "time": "2019-08-29T13:16:46+00:00"
+            "time": "2023-11-12T22:52:20+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "dev-main",
+            "version": "1.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "9fa980f4c4b0cbf0b6406832e307b9aed839876f"
+                "reference": "ea208ce43cbb04af6867b4fdddb1bdbf84cc28cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/9fa980f4c4b0cbf0b6406832e307b9aed839876f",
-                "reference": "9fa980f4c4b0cbf0b6406832e307b9aed839876f",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/ea208ce43cbb04af6867b4fdddb1bdbf84cc28cb",
+                "reference": "ea208ce43cbb04af6867b4fdddb1bdbf84cc28cb",
                 "shasum": ""
             },
             "require": {
@@ -222,7 +172,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.26-dev"
+                    "dev-main": "1.28-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -260,7 +210,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/main"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.28.0"
             },
             "funding": [
                 {
@@ -276,20 +226,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-05-10T07:21:04+00:00"
+            "time": "2023-01-26T09:26:14+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "dev-main",
+            "version": "1.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "240259a291e16e306dbf46dfe139d50c7fcb2d34"
+                "reference": "42292d99c55abe617799667f454222c54c60e229"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/240259a291e16e306dbf46dfe139d50c7fcb2d34",
-                "reference": "240259a291e16e306dbf46dfe139d50c7fcb2d34",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/42292d99c55abe617799667f454222c54c60e229",
+                "reference": "42292d99c55abe617799667f454222c54c60e229",
                 "shasum": ""
             },
             "require": {
@@ -305,7 +255,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.26-dev"
+                    "dev-main": "1.28-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -344,7 +294,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/main"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.28.0"
             },
             "funding": [
                 {
@@ -360,20 +310,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-05-10T07:21:04+00:00"
+            "time": "2023-07-28T09:04:16+00:00"
         },
         {
             "name": "symfony/polyfill-php80",
-            "version": "dev-main",
+            "version": "1.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php80.git",
-                "reference": "cfa0ae98841b9e461207c13ab093d76b0fa7bace"
+                "reference": "6caa57379c4aec19c0a12a38b59b26487dcfe4b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/cfa0ae98841b9e461207c13ab093d76b0fa7bace",
-                "reference": "cfa0ae98841b9e461207c13ab093d76b0fa7bace",
+                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/6caa57379c4aec19c0a12a38b59b26487dcfe4b5",
+                "reference": "6caa57379c4aec19c0a12a38b59b26487dcfe4b5",
                 "shasum": ""
             },
             "require": {
@@ -383,7 +333,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.26-dev"
+                    "dev-main": "1.28-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -428,7 +378,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php80/tree/main"
+                "source": "https://github.com/symfony/polyfill-php80/tree/v1.28.0"
             },
             "funding": [
                 {
@@ -444,11 +394,11 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-05-10T07:21:04+00:00"
+            "time": "2023-01-26T09:26:14+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
-            "version": "dev-master",
+            "version": "5.4.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vlucas/phpdotenv.git",
@@ -477,7 +427,6 @@
             "suggest": {
                 "ext-filter": "Required to use the boolean validator."
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -532,12 +481,11 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "vlucas/phpdotenv": 20,
-        "psr/http-message": 20
+        "vlucas/phpdotenv": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }

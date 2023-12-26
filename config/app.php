@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Application configuration
+ */
 return [
     '' => '',
 ];

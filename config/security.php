@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Security configuration
+ */
+return [
+
+];

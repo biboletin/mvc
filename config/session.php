@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Session configuration
+ */
+return [
+
+];

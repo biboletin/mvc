@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Mail configuration
+ */
+return [
+
+];

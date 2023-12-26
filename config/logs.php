@@ -1,0 +1,9 @@
+<?php
+
+/**
+ * Logs configuration
+ */
+
+return [
+
+];

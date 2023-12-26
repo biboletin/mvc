@@ -1,5 +1,9 @@
 <?php
 
+use Biboletin\Mvc\App;
+use Biboletin\Mvc\Router;
+use Biboletin\Mvc\View;
+
 /**
  * Sanitize global variables
  *
@@ -28,6 +32,7 @@ function sanitizeGlobalVariable(array $variable): array
  */
 function view(string $view): void
 {
+    $view = new View();
 }
 
 /**
@@ -38,11 +43,13 @@ function view(string $view): void
  */
 function route(string $route, ...$params): void
 {
+    $router = new Router();
 }
 
 /**
- * @return void
+ * @return App
  */
-function app(): void
+function app(): App
 {
+    return new App();
 }

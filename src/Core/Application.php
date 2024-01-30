@@ -8,6 +8,18 @@ namespace Biboletin\Mvc\Core;
 abstract class Application
 {
     /**
+     * Application version
+     *
+     * @var string
+     */
+    private const VERSION = '0.0.0';
+    /**
+     * Application name
+     *
+     * @var string
+     */
+    private string $name = '';
+    /**
      *
      */
     public function __construct()
@@ -33,5 +45,15 @@ abstract class Application
      */
     public function register(): void
     {
+    }
+
+    /**
+     * Application version
+     *
+     * @return string
+     */
+    public function version(): string
+    {
+        return self::VERSION;
     }
 }

@@ -30,6 +30,8 @@ class Config
     }
 
     /**
+     * Keys must be in format: main_key.sub_key
+     *
      * @param string      $keys
      * @param string|null $default
      *

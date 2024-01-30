@@ -3,6 +3,7 @@
 namespace Biboletin\Mvc;
 
 use Biboletin\Mvc\Core\BaseRouter;
+use Biboletin\Mvc\Core\Exceptions\InvalidHttpMethodException;
 
 /**
  *
@@ -23,8 +24,13 @@ class Router extends BaseRouter
      *
      * @return void
      */
-    public function get(string $path = '', array $class = [])
+    public function get(string $path = '', array $class = []): void
     {
+        try {
+            $this->set(BaseRouter::GET_METHOD, $path, $class);
+        } catch (InvalidHttpMethodException $exception) {
+            echo $exception->getMessage();
+        }
     }
 
     /**
@@ -32,9 +38,11 @@ class Router extends BaseRouter
      * @param array  $class
      *
      * @return void
+     * @throws InvalidHttpMethodException
      */
-    public function post(string $path = '', array $class = [])
+    public function post(string $path = '', array $class = []): void
     {
+        $this->set(BaseRouter::POST_METHOD, $path, $class);
     }
 
     /**
@@ -42,9 +50,11 @@ class Router extends BaseRouter
      * @param array  $class
      *
      * @return void
+     * @throws InvalidHttpMethodException
      */
-    public function put(string $path = '', array $class = [])
+    public function put(string $path = '', array $class = []): void
     {
+        $this->set(BaseRouter::PUT_METHOD, $path, $class);
     }
 
     /**
@@ -52,8 +62,10 @@ class Router extends BaseRouter
      * @param array  $class
      *
      * @return void
+     * @throws InvalidHttpMethodException
      */
-    public function delete(string $path = '', array $class = [])
+    public function delete(string $path = '', array $class = []): void
     {
+        $this->set(BaseRouter::DELETE_METHOD, $path, $class);
     }
 }

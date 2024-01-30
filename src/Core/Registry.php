@@ -5,7 +5,7 @@ namespace Biboletin\Mvc\Core;
 /**
  *
  */
-final class Registry
+class Registry
 {
     /**
      * Registry container

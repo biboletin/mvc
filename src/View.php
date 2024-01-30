@@ -2,14 +2,8 @@
 
 namespace Biboletin\Mvc;
 
-class View
-{
-    public function __construct()
-    {
-    }
+use Biboletin\Mvc\Core\BaseView;
 
-    public function __destruct()
-    {
-        // TODO: Implement __destruct() method.
-    }
+class View extends BaseView
+{
 }

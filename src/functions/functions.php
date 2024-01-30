@@ -5,6 +5,11 @@ use Biboletin\Mvc\Config;
 use Biboletin\Mvc\Router;
 use Biboletin\Mvc\View;
 
+function debug($data): void
+{
+    echo '<pre>' . print_r($data, true) . '</pre>';
+    exit;
+}
 /**
  * Sanitize global variables
  *

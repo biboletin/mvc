@@ -15,7 +15,9 @@
             "App\\Models\\": "app/Models/",
             "App\\Views\\": "app/Views/"
         },
-        "files": ["src/functions/functions.php"]
+        "files": [
+            "src/functions/functions.php"
+        ]
     },
     "authors": [
         {

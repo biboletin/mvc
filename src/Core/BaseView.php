@@ -1,10 +1,8 @@
 <?php
 
-namespace Biboletin\Mvc;
+namespace Biboletin\Mvc\Core;
 
-use Biboletin\Mvc\Core\BaseTemplate;
-
-class Template extends BaseTemplate
+class BaseView
 {
     public function __construct()
     {
@@ -12,5 +10,6 @@ class Template extends BaseTemplate
 
     public function __destruct()
     {
+        // TODO: Implement __destruct() method.
     }
 }

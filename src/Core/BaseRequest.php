@@ -43,16 +43,36 @@ class BaseRequest
      */
     public function __construct()
     {
-        $this->get = sanitizeGlobalVariable($_GET);
-        $this->post = sanitizeGlobalVariable($_POST);
-        $this->server = sanitizeGlobalVariable($_SERVER);
-        $this->session = sanitizeGlobalVariable($_SESSION);
-        $this->cookie = sanitizeGlobalVariable($_COOKIE);
-        $this->ip = $this->server['REMOTE_ADDR'];
+        $this->get = sanitizeGlobalVariable($_GET ?? []);
+        $this->post = sanitizeGlobalVariable($_POST ?? []);
+        $this->server = sanitizeGlobalVariable($_SERVER ?? []);
+        $this->session = sanitizeGlobalVariable($_SESSION ?? []);
+        $this->cookie = sanitizeGlobalVariable($_COOKIE ?? []);
     }
 
-    protected function ip()
+    private function keyExists(string $key, array $method): bool
     {
-        return $this->ip;
+        if (empty($key)) {
+            return false;
+        }
+        if (!array_key_exists($key, $method)) {
+            return false;
+        }
+        return true;
+    }
+    public function get(string $param): ?string
+    {
+        if ($this->keyExists($param, $this->get) === false) {
+            return null;
+        }
+        return $this->get[$param];
+    }
+
+    public function input(string $param): ?string
+    {
+        if ($this->keyExists($param, $this->post) === false) {
+            return null;
+        }
+        return $this->post[$param];
     }
 }

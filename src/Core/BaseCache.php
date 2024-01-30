@@ -1,10 +1,8 @@
 <?php
 
-namespace Biboletin\Mvc;
+namespace Biboletin\Mvc\Core;
 
-use Biboletin\Mvc\Core\BaseTemplate;
-
-class Template extends BaseTemplate
+class BaseCache
 {
     public function __construct()
     {

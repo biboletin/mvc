@@ -2,13 +2,8 @@
 
 namespace Biboletin\Mvc;
 
-class Cache
-{
-    public function __construct()
-    {
-    }
+use Biboletin\Mvc\Core\BaseCache;
 
-    public function __destruct()
-    {
-    }
+class Cache extends BaseCache
+{
 }

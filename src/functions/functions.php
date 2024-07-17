@@ -5,11 +5,6 @@ use Biboletin\Mvc\Config;
 use Biboletin\Mvc\Router;
 use Biboletin\Mvc\View;
 
-function debug($data): void
-{
-    echo '<pre>' . print_r($data, true) . '</pre>';
-    exit;
-}
 /**
  * Sanitize global variables
  *
@@ -32,6 +27,8 @@ function sanitizeGlobalVariable(array $variable): array
 }
 
 /**
+ * View
+ *
  * @param string $view
  *
  * @return void
@@ -42,6 +39,8 @@ function view(string $view): void
 }
 
 /**
+ * Route
+ *
  * @param string      $route
  * @param string|null ...$params
  *
@@ -53,14 +52,19 @@ function route(string $route, ?string ...$params): void
 }
 
 /**
+ * App
+ *
  * @return App
  */
 function app(): App
 {
-    return new App();
+    $app = new App();
+    return $app;
 }
 
 /**
+ * Config
+ *
  * @param string      $key
  * @param string|null $default
  *
@@ -69,6 +73,6 @@ function app(): App
 function config(string $key, ?string $default = null): string
 {
     $config = new Config();
-
-    return $config->get($key, $default);
+    $option = $config->get($key, $default);
+    return $option;
 }

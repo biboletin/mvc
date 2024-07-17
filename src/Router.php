@@ -6,12 +6,12 @@ use Biboletin\Mvc\Core\BaseRouter;
 use Biboletin\Mvc\Core\Exceptions\InvalidHttpMethodException;
 
 /**
- *
+ * Router class
  */
 class Router extends BaseRouter
 {
     /**
-     *
+     * Router constructor.
      */
     public function __construct()
     {
@@ -19,26 +19,25 @@ class Router extends BaseRouter
     }
 
     /**
+     * Set get route
+     *
      * @param string $path
      * @param array  $class
      *
      * @return void
      */
-    public function get(string $path = '', array $class = []): void
+    public function get(string $path, array $class): void
     {
-        try {
-            $this->set(BaseRouter::GET_METHOD, $path, $class);
-        } catch (InvalidHttpMethodException $exception) {
-            echo $exception->getMessage();
-        }
+        $this->set(BaseRouter::GET_METHOD, $path, $class);
     }
 
     /**
+     * Set post route
+     *
      * @param string $path
      * @param array  $class
      *
      * @return void
-     * @throws InvalidHttpMethodException
      */
     public function post(string $path = '', array $class = []): void
     {
@@ -46,6 +45,8 @@ class Router extends BaseRouter
     }
 
     /**
+     * Set put route
+     *
      * @param string $path
      * @param array  $class
      *
@@ -58,6 +59,8 @@ class Router extends BaseRouter
     }
 
     /**
+     * Set delete route
+     *
      * @param string $path
      * @param array  $class
      *

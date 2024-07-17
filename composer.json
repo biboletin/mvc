@@ -7,16 +7,19 @@
         "psr-4": {
             "Biboletin\\Mvc\\": "src/",
             "Biboletin\\Mvc\\Core\\": "src/Core/",
+            "Biboletin\\Mvc\\Core\\DIContainer\\": "src/Core/DIContainer",
             "Biboletin\\Mvc\\Core\\Behaviours\\": "src/Core/Behaviours/",
             "Biboletin\\Mvc\\Core\\Creators\\": "src/Core/Creators/",
             "Biboletin\\Mvc\\Core\\Structurals\\": "src/Core/Structurals/",
+            "Biboletin\\Mvc\\Core\\Interfaces\\": "src/Core/Interfaces/",
             "Biboletin\\Mvc\\Helpers\\": "src/Helpers/",
             "App\\Controllers\\": "app/Controllers/",
             "App\\Models\\": "app/Models/",
             "App\\Views\\": "app/Views/"
         },
         "files": [
-            "src/functions/functions.php"
+            "src/functions/functions.php",
+            "src/constants/constants.php"
         ]
     },
     "authors": [
@@ -28,5 +31,8 @@
     "minimum-stability": "dev",
     "require": {
         "vlucas/phpdotenv": "5.4.x-dev"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "7.1.x-dev"
     }
 }

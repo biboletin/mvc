@@ -8,6 +8,8 @@ class ErrorHandler
     {
     }
 
+
+
     public function __destruct()
     {
     }

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="">
+        <?php
+            Html::input(
+                'text', 
+                'some string', 
+                [
+                    'name' => 'user_name',
+                    'id' => 'user_name',
+                    'data-user-id' => '123',
+                ]
+            );
+        ?>
+    </form>
+</body>
+</html>

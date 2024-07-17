@@ -3,7 +3,7 @@
 namespace Biboletin\Mvc\Core;
 
 /**
- *
+ * Application class
  */
 abstract class Application
 {
@@ -13,20 +13,24 @@ abstract class Application
      * @var string
      */
     private const VERSION = '0.0.0';
+
     /**
      * Application name
      *
      * @var string
      */
     private string $name = '';
+
     /**
-     *
+     * Application constructor
      */
     public function __construct()
     {
     }
 
     /**
+     * Initialize application
+     *
      * @return void
      */
     public function init(): void
@@ -34,6 +38,8 @@ abstract class Application
     }
 
     /**
+     * Run application
+     *
      * @return void
      */
     public function run(): void
@@ -41,6 +47,8 @@ abstract class Application
     }
 
     /**
+     * Register application
+     *
      * @return void
      */
     public function register(): void

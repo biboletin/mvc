@@ -33,4 +33,9 @@ class Html
     {
         return '';
     }
+
+    public static function csrf(): string
+    {
+        return '';
+    }
 }

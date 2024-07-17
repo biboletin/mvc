@@ -6,13 +6,13 @@ use Biboletin\Mvc\Controller;
 
 class IndexController extends Controller
 {
-    public function home()
+    public function index(): void
     {
-        return 'Index';
+        echo 'Index page';
     }
 
-    public function contacts()
+    public function contacts(): void
     {
-        return 'Contacts';
+        echo 'Contacts';
     }
 }

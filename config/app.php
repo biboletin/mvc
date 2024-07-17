@@ -6,4 +6,5 @@
 
 return [
     'name' => 'test',
+    'debug' => true,
 ];

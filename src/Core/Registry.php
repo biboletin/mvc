@@ -2,10 +2,12 @@
 
 namespace Biboletin\Mvc\Core;
 
+use ArrayAccess;
+
 /**
- *
+ * Registry class
  */
-class Registry
+class Registry implements ArrayAccess
 {
     /**
      * Registry container
@@ -44,10 +46,7 @@ class Registry
      */
     public function get(string $key, $default = null): mixed
     {
-        if (!isset($this->registry[$key])) {
-            return $default ?? null;
-        }
-        return $this->registry[$key];
+        return $this->registry[$key] ?? $default;
     }
 
     /**
@@ -59,10 +58,7 @@ class Registry
      */
     public function contains(string $key): bool
     {
-        if (!isset($this->registry[$key])) {
-            return false;
-        }
-        return true;
+        return isset($this->registry[$key]);
     }
 
     /**
@@ -74,15 +70,35 @@ class Registry
      */
     public function remove(string $key): bool
     {
-        if (!isset($this->registry[$key])) {
+        if (isset($this->registry[$key]) === false) {
             return false;
         }
         unset($this->registry[$key]);
         return true;
     }
 
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->registry[$offset]);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        return $this->registry[$offset];
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->registry[$offset] = $value;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->registry[$offset]);
+    }
+
     /**
-     *
+     * Destructor
      */
     public function __destruct()
     {

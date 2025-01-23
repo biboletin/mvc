@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# Check if request doesn't point to actual dir, file or symlink
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-l
+
+
+# http://localhost/foo/bar => http://localhost/index.php?request=foo/bar
+RewriteRule ^(.+)$ index.php?request=$1 [QSA,L]

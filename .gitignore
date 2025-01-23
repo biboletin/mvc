@@ -1,0 +1,13 @@
+.code/
+.idea/
+.git/
+node_modules/
+vendor/
+storage/cache/
+storage/logs/
+storage/session/
+storage/tmp/
+
+.env
+.php-cs-fixer.cache
+.composer.lock

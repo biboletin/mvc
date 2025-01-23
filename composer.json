@@ -1,0 +1,31 @@
+{
+    "name": "bibo/mvc",
+    "description": "Simple MVC framework with many functionalities",
+    "type": "library",
+    "license": "MIT",
+    "version": "1.0.0",
+    "keywords": ["framework", "php", "mvc", "bibo", "biboletin"],
+    "autoload": {
+        "psr-4": {
+            "Bibo\\Mvc\\": "src/",
+            "Bibo\\App\\Controllers\\": "app/Controllers/",
+            "Bibo\\App\\Models\\": "app/Models/"
+        },
+        "files":[
+            "src/constants/constants.php",
+            "src/functions/functions.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "biboletin",
+            "email": "shady_fan@abv.bg"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "require-dev": {
+        "symfony/var-dumper": "7.3.x-dev",
+        "phpunit/phpunit": "^11"
+    }
+}

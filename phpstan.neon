@@ -1,0 +1,24 @@
+parameters:
+    level: 8
+    paths:
+        - src
+        - config
+        - routes
+        - install
+        - app/Controllers
+        - app/Models
+        - app/Services
+        - public/index.php
+    earlyTerminatingMethodCalls:
+        Nette\Application\UI\Presenter:
+            - redirect
+            - redirectUrl
+            - sendJson
+            - sendResponse
+    excludePaths:
+        - vendor/*
+        - tmp/*
+        - tests/tmp/*
+        - tests/*/Example*.php
+        - tests/*/console_application_loader.php
+        - tests/*/data/*

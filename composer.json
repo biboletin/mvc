@@ -39,7 +39,7 @@
             "Bibo\\Core\\Request\\": "src/Core/Request/",
             "Bibo\\Core\\Response\\": "src/Core/Response/",
             "Bibo\\Core\\Rest\\": "src/Core/Rest/",
-            "Bibo\\Core\\Router\\": "src/Core/Router/",
+            "Bibo\\Core\\BaseRouter\\": "src/Core/Router/",
             "Bibo\\Core\\Security\\": "src/Core/Security/",
             "Bibo\\Core\\Service\\": "src/Core/Service/",
             "Bibo\\Core\\Session\\": "src/Core/Session/",
@@ -52,7 +52,8 @@
             "Bibo\\Core\\Utilities\\": "src/Core/Utilities/",
             "Bibo\\Core\\View\\": "src/Core/View/",
             "Bibo\\Core\\Worker\\": "src/Core/Worker/",
-            "Bibo\\Core\\Wrapper\\": "src/Core/Wrapper/"
+            "Bibo\\Core\\Wrapper\\": "src/Core/Wrapper/",
+            "Tests\\": "tests/unit/"
         },
         "files":[
             "src/constants/constants.php",
@@ -66,9 +67,19 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
     "require-dev": {
         "symfony/var-dumper": "7.3.x-dev",
         "phpunit/phpunit": "^11"
+    },
+    "require": {
+        "psr/log": "^3.0@dev",
+        "psr/http-message": "^2.0@dev",
+        "psr/container": "^2.0@dev",
+        "psr/http-factory": "^1.1",
+        "psr/http-server-handler": "^1.0@dev",
+        "psr/simple-cache": "^3.0@dev",
+        "psr/clock": "dev-master",
+        "psr/http-server-middleware": "^1.0@dev",
+        "psr/http-client": "^1.0@dev"
     }
 }

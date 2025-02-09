@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\BaseRouter;
+namespace Bibo\Core\Router;
 
 use Bibo\Core\Interfaces\RouterInterface;
 
@@ -188,6 +188,16 @@ class BaseRouter implements RouterInterface
         if ($lastRouteKey !== null) {
             $this->routes[$lastRouteKey]['name'] = $name;
         }
+    }
+
+    /**
+     * Get routes
+     *
+     * @return array
+     */
+    public function getRoutes(): array
+    {
+        return $this->routes;
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Bibo\Core\Facades;
 
-use Bibo\Core\BaseRouter\BaseRouter;
+use Bibo\Core\Router\BaseRouter;
 
 /**
  * Facade route class
@@ -142,6 +142,16 @@ class Route
     public static function name(string $name): void
     {
         self::getInstance()->name($name);
+    }
+
+    /**
+     * Get routes
+     *
+     * @return array
+     */
+    public static function getRoutes(): array
+    {
+        return self::getInstance()->getRoutes();
     }
 
     /**

@@ -7,7 +7,6 @@ parameters:
         - install
         - app/Controllers
         - app/Models
-        - app/Services
         - public/index.php
     earlyTerminatingMethodCalls:
         Nette\Application\UI\Presenter:

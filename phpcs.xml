@@ -10,10 +10,10 @@
     <file>install</file>
     <file>app/Controllers</file>
     <file>app/Models</file>
-    <file>app/Services</file>
     <file>public/index.php</file>
     <file>routes</file>
-    <exclude-pattern type="relative">*/vendor/**/tmp/*</exclude-pattern>
+    <file>tests</file>
+    <exclude-pattern type="relative">*/vendor/**/tmp/**/tests/*</exclude-pattern>
 	<rule ref="Internal.Tokenizer.Exception">
 		<type>error</type>
 	</rule>

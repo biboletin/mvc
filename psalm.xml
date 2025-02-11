@@ -24,7 +24,6 @@
 		<directory name="routes" />
 		<directory name="app/Controllers" />
 		<directory name="app/Models" />
-		<directory name="app/Services" />
 
 		<file name="public/index.php" />
 		<ignoreFiles>

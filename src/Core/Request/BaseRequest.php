@@ -3,11 +3,9 @@
 namespace Bibo\Core\Request;
 
 use InvalidArgumentException;
-use Psr\Http\Message\MessageInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriInterface;
 
 /**
  * Base request class
@@ -249,7 +247,7 @@ class BaseRequest implements ServerRequestInterface
     public function withHeader(string $name, $value): static
     {
         $clone = clone $this;
-        $clone->headers[$name] = $value;
+        $clone->headers[strtolower($name)] = [$value];
 
         return $clone;
     }
@@ -295,7 +293,7 @@ class BaseRequest implements ServerRequestInterface
      *
      * @return static
      */
-    public function withProtocolVersion(string $version): MessageInterface
+    public function withProtocolVersion(string $version): static
     {
         $clone = clone $this;
         $clone->protocolVersion = $version;
@@ -384,7 +382,7 @@ class BaseRequest implements ServerRequestInterface
      * @return static
      * @throws InvalidArgumentException for invalid header names or values.
      */
-    public function withAddedHeader(string $name, $value): MessageInterface
+    public function withAddedHeader(string $name, $value): static
     {
         $normalized = strtolower($name);
         $value = is_array($value) ? $value : [$value];
@@ -412,7 +410,7 @@ class BaseRequest implements ServerRequestInterface
      *
      * @return static
      */
-    public function withoutHeader(string $name): MessageInterface
+    public function withoutHeader(string $name): static
     {
         // Normalize the header name to lowercase (PSR-7 standard)
         $normalized = strtolower($name);
@@ -441,7 +439,7 @@ class BaseRequest implements ServerRequestInterface
      * @return static
      * @throws InvalidArgumentException When the body is not valid.
      */
-    public function withBody(StreamInterface $body): MessageInterface
+    public function withBody(StreamInterface $body): static
     {
         $clone = clone $this;
         $clone->body = $body;
@@ -504,7 +502,7 @@ class BaseRequest implements ServerRequestInterface
      *
      * @return static
      */
-    public function withRequestTarget(string $requestTarget): RequestInterface
+    public function withRequestTarget(string $requestTarget): static
     {
         // Parse the request target to extract path and query string
         $parts = parse_url($requestTarget);

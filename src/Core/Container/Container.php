@@ -14,6 +14,7 @@ class Container implements ContainerInterface
 {
     /**
      * Services stored in the container
+     *
      * @var array
      */
     private array $services = [];
@@ -35,7 +36,7 @@ class Container implements ContainerInterface
     /**
      * Get a service from the container
      *
-     * @param string $id
+     * @param  string $id
      * @return mixed
      * @throws NotFoundExceptionInterface
      */
@@ -52,7 +53,7 @@ class Container implements ContainerInterface
     /**
      * Check if a service exists in the container
      *
-     * @param string $id
+     * @param  string $id
      * @return bool
      */
     public function has(string $id): bool

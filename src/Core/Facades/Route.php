@@ -2,7 +2,9 @@
 
 namespace Bibo\Core\Facades;
 
-use Bibo\Core\Router\BaseRouter;
+use Bibo\Core\BaseRouter\BaseRouter;
+use Exception;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Facade route class
@@ -16,6 +18,10 @@ class Route
      */
     private static ?BaseRouter $instance = null;
 
+    public static function init(BaseRouter $router): void
+    {
+        self::$instance = $router;
+    }
     /**
      * Creates new instance
      *
@@ -100,9 +106,10 @@ class Route
      * @param string $method
      * @param string $uri
      *
-     * @return array|null
+     * @return ResponseInterface
+     * @throws Exception
      */
-    public static function match(string $method, string $uri): ?array
+    public static function match(string $method, string $uri): ResponseInterface
     {
         return self::getInstance()->match($method, $uri);
     }

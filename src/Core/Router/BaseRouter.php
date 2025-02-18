@@ -1,8 +1,12 @@
 <?php
 
-namespace Bibo\Core\Router;
+namespace Bibo\Core\BaseRouter;
 
 use Bibo\Core\Interfaces\RouterInterface;
+use Bibo\Core\Request\Stream;
+use Bibo\Core\Response\BaseResponse;
+use Exception;
+use Psr\Http\Message\ResponseInterface;
 
 use function array_find;
 
@@ -134,15 +138,79 @@ class BaseRouter implements RouterInterface
      * @param string $method
      * @param string $uri
      *
-     * @return array|null
+     * @return ResponseInterface
+     * @throws Exception
      */
-    public function match(string $method, string $uri): ?array
+    public function match(string $method, string $uri): ResponseInterface
     {
-        return array_find(
-            $this->routes,
-            fn (array $route) => $route['method'] === $method && preg_match('#^' . $route['route'] . '$#', $uri)
-        );
+        $method = strtoupper($method);
+
+        foreach ($this->routes as $route) {
+            $routePattern = $this->convertRouteToRegex($route['route']);
+
+            if ($route['method'] === $method && preg_match($routePattern, $uri, $matches)) {
+                // Extract parameters (remove numeric keys from matches)
+                $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+                $handler = $route['handler'];
+
+                // Handle Closure or Callable function
+                if (is_callable($handler)) {
+                    return $this->handleCallable($handler, $params);
+                }
+
+                // Handle Controller Actions [Controller::class, 'method']
+                if (is_array($handler) && count($handler) === 2 && is_string($handler[0]) && is_string($handler[1])) {
+                    return $this->handleController($handler, $params);
+                }
+            }
+        }
+
+        throw new Exception('Route not found', 404);
     }
+
+    private function convertRouteToRegex(string $route): string
+    {
+        return "#^" . preg_replace('/\{(\w+)\}/', '(?P<$1>[^/]+)', $route) . "$#";
+    }
+
+
+    /**
+     * Handles callables and wraps responses properly
+     */
+    private function handleCallable(callable $handler, array $params = []): ResponseInterface
+    {
+        return call_user_func_array($handler, $params);
+    }
+
+    private function handleController(array $handler, array $params = []): ResponseInterface
+    {
+        [$controller, $method] = $handler;
+
+        if (!class_exists($controller)) {
+            throw new Exception("Controller $controller not found", 500);
+        }
+
+        $instance = new $controller();
+
+        if (!method_exists($instance, $method)) {
+            throw new Exception("Method $method not found in $controller", 500);
+        }
+
+        return call_user_func_array([$instance, $method], $params);
+    }
+
+
+    /**
+     * Creates a stream from a string
+     */
+    private function createStream(string $content): Stream
+    {
+        $stream = new Stream(fopen('php://temp', 'r+'));
+        $stream->write($content);
+        $stream->rewind();
+        return $stream;
+    }
+
 
     /**
      * Add middleware

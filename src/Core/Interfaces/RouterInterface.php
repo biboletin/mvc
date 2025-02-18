@@ -2,6 +2,8 @@
 
 namespace Bibo\Core\Interfaces;
 
+use Psr\Http\Message\ResponseInterface;
+
 /**
  * BaseRouter interface
  */
@@ -63,9 +65,9 @@ interface RouterInterface
      * @param string $method
      * @param string $uri
      *
-     * @return array|null
+     * @return ResponseInterface
      */
-    public function match(string $method, string $uri): ?array;
+    public function match(string $method, string $uri): ResponseInterface;
 
     /**
      * Add middleware

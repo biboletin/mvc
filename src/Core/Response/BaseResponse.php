@@ -46,16 +46,24 @@ class BaseResponse implements ResponseInterface
      * Status phrases
      */
     private const array STATUS_PHRASES = [
+        100 => 'Continue',
+        101 => 'Switching Protocols',
         200 => 'OK',
         201 => 'Created',
+        202 => 'Accepted',
         204 => 'No Content',
+        301 => 'Moved Permanently',
         302 => 'Found',
         400 => 'Bad Request',
         401 => 'Unauthorized',
         403 => 'Forbidden',
         404 => 'Not Found',
-        500 => 'Internal Server Error'
+        405 => 'Method Not Allowed',
+        500 => 'Internal Server Error',
+        502 => 'Bad Gateway',
+        503 => 'Service Unavailable'
     ];
+
 
     /**
      * Constructor
@@ -153,7 +161,8 @@ class BaseResponse implements ResponseInterface
     public function withHeader(string $name, $value): static
     {
         $clone = clone $this;
-        $clone->headers[strtolower($name)] = (array) $value;
+        $clone->headers[strtolower($name)] = is_array($value) ? array_values($value) : [$value];
+
         return $clone;
     }
 
@@ -170,6 +179,7 @@ class BaseResponse implements ResponseInterface
         $clone = clone $this;
         $normalized = strtolower($name);
         $clone->headers[$normalized] = array_merge($this->headers[$normalized] ?? [], (array) $value);
+
         return $clone;
     }
 
@@ -265,12 +275,20 @@ class BaseResponse implements ResponseInterface
 
     public function send(): void
     {
+        if (headers_sent()) {
+            throw new \RuntimeException('Headers already sent');
+        }
+
         http_response_code($this->getStatusCode());
 
-        foreach ($this->getHeaders() ?? [] as $name => $values) {
+        foreach ($this->getHeaders() as $name => $values) {
             foreach ($values as $value) {
                 header($name . ': ' . $value, false);
             }
+        }
+
+        if ($this->hasHeader('Location')) {
+            exit(); // Stop execution for redirects
         }
 
         $body = $this->getBody();

@@ -3,35 +3,35 @@
 namespace Bibo\Core\Response;
 
 use Bibo\Core\Request\Stream;
-use Bibo\Core\Response\BaseResponse;
-use Psr\Http\Message\StreamInterface;
+use JsonException;
 use JsonSerializable;
 
 /**
  * Handles JSON responses
  */
-class JsonResponseHandler extends BaseResponse
+class JsonResponse extends BaseResponse
 {
     /**
      * Constructor
      *
-     * @param mixed                     $data
-     * @param int                  $statusCode
-     * @param array                $headers
-     * @param StreamInterface|null $body
+     * @param mixed $data
+     * @param int   $statusCode
+     * @param array $headers
+     *
+     * @throws JsonException
      */
-    public function __construct($data = null, int $statusCode = 200, array $headers = [], ?StreamInterface $body = null)
+    public function __construct($data = null, int $statusCode = 200, array $headers = [])
     {
-        if ($body === null) {
-            if ($data instanceof JsonSerializable) {
-                $data = $data->jsonSerialize();
-            }
-            $body = new Stream(fopen('php://temp', 'r+'));
-            $body->write(json_encode($data));
-            $body->rewind();
+        if ($data instanceof JsonSerializable) {
+            $data = $data->jsonSerialize();
         }
 
-        $headers['Content-Type'] = ['application/json'];
+        $body = new Stream(fopen('php://temp', 'r+'));
+        $body->write(json_encode($data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
+        $body->rewind();
+
+
+        $headers['Content-Type'] = 'application/json';
 
         parent::__construct($statusCode, $headers, $body);
     }
@@ -42,6 +42,7 @@ class JsonResponseHandler extends BaseResponse
      * @param $data
      *
      * @return self
+     * @throws JsonException
      */
     public function setData($data): self
     {
@@ -50,7 +51,7 @@ class JsonResponseHandler extends BaseResponse
         }
 
         $body = new Stream(fopen('php://temp', 'r+'));
-        $body->write(json_encode($data));
+        $body->write(json_encode($data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
         $body->rewind();
 
         return $this->withBody($body);
@@ -58,6 +59,8 @@ class JsonResponseHandler extends BaseResponse
 
     public function send(): void
     {
+        http_response_code($this->getStatusCode()); // Ensure proper HTTP status
+
         foreach ($this->getHeaders() as $name => $values) {
             foreach ($values as $value) {
                 header($name . ': ' . $value, true);

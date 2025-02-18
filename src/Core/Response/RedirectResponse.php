@@ -4,7 +4,7 @@ namespace Bibo\Core\Response;
 
 use Bibo\Core\Response\BaseResponse;
 
-class RedirectResponseHandler extends BaseResponse
+class RedirectResponse extends BaseResponse
 {
     public function __construct(string $url, int $statusCode = 200, array $headers = [])
     {

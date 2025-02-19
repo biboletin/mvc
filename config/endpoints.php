@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Endpoints configuration
+ */
+
 return [
     'system' => [
         'updates' => 'ftp://example.com',

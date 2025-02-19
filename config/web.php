@@ -1,5 +1,7 @@
 <?php
 
-return [
-    'web' => true,
-];
+/**
+ * Web configuration
+ */
+
+return [];

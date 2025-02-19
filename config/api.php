@@ -1,6 +1,16 @@
 <?php
 
+/**
+ * Default configuration for API
+ */
+
 return [
-    'weather_api_key' => '123',
-    'news_api_key' => '456',
+    'redirect' => [
+        'class' => 'Biboletin\Response\RedirectResponse',
+        'arguments' => [
+            'url' => 'http://example.com',
+            'statusCode' => 200,
+            'headers' => []
+        ]
+    ]
 ];

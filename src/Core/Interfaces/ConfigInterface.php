@@ -1,13 +1,11 @@
 <?php
 
-namespace Bibo\Core\Config;
-
-use Bibo\Core\Interfaces\ConfigInterface;
+namespace Bibo\Core\Interfaces;
 
 /**
- * Config
+ * Config Interface
  */
-class Config implements ConfigInterface
+interface ConfigInterface
 {
     /**
      * Get a value from the config
@@ -19,10 +17,7 @@ class Config implements ConfigInterface
      *
      * @return mixed
      */
-    public function get(string $key, ?string $default = null): mixed
-    {
-        // TODO: Implement get() method.
-    }
+    public function get(string $key, ?string $default = null): mixed;
 
     /**
      * Set a value in the config
@@ -38,10 +33,7 @@ class Config implements ConfigInterface
      *
      * @return void
      */
-    public function set(string $key, $value): void
-    {
-        // TODO: Implement set() method.
-    }
+    public function set(string $key, $value): void;
 
     /**
      * Check if a key exists in the config
@@ -50,20 +42,14 @@ class Config implements ConfigInterface
      *
      * @return bool
      */
-    public function has(string $key): bool
-    {
-        // TODO: Implement has() method.
-    }
+    public function has(string $key): bool;
 
     /**
      * Get all the values from the config
      *
      * @return array
      */
-    public function all(): array
-    {
-        // TODO: Implement all() method.
-    }
+    public function all(): array;
 
     /**
      * Load a config file
@@ -72,10 +58,7 @@ class Config implements ConfigInterface
      *
      * @return void
      */
-    public function load(string $file): void
-    {
-        // TODO: Implement load() method.
-    }
+    public function load(string $file): void;
 
     /**
      * Save the config to a file
@@ -84,10 +67,7 @@ class Config implements ConfigInterface
      *
      * @return void
      */
-    public function save(string $file): void
-    {
-        // TODO: Implement save() method.
-    }
+    public function save(string $file): void;
 
     /**
      * Merge an array into the config
@@ -96,10 +76,7 @@ class Config implements ConfigInterface
      *
      * @return void
      */
-    public function merge(array $config): void
-    {
-        // TODO: Implement merge() method.
-    }
+    public function merge(array $config): void;
 
     /**
      * Merge a file into the config
@@ -108,10 +85,7 @@ class Config implements ConfigInterface
      *
      * @return void
      */
-    public function mergeFile(string $file): void
-    {
-        // TODO: Implement mergeFile() method.
-    }
+    public function mergeFile(string $file): void;
 
     /**
      * Remove a key from the config
@@ -120,30 +94,21 @@ class Config implements ConfigInterface
      *
      * @return void
      */
-    public function remove(string $key): void
-    {
-        // TODO: Implement remove() method.
-    }
+    public function remove(string $key): void;
 
     /**
      * Parse the config from an ini file
      *
      * @return void
      */
-    public function parseFromIni(): void
-    {
-        // TODO: Implement parseFromIni() method.
-    }
+    public function parseFromIni(): void;
 
     /**
      * Parse the config from database config settings
      *
      * @return void
      */
-    public function parseFromDb(): void
-    {
-        // TODO: Implement parseFromDb() method.
-    }
+    public function parseFromDb(): void;
 
     /**
      * Create a constant from the config
@@ -153,8 +118,5 @@ class Config implements ConfigInterface
      *
      * @return void
      */
-    public function toConstant(): void
-    {
-        // TODO: Implement toConstant() method.
-    }
+    public function toConstant(): void;
 }

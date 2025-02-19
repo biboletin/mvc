@@ -1,9 +1,15 @@
 <?php
 
+/**
+ * Cookies configuration
+ */
+
 return [
-    'duration' => '',
-    'domain' => '',
-    'path' => '',
-    'secure' => '',
-    'prefix' => '',
+    'name' => 'ExampleCookie',
+    'expires' => 3600,
+    'path' => '/',
+    'domain' => null,
+    'secure' => false,
+    'httponly' => true,
+    'samesite' => 'Lax',
 ];

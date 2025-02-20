@@ -9,4 +9,4 @@ RewriteCond %{REQUEST_FILENAME} !-l
 # http://localhost/foo/bar => http://localhost/index.php?request=foo/bar
 RewriteRule ^(.+)$ index.php?request=$1 [QSA,L]
 
-php_value pcre.jit = 0
+php_value pcre.jit 0

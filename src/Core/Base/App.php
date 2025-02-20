@@ -49,6 +49,7 @@ class App
      * Run app
      *
      * @return void
+     * @throws JsonException
      */
     public function run(): void
     {

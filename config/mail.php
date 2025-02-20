@@ -5,14 +5,38 @@
  */
 
 return [
-    'driver' => 'smtp',
-    'host' => 'smtp.example.com',
-    'port' => 587,
-    'username' => '',
-    'password' => '',
-    'encryption' => 'tls',
-    'from' => [
-        'address' => '',
-        'name' => '',
+
+    'mail' => [
+        /**
+         * Mail driver
+         */
+        'driver' => 'smtp',
+        /**
+         * Mail host
+         */
+        'host' => 'smtp.example.com',
+        /**
+         * Mail port
+         */
+        'port' => 587,
+        /**
+         * Mail username
+         */
+        'username' => '',
+        /**
+         * Mail password
+         */
+        'password' => '',
+        /**
+         * Mail encryption
+         */
+        'encryption' => 'tls',
+        /**
+         * Mail from
+         */
+        'from' => [
+            'address' => '',
+            'name' => '',
+        ],
     ],
 ];

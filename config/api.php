@@ -5,6 +5,19 @@
  */
 
 return [
+    /**
+     * API version
+     */
+    'api' => [
+        'version' => '1.0',
+        'prefix' => '/api',
+        'middleware' => [
+            'Biboletin\Middleware\ExampleMiddleware'
+        ]
+    ],
+    /**
+     * API response
+     */
     'redirect' => [
         'class' => 'Biboletin\Response\RedirectResponse',
         'arguments' => [
@@ -12,5 +25,5 @@ return [
             'statusCode' => 200,
             'headers' => []
         ]
-    ]
+    ],
 ];

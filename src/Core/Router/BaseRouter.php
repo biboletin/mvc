@@ -170,7 +170,7 @@ class BaseRouter implements RouterInterface
 
     private function convertRouteToRegex(string $route): string
     {
-        return "#^" . preg_replace('/\{(\w+)\}/', '(?P<$1>[^/]+)', $route) . "$#";
+        return '#^' . preg_replace('/\{(\w+)\}/', '(?P<$1>[^/]+)', $route) . '$#';
     }
 
 

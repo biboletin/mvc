@@ -6,7 +6,10 @@ use Bibo\Core\Interfaces\RouterInterface;
 use Bibo\Core\Request\Stream;
 use Bibo\Core\Response\BaseResponse;
 use Exception;
+use JsonException;
 use Psr\Http\Message\ResponseInterface;
+use Bibo\Core\Response\HtmlResponse;
+use Bibo\Core\Response\JsonResponse;
 
 use function array_find;
 
@@ -176,11 +179,29 @@ class BaseRouter implements RouterInterface
 
     /**
      * Handles callables and wraps responses properly
+     *
+     * @throws JsonException
      */
     private function handleCallable(callable $handler, array $params = []): ResponseInterface
     {
-        return call_user_func_array($handler, $params);
+        ob_start(); // Capture echoed output
+        $response = call_user_func_array($handler, $params);
+        $output = ob_get_clean(); // Get the output
+
+        // If handler returns a ResponseInterface, return it
+        if ($response instanceof ResponseInterface) {
+            return $response;
+        }
+
+        // If handler echoes output, wrap it in a Response
+        if (!empty($output)) {
+            return new HtmlResponse($output); // Ensure you have an HtmlResponse class
+        }
+
+        // Default to an empty JSON response if nothing is returned
+        return new JsonResponse(['message' => 'No content'], 200);
     }
+
 
     private function handleController(array $handler, array $params = []): ResponseInterface
     {

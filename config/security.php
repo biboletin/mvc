@@ -7,40 +7,40 @@
 return [
 
     'security' => [
-        /**
+        /*
          * Encryption key
          */
         'key' => 'your-secret-key',
-        /**
+        /*
          * Encryption cipher
          */
         'cipher' => 'AES-256-CBC',
-        /**
+        /*
          * Hash algorithm
          */
         'hash' => 'sha256',
-        /**
+        /*
          * Hash key
          */
         'hash_key' => 'your-hash-key',
-        /**
+        /*
          * Hash algo
          */
         'hash_algo' => 'sha256',
-        /**
+        /*
          * Hash algorithm options
          */
         'hash_options' => [
             'cost' => 12,
         ],
-        /**
+        /*
          * CSRF token
          */
         'csrf' => [
             'key' => 'csrf-token',
             'expires' => 3600,
         ],
-        /**
+        /*
          * CORS
          */
         'cors' => [
@@ -51,20 +51,20 @@ return [
             'exposed' => [],
             'max_age' => 0,
         ],
-        /**
+        /*
          * JWT
          */
         'jwt' => [
             'enabled' => false,
         ],
-        /**
+        /*
          * Recaptcha
          */
         'recaptcha' => [
             'enabled' => false,
             'site_key' => '',
         ],
-        /**
+        /*
          * Encryption
          */
         'encryption' => [
@@ -72,7 +72,7 @@ return [
             'key' => 'your-encryption-key',
             'cipher' => 'AES-256-CBC',
         ],
-        /**
+        /*
          * Hashids
          */
         'hashids' => [
@@ -80,7 +80,7 @@ return [
             'salt' => 'your-salt',
             'length' => 10,
         ],
-        /**
+        /*
          * Password
          */
         'password' => [
@@ -89,14 +89,14 @@ return [
                 'cost' => 12,
             ],
         ],
-        /**
+        /*
          * OTP
          */
         'otp' => [
             'length' => 6,
             'ttl' => 300,
         ],
-        /**
+        /*
          * Auth
          */
         'auth' => [
@@ -113,15 +113,15 @@ return [
                 'cost' => 12,
             ],
         ],
-        /**
+        /*
          * Security
          */
         'session' => [],
-        /**
+        /*
          * Cookies
          */
         'cookies' => [],
-        /**
+        /*
          * Security headers
          */
         'headers' => [
@@ -131,7 +131,7 @@ return [
             'referrer-policy' => 'no-referrer',
             'feature-policy' => '',
         ],
-        /**
+        /*
          * Content Security Policy
          */
         'content_security_policy' => [
@@ -163,7 +163,7 @@ return [
                 'report-to' => '',
             ],
         ],
-        /**
+        /*
          * Content Security Policy report
          */
         'hsts' => [
@@ -172,14 +172,14 @@ return [
             'include_subdomains' => false,
             'preload' => false,
         ],
-        /**
+        /*
          * Content Security Policy report
          */
         'referrer_policy' => [
             'enabled' => false,
             'policy' => 'no-referrer',
         ],
-        /**
+        /*
          * Feature Policy
          */
         'feature_policy' => [
@@ -206,7 +206,7 @@ return [
                 'xr-spatial-tracking' => "'none'",
             ],
         ],
-        /**
+        /*
          * Expect-CT
          */
         'csp' => [
@@ -238,14 +238,14 @@ return [
                 'report-to' => '',
             ],
         ],
-        /**
+        /*
          * Expect-CT report
          */
         'csp_report' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * Referrer Policy report
          */
         'csp_report_only' => [
@@ -277,91 +277,91 @@ return [
                 'report-to' => '',
             ],
         ],
-        /**
+        /*
          * CSP Policy report
          */
         'csp_report_only_report' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * HSTS report
          */
         'referrer_policy_report' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * Feature Policy report
          */
         'feature_policy_report' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * Security Policy report
          */
         'hsts_report' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * Security Policy
          */
         'security_policy' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * Security Policy report
          */
         'security_policy_report' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * XSS Protection report
          */
         'xss_protection_report' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * Content Type Options report
          */
         'content_type_options_report' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * Frame Options report
          */
         'frame_options_report' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * Expect CT report
          */
         'expect_ct_report' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * X Content Type Options report
          */
         'x_content_type_options_report' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * X Frame Options report
          */
         'x_frame_options_report' => [
             'enabled' => false,
             'report_uri' => '',
         ],
-        /**
+        /*
          * X XSS Protection report
          */
         'x_xss_protection_report' => [

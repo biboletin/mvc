@@ -7,42 +7,42 @@
 return [
 
     'session' => [
-        /**
+        /*
          * Session name
          */
         'name' => 'ExampleSession',
 
-        /**
+        /*
          * Session lifetime
          */
         'lifetime' => 3600,
 
-        /**
+        /*
          * Session path
          */
         'path' => '/',
 
-        /**
+        /*
          * Session domain
          */
         'domain' => null,
 
-        /**
+        /*
          * Session secure flag
          */
         'secure' => false,
 
-        /**
+        /*
          * Session HTTP only flag
          */
         'httponly' => true,
 
-        /**
+        /*
          * Session same site attribute
          */
         'samesite' => 'Lax',
 
-        /**
+        /*
          * Session encryption
          */
         'encryption' => [
@@ -51,7 +51,7 @@ return [
             'cipher' => 'AES-256-CBC',
         ],
 
-        /**
+        /*
          * Session hashids
          */
         'hashids' => [
@@ -60,7 +60,7 @@ return [
             'length' => 10,
         ],
 
-        /**
+        /*
          * Session password
          */
         'password' => [
@@ -70,7 +70,7 @@ return [
             ],
         ],
 
-        /**
+        /*
          * Session database
          */
         'database' => [
@@ -79,7 +79,7 @@ return [
             'table' => 'sessions',
         ],
 
-        /**
+        /*
          * Session cache
          */
         'cache' => [
@@ -89,7 +89,7 @@ return [
             'ttl' => 3600,
         ],
 
-        /**
+        /*
          * Session CSRF
          */
         'csrf' => [
@@ -97,7 +97,7 @@ return [
             'expires' => 3600,
         ],
 
-        /**
+        /*
          * Session CORS
          */
         'cors' => [
@@ -109,14 +109,14 @@ return [
             'max_age' => 0,
         ],
 
-        /**
+        /*
          * Session JWT
          */
         'jwt' => [
             'enabled' => false,
         ],
 
-        /**
+        /*
          * Session recaptcha
          */
         'recaptcha' => [
@@ -124,7 +124,7 @@ return [
             'site_key' => '',
         ],
 
-        /**
+        /*
          * Session auth
          */
         'auth' => [
@@ -142,12 +142,12 @@ return [
             ],
         ],
 
-        /**
+        /*
          * Session cookies
          */
         'cookies' => [],
 
-        /**
+        /*
          * Session middleware
          */
         'middleware' => [
@@ -159,7 +159,7 @@ return [
             ]
         ],
 
-        /**
+        /*
          * Session redirect
          */
         'redirect' => [

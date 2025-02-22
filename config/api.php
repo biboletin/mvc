@@ -5,7 +5,7 @@
  */
 
 return [
-    /**
+    /*
      * API version
      */
     'api' => [
@@ -15,7 +15,7 @@ return [
             'Biboletin\Middleware\ExampleMiddleware'
         ]
     ],
-    /**
+    /*
      * API response
      */
     'redirect' => [

@@ -2,10 +2,9 @@
 
 namespace Bibo\Core\Container;
 
+use Exception;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\Container\ContainerExceptionInterface;
-use Exception;
 
 /**
  * Simple Dependency Injection (DI) container implementing PSR-11

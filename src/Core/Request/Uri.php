@@ -2,8 +2,8 @@
 
 namespace Bibo\Core\Request;
 
-use Psr\Http\Message\UriInterface;
 use InvalidArgumentException;
+use Psr\Http\Message\UriInterface;
 
 /**
  * Uri class

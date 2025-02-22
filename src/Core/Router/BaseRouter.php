@@ -4,12 +4,11 @@ namespace Bibo\Core\BaseRouter;
 
 use Bibo\Core\Interfaces\RouterInterface;
 use Bibo\Core\Request\Stream;
-use Bibo\Core\Response\BaseResponse;
+use Bibo\Core\Response\HtmlResponse;
+use Bibo\Core\Response\JsonResponse;
 use Exception;
 use JsonException;
 use Psr\Http\Message\ResponseInterface;
-use Bibo\Core\Response\HtmlResponse;
-use Bibo\Core\Response\JsonResponse;
 
 use function array_find;
 

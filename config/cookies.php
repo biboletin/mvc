@@ -7,36 +7,36 @@
 return [
 
     'cookie' => [
-        /**
+        /*
          * Cookie name
          */
         'name' => 'ExampleCookie',
-        /**
+        /*
          * Cookie expiration time
          */
         'expires' => 3600,
-        /**
+        /*
          * Cookie path
          */
         'path' => '/',
-        /**
+        /*
          * Cookie domain
          */
         'domain' => null,
-        /**
+        /*
          * Cookie secure flag
          */
         'secure' => false,
-        /**
+        /*
          * Cookie HTTP only flag
          */
         'httponly' => true,
-        /**
+        /*
          * Cookie same site attribute
          */
         'samesite' => 'Lax',
 
-        /**
+        /*
          * Cookie encryption
          */
         'encryption' => [
@@ -45,7 +45,7 @@ return [
             'cipher' => 'AES-256-CBC',
         ],
 
-        /**
+        /*
          * Cookie hashids
          */
         'hashids' => [
@@ -54,7 +54,7 @@ return [
             'length' => 10,
         ],
 
-        /**
+        /*
          * Cookie password
          */
         'password' => [
@@ -64,7 +64,7 @@ return [
             ],
         ],
 
-        /**
+        /*
          * Cookie OTP
          */
         'otp' => [
@@ -72,7 +72,7 @@ return [
             'ttl' => 300,
         ],
 
-        /**
+        /*
          * Cookie auth
          */
         'auth' => [
@@ -90,7 +90,7 @@ return [
             ],
         ],
 
-        /**
+        /*
          * Cookie recaptcha
          */
         'recaptcha' => [
@@ -98,7 +98,7 @@ return [
             'site_key' => '',
         ],
 
-        /**
+        /*
          * Cookie csrf
          */
         'csrf' => [
@@ -106,7 +106,7 @@ return [
             'expires' => 3600,
         ],
 
-        /**
+        /*
          * Cookie cors
          */
         'cors' => [
@@ -118,7 +118,7 @@ return [
             'max_age' => 0,
         ],
 
-        /**
+        /*
          * Cookie jwt
          */
         'jwt' => [

@@ -3,13 +3,17 @@
 use Bibo\Core\Facades\Route;
 use Bibo\Core\Response\JsonResponse;
 
-// Route::get('/', function () {
-//     return new JsonResponse(['message' => 'Welcome to Home']);
-// });
-
 Route::get('/', function () {
-    echo 'Hello';
+    return new JsonResponse(['message' => 'Welcome to Home']);
 });
+
+Route::get('/about', function () {
+    return new JsonResponse(['message' => 'Welcome to about']);
+});
+
+// Route::get('/', function () {
+//     echo 'Hello';
+// });
 
 // Route::get('/', function () {
 //     return 'Hello';

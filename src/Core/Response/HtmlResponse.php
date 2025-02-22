@@ -2,8 +2,6 @@
 
 namespace Bibo\Core\Response;
 
-use Psr\Http\Message\ResponseInterface;
-use Bibo\Core\Response\BaseResponse;
 use Bibo\Core\Request\Stream;
 
 /**

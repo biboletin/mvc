@@ -2,9 +2,10 @@
 
 namespace Bibo\Core\BaseRouter;
 
-use Bibo\Core\Interfaces\RouteMatchingStrategy;
-
-class RegexMatchStrategy implements RouteMatchingStrategy
+/**
+ * Regex match routes class
+ */
+class RegexMatchStrategy extends AbstractMatchStrategy
 {
     /**
      * Match regex routes
@@ -18,10 +19,28 @@ class RegexMatchStrategy implements RouteMatchingStrategy
     public function match(string $method, string $path, array $routes): ?array
     {
         foreach ($routes as $route) {
-            if ($route['method'] === $method && preg_match($route['path'], $path)) {
-                return $route;
+            $routePattern = $this->convertRouteToRegex($route['route']);
+
+            if ($route['method'] === $method && preg_match($routePattern, $path, $matches)) {
+                return [
+                    'handler' => $route['handler'],
+                    'params' => array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY),
+                ];
             }
         }
+
         return null;
+    }
+
+    /**
+     * Convert route to regex
+     *
+     * @param string $route
+     *
+     * @return string
+     */
+    private function convertRouteToRegex(string $route): string
+    {
+        return '#^' . preg_replace('/\{([\w]+)\}/', '(?P<\1>[^/]+)', $route) . '$#';
     }
 }

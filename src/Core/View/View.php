@@ -18,7 +18,7 @@ class View
         $viewPath = VIEW_PATH . $view . '.php';
 
         if (!file_exists($viewPath)) {
-            throw new RuntimeException("View file '{$view}' not found.");
+            throw new RuntimeException("View file '" . $view . "' not found.");
         }
 
         ob_start(); // Start output buffering
@@ -53,7 +53,7 @@ class View
         return $this->render();
     }
 
-    public function __invoke(): array
+    public function __invoke(): string
     {
         return $this->render();
     }

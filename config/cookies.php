@@ -7,38 +7,53 @@
 return [
 
     'cookie' => [
+
         /*
          * Cookie name
          */
+
         'name' => 'ExampleCookie',
+
         /*
          * Cookie expiration time
          */
+
         'expires' => 3600,
+
         /*
          * Cookie path
          */
+
         'path' => '/',
+
         /*
          * Cookie domain
          */
+
         'domain' => null,
+
         /*
          * Cookie secure flag
          */
+
         'secure' => false,
+
         /*
          * Cookie HTTP only flag
          */
+
         'httponly' => true,
+
         /*
          * Cookie same site attribute
          */
+
         'samesite' => 'Lax',
 
         /*
          * Cookie encryption
          */
+
         'encryption' => [
             'enabled' => false,
             'key' => 'your-encryption-key',
@@ -48,6 +63,7 @@ return [
         /*
          * Cookie hashids
          */
+
         'hashids' => [
             'enabled' => false,
             'salt' => 'your-salt',
@@ -57,6 +73,7 @@ return [
         /*
          * Cookie password
          */
+
         'password' => [
             'algorithm' => PASSWORD_DEFAULT,
             'options' => [
@@ -67,6 +84,7 @@ return [
         /*
          * Cookie OTP
          */
+
         'otp' => [
             'length' => 6,
             'ttl' => 300,
@@ -75,6 +93,7 @@ return [
         /*
          * Cookie auth
          */
+
         'auth' => [
             'enabled' => false,
             'model' => 'App\Models\User',
@@ -93,6 +112,7 @@ return [
         /*
          * Cookie recaptcha
          */
+
         'recaptcha' => [
             'enabled' => false,
             'site_key' => '',
@@ -101,6 +121,7 @@ return [
         /*
          * Cookie csrf
          */
+
         'csrf' => [
             'key' => 'csrf-token',
             'expires' => 3600,
@@ -109,6 +130,7 @@ return [
         /*
          * Cookie cors
          */
+
         'cors' => [
             'enabled' => false,
             'origin' => '*',
@@ -121,6 +143,7 @@ return [
         /*
          * Cookie jwt
          */
+
         'jwt' => [
             'enabled' => false,
         ],

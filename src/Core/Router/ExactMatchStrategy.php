@@ -2,12 +2,13 @@
 
 namespace Bibo\Core\BaseRouter;
 
-use Bibo\Core\Interfaces\RouteMatchingStrategy;
-
-class ExactMatchStrategy implements RouteMatchingStrategy
+/**
+ * Simple route matching class
+ */
+class ExactMatchStrategy extends AbstractMatchStrategy
 {
     /**
-     * Match normal routes
+     * Simple route matching
      *
      * @param string $method
      * @param string $path
@@ -18,7 +19,7 @@ class ExactMatchStrategy implements RouteMatchingStrategy
     public function match(string $method, string $path, array $routes): ?array
     {
         foreach ($routes as $route) {
-            if ($route['method'] === $method && $route['path'] === $path) {
+            if ($route['method'] === $method && $route['route'] === $path) {
                 return $route;
             }
         }

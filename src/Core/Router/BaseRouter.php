@@ -2,6 +2,7 @@
 
 namespace Bibo\Core\BaseRouter;
 
+use Bibo\Core\Interfaces\RouteMatchingStrategyInterface;
 use Bibo\Core\Interfaces\RouterInterface;
 use Bibo\Core\Request\Stream;
 use Bibo\Core\Response\HtmlResponse;
@@ -38,10 +39,18 @@ class BaseRouter implements RouterInterface
     private string $currentRouteGroup = '';
 
     /**
+     * Route strategy
+     *
+     * @var CachedRegexMatchStrategy|RouteMatchingStrategyInterface
+     */
+    private RouteMatchingStrategyInterface|CachedRegexMatchStrategy $strategy;
+
+    /**
      * Constructor
      */
-    public function __construct()
+    public function __construct(?RouteMatchingStrategyInterface $strategy = null)
     {
+        $this->strategy = $strategy ?? new CachedRegexMatchStrategy();
     }
 
     /**
@@ -49,19 +58,20 @@ class BaseRouter implements RouterInterface
      *
      * @param string         $method
      * @param string         $route
-     * @param array|callable $callback
+     * @param array|callable $handler
      *
      * @return void
      */
-    private function add(string $method, string $route, array|callable $callback): void
+    private function add(string $method, string $route, array|callable $handler): void
     {
-        $fullRoute = ($this->currentRouteGroup ? '/' . $this->currentRouteGroup : '')
-        . '/' . trim($route, '/');
-        $this->routes[] = [
-            'method' => $method,
-            'route' => $fullRoute,
-            'handler' => $callback,
-        ];
+        // $fullRoute = ($this->currentRouteGroup ? '/' . $this->currentRouteGroup : '')
+        // . '/' . trim($route, '/');
+        // $this->routes[] = [
+        //     'method' => $method,
+        //     'route' => $fullRoute,
+        //     'handler' => $callback,
+        // ];
+        $this->routes[] = compact('method', 'route', 'handler');
     }
     /**
      * Set GET routes
@@ -149,34 +159,36 @@ class BaseRouter implements RouterInterface
         $method = strtoupper($method);
 
         foreach ($this->routes as $route) {
-            $routePattern = $this->convertRouteToRegex($route['route']);
-
-            if ($route['method'] === $method && preg_match($routePattern, $uri, $matches)) {
-                // Extract parameters (remove numeric keys from matches)
-                $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
-                $handler = $route['handler'];
-
-                // Handle Closure or Callable function
-                if (is_callable($handler)) {
-                    return $this->handleCallable($handler, $params);
-                }
-
-                // Handle Controller Actions [Controller::class, 'method']
-                if (is_array($handler) && count($handler) === 2 && is_string($handler[0]) && is_string($handler[1])) {
-                    return $this->handleController($handler, $params);
+            if ($route['method'] === $method) {
+                if ($this->strategy->matches($route['route'], $uri, $params)) {
+                    return $this->handleRoute($route, $params);
                 }
             }
-
         }
 
         throw new Exception('Route not found', 404);
     }
 
-    private function convertRouteToRegex(string $route): string
+    /**
+     * Handles route
+     *
+     * @throws JsonException
+     * @throws Exception
+     */
+    protected function handleRoute(array $route, array $params = []): ResponseInterface
     {
-        return '#^' . preg_replace('/\{(\w+)}/', '(?P<$1>[^/]+)', $route) . '$#';
-    }
+        $handler = $route['handler'];
 
+        if (is_callable($handler)) {
+            return $this->handleCallable($handler, $params);
+        }
+
+        if (is_array($handler) && count($handler) === 2) {
+            return $this->handleController($handler, $params);
+        }
+
+        throw new Exception('Invalid route handler');
+    }
 
     /**
      * Handles callables and wraps responses properly
@@ -209,6 +221,8 @@ class BaseRouter implements RouterInterface
 
 
     /**
+     * Handle controller action
+     *
      * @throws Exception
      */
     private function handleController(array $handler, array $params = []): ResponseInterface
@@ -216,13 +230,13 @@ class BaseRouter implements RouterInterface
         [$controller, $method] = $handler;
 
         if (!class_exists($controller)) {
-            throw new Exception("Controller $controller not found", 500);
+            throw new Exception('Controller ' . $controller . ' not found', 500);
         }
 
         $instance = new $controller();
 
         if (!method_exists($instance, $method)) {
-            throw new Exception("Method $method not found in $controller", 500);
+            throw new Exception('Method ' . $method . ' not found in ' . $controller, 500);
         }
 
         $response = call_user_func_array([$instance, $method], $params);

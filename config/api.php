@@ -5,9 +5,11 @@
  */
 
 return [
+
     /*
      * API version
      */
+
     'api' => [
         'version' => '1.0',
         'prefix' => '/api',
@@ -15,9 +17,11 @@ return [
             'Biboletin\Middleware\ExampleMiddleware'
         ]
     ],
+
     /*
      * API response
      */
+
     'redirect' => [
         'class' => 'Biboletin\Response\RedirectResponse',
         'arguments' => [

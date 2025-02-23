@@ -7,44 +7,53 @@
 return [
 
     'session' => [
+
         /*
          * Session name
          */
+
         'name' => 'ExampleSession',
 
         /*
          * Session lifetime
          */
+
         'lifetime' => 3600,
 
         /*
          * Session path
          */
+
         'path' => '/',
 
         /*
          * Session domain
          */
+
         'domain' => null,
 
         /*
          * Session secure flag
          */
+
         'secure' => false,
 
         /*
          * Session HTTP only flag
          */
+
         'httponly' => true,
 
         /*
          * Session same site attribute
          */
+
         'samesite' => 'Lax',
 
         /*
          * Session encryption
          */
+
         'encryption' => [
             'enabled' => false,
             'key' => 'your-encryption-key',
@@ -54,6 +63,7 @@ return [
         /*
          * Session hashids
          */
+
         'hashids' => [
             'enabled' => false,
             'salt' => 'your-salt',
@@ -63,6 +73,7 @@ return [
         /*
          * Session password
          */
+
         'password' => [
             'algorithm' => PASSWORD_DEFAULT,
             'options' => [
@@ -73,6 +84,7 @@ return [
         /*
          * Session database
          */
+
         'database' => [
             'enabled' => false,
             'connection' => 'default',
@@ -82,6 +94,7 @@ return [
         /*
          * Session cache
          */
+
         'cache' => [
             'enabled' => false,
             'store' => 'default',
@@ -92,6 +105,7 @@ return [
         /*
          * Session CSRF
          */
+
         'csrf' => [
             'key' => 'csrf-token',
             'expires' => 3600,
@@ -100,6 +114,7 @@ return [
         /*
          * Session CORS
          */
+
         'cors' => [
             'enabled' => false,
             'origin' => '*',
@@ -112,6 +127,7 @@ return [
         /*
          * Session JWT
          */
+
         'jwt' => [
             'enabled' => false,
         ],
@@ -119,6 +135,7 @@ return [
         /*
          * Session recaptcha
          */
+
         'recaptcha' => [
             'enabled' => false,
             'site_key' => '',
@@ -127,6 +144,7 @@ return [
         /*
          * Session auth
          */
+
         'auth' => [
             'enabled' => false,
             'model' => 'App\Models\User',
@@ -145,11 +163,13 @@ return [
         /*
          * Session cookies
          */
+
         'cookies' => [],
 
         /*
          * Session middleware
          */
+
         'middleware' => [
             'session' => [
                 'class' => 'Biboletin\Middleware\SessionMiddleware',
@@ -162,6 +182,7 @@ return [
         /*
          * Session redirect
          */
+
         'redirect' => [
             'class' => 'Biboletin\Response\RedirectResponse',
             'arguments' => [

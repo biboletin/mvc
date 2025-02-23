@@ -6,6 +6,7 @@ use Bibo\Core\Interfaces\RouterInterface;
 use Bibo\Core\Request\Stream;
 use Bibo\Core\Response\HtmlResponse;
 use Bibo\Core\Response\JsonResponse;
+use Bibo\Core\View\View;
 use Exception;
 use JsonException;
 use Psr\Http\Message\ResponseInterface;
@@ -165,6 +166,7 @@ class BaseRouter implements RouterInterface
                     return $this->handleController($handler, $params);
                 }
             }
+
         }
 
         throw new Exception('Route not found', 404);
@@ -172,7 +174,7 @@ class BaseRouter implements RouterInterface
 
     private function convertRouteToRegex(string $route): string
     {
-        return '#^' . preg_replace('/\{(\w+)\}/', '(?P<$1>[^/]+)', $route) . '$#';
+        return '#^' . preg_replace('/\{(\w+)}/', '(?P<$1>[^/]+)', $route) . '$#';
     }
 
 
@@ -192,6 +194,10 @@ class BaseRouter implements RouterInterface
             return $response;
         }
 
+        if (is_string($response)) {
+            return new HtmlResponse($response);
+        }
+
         // If handler echoes output, wrap it in a Response
         if (!empty($output)) {
             return new HtmlResponse($output); // Ensure you have an HtmlResponse class
@@ -202,6 +208,9 @@ class BaseRouter implements RouterInterface
     }
 
 
+    /**
+     * @throws Exception
+     */
     private function handleController(array $handler, array $params = []): ResponseInterface
     {
         [$controller, $method] = $handler;
@@ -216,7 +225,17 @@ class BaseRouter implements RouterInterface
             throw new Exception("Method $method not found in $controller", 500);
         }
 
-        return call_user_func_array([$instance, $method], $params);
+        $response = call_user_func_array([$instance, $method], $params);
+
+        if ($response instanceof JsonResponse) {
+            return $response;
+        }
+
+        if ($response instanceof View) {
+            return new HtmlResponse($response->render());
+        }
+
+        return new HtmlResponse($response);
     }
 
 

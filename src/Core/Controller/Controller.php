@@ -2,17 +2,21 @@
 
 namespace Bibo\Core\Controller;
 
+use Bibo\Core\View\View;
+
 /**
  * Controller class
  */
 abstract class Controller
 {
+    private View $view;
     /**
      * Controller constructor.
      */
     public function __construct()
     {
         // TODO: Implement __construct() method.
+        $this->view = new View();
     }
 
     /**
@@ -21,11 +25,11 @@ abstract class Controller
      * @param string $view
      * @param array  $data
      *
-     * @return void
+     * @return string
      */
-    public function render(string $view, array $data = []): void
+    public function render(string $view, array $data = []): string
     {
-        // TODO: Implement render() method.
+        return $this->view->render($view, $data);
     }
 
     public function redirect(string $url): void

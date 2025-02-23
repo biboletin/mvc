@@ -1,8 +1,8 @@
 <?php
 
+use Bibo\App\Controllers\IndexController;
 use Bibo\App\Controllers\InstallController;
 use Bibo\Core\Facades\Route;
-use Bibo\App\Controllers\IndexController;
 
 Route::get('/', [IndexController::class, 'index']);
 

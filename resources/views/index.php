@@ -7,6 +7,6 @@
 </head>
 <body>
     <h1>Index View</h1>
-    <p>This is the index view.</p>
+    <p>This is the index view. And cached!</p>
 </body>
 </html>

@@ -82,6 +82,7 @@
         "psr/clock": "dev-master",
         "psr/http-server-middleware": "^1.0@dev",
         "psr/http-client": "^1.0@dev",
-        "symfony/polyfill-iconv": "1.x-dev"
+        "symfony/polyfill-iconv": "1.x-dev",
+        "ext-zlib": "*"
     }
 }

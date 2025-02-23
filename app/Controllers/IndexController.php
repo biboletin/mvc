@@ -3,9 +3,7 @@
 namespace Bibo\App\Controllers;
 
 use Bibo\Core\Controller\Controller;
-use Bibo\Core\Response\HtmlResponse;
 use Bibo\Core\Response\JsonResponse;
-use Bibo\Core\View\View;
 use JsonException;
 
 /**

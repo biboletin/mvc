@@ -4,10 +4,10 @@ namespace Bibo\Core\Cache;
 
 use DateInterval;
 use DateTime;
+use InvalidArgumentException;
 use Psr\SimpleCache\CacheInterface;
 use RuntimeException;
 use Traversable;
-use InvalidArgumentException;
 
 /**
  * Simple file caching class

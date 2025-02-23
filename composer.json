@@ -57,6 +57,7 @@
         },
         "files":[
             "src/constants/constants.php",
+            "src/constants/app.php",
             "src/functions/functions.php"
         ]
     },
@@ -80,6 +81,7 @@
         "psr/simple-cache": "^3.0@dev",
         "psr/clock": "dev-master",
         "psr/http-server-middleware": "^1.0@dev",
-        "psr/http-client": "^1.0@dev"
+        "psr/http-client": "^1.0@dev",
+        "symfony/polyfill-iconv": "1.x-dev"
     }
 }

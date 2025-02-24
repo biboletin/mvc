@@ -54,8 +54,9 @@ class View
     /**
      * Generates a unique cache key based on the view name and data.
      *
-     * @param string $view The view file name
+     * @param string     $view The view file name
      * @param array|null $data The data for the view
+     *
      * @return string The cache key
      */
     protected function getCacheKey(string $view, ?array $data): string

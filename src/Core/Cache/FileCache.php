@@ -37,7 +37,7 @@ class FileCache implements CacheInterface
      * Get item
      *
      * @param string $key
-     * @param        $default
+     * @param mixed  $default
      *
      * @return mixed
      */
@@ -85,6 +85,7 @@ class FileCache implements CacheInterface
      * Delete a cache item.
      *
      * @param string $key Cache key
+     *
      * @return bool True on success, false on failure
      */
     public function delete(string $key): bool
@@ -141,8 +142,9 @@ class FileCache implements CacheInterface
     /**
      * Get multiple cache items.
      *
-     * @param iterable<string> $keys List of keys
-     * @param mixed $default Default value for missing keys
+     * @param iterable<string> $keys    List of keys
+     * @param mixed            $default Default value for missing keys
+     *
      * @return iterable<string, mixed> Key-value pairs of cached data
      */
     public function getMultiple(iterable $keys, mixed $default = null): iterable
@@ -181,6 +183,7 @@ class FileCache implements CacheInterface
      * Convert a DateInterval to seconds.
      *
      * @param DateInterval $interval
+     *
      * @return int The number of seconds represented by the DateInterval.
      */
     protected function convertDateIntervalToSeconds(DateInterval $interval): int
@@ -194,6 +197,7 @@ class FileCache implements CacheInterface
      * Delete multiple cache items.
      *
      * @param iterable<string> $keys List of keys
+     *
      * @return bool True on success, false on failure
      */
     public function deleteMultiple(iterable $keys): bool

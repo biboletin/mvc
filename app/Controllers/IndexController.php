@@ -28,7 +28,7 @@ class IndexController extends Controller
      */
     public function about(): string
     {
-        return 'About';
+        return $this->render('about', []);
     }
 
     /**

@@ -4,5 +4,4 @@ namespace Bibo\Core\Cache;
 
 class Cache
 {
-
 }

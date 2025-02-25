@@ -8,9 +8,11 @@ use Bibo\Core\Container\Container;
 use Bibo\Core\Facades\Route;
 use Bibo\Core\Request\BaseRequest;
 use Bibo\Core\Response\BaseResponse;
+use Bibo\Core\Error\Error;
 
 include __DIR__ . '/../vendor/autoload.php';
 
+Error::register();
 
 $router = new BaseRouter(new CachedRegexMatchStrategy());
 Route::init($router);
@@ -25,7 +27,11 @@ $app->container()
     ->set('response', fn () => new BaseResponse())
     ->set('cache', function () {
         return new FileCache(CACHE_PATH);
-    });
+    })
+    ->set('config', function () {
+        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+        $dotenv->load();
+    })->get('config');
 
 // Now, you can run the app and it will handle the routing and response.
 $app->run();

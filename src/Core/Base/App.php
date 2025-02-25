@@ -2,6 +2,8 @@
 
 namespace Bibo\Core\Base;
 
+use Bibo\Core\Exception\NotFoundException;
+use Bibo\Core\Response\HtmlResponse;
 use Bibo\Core\Response\JsonResponse;
 use Bibo\Core\Response\ResponseEmitter;
 use JsonException;
@@ -65,6 +67,9 @@ class App
             $responseEmitter->emit($response);
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface | JsonException $e) {
             $response = new JsonResponse(['error' => 'Service unavailable'], 503);
+            $responseEmitter->emit($response);
+        } catch (NotFoundException $e) {
+            $response = new HtmlResponse($e->getMessage(), $e->getCode());
             $responseEmitter->emit($response);
         }
     }

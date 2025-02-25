@@ -109,14 +109,4 @@ interface ConfigInterface
      * @return void
      */
     public function parseFromDb(): void;
-
-    /**
-     * Create a constant from the config
-     * Define the constant with the key and value
-     * Constants are dynamic and can be accessed from anywhere
-     * Constants are global and can be accessed from anywhere
-     *
-     * @return void
-     */
-    public function toConstant(): void;
 }

@@ -9,6 +9,8 @@ use Bibo\Core\Interfaces\ConfigInterface;
  */
 class Config implements ConfigInterface
 {
+    private array $config = [];
+
     /**
      * Get a value from the config
      * If the key does not exist, return the default value
@@ -143,18 +145,5 @@ class Config implements ConfigInterface
     public function parseFromDb(): void
     {
         // TODO: Implement parseFromDb() method.
-    }
-
-    /**
-     * Create a constant from the config
-     * Define the constant with the key and value
-     * Constants are dynamic and can be accessed from anywhere
-     * Constants are global and can be accessed from anywhere
-     *
-     * @return void
-     */
-    public function toConstant(): void
-    {
-        // TODO: Implement toConstant() method.
     }
 }

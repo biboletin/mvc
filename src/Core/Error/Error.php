@@ -32,7 +32,6 @@ class Error
      */
     public static function handleException(Throwable $exception): void
     {
-        // $code = $exception instanceof AppException ? $exception->getCode() : 500;
         $code = $exception->getCode();
 
         http_response_code($code);
@@ -47,6 +46,12 @@ class Error
     /**
      * Handle errors
      *
+     * @param int    $errno
+     * @param string $errstr
+     * @param string $errfile
+     * @param int    $errline
+     *
+     * @return void
      * @throws ErrorException
      */
     public static function handleError(int $errno, string $errstr, string $errfile, int $errline): void

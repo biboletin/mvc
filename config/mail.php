@@ -18,31 +18,31 @@ return [
          * Mail host
          */
 
-        'host' => 'smtp.example.com',
+        'host' => $_ENV['MAIL_HOST'] ?? 'smtp.example.com',
 
         /*
          * Mail port
          */
 
-        'port' => 587,
+        'port' => $_ENV['MAIL_PORT'] ?? 587,
 
         /*
          * Mail username
          */
 
-        'username' => '',
+        'username' => $_ENV['MAIL_USER'] ?? '',
 
         /*
          * Mail password
          */
 
-        'password' => '',
+        'password' => $_ENV['MAIL_PASS'] ?? '',
 
         /*
          * Mail encryption
          */
 
-        'encryption' => 'tls',
+        'encryption' => $_ENV['MAIL_TLS'] ?? 'tls',
 
         /*
          * Mail from

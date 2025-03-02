@@ -52,6 +52,7 @@ class App
     public function run(): void
     {
         $responseEmitter = new ResponseEmitter();
+
         try {
             $router = $this->container->get('router');
             $request = $this->container->get('request');
@@ -62,7 +63,6 @@ class App
 
             // Match the route using method and path
             $response = $router->match($method, $uri);
-
             // Emit the response
             $responseEmitter->emit($response);
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface | JsonException $e) {

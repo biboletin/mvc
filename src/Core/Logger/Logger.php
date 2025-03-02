@@ -2,9 +2,9 @@
 
 namespace Bibo\Core\Logger;
 
+use Bibo\Core\Interfaces\LogHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Bibo\Core\Interfaces\LogHandlerInterface;
 
 /**
  *

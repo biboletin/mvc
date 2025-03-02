@@ -2,7 +2,9 @@
 
 namespace Bibo\Core\Container;
 
+use Closure;
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -16,19 +18,20 @@ class Container implements ContainerInterface
      *
      * @var array
      */
-    private array $services = [];
+    private array $bindings = [];
+    private array $instances = [];
 
     /**
      * Bind a service to the container
      *
-     * @param string   $id
-     * @param callable $concrete
+     * @param string  $id
+     * @param Closure $concrete
      *
      * @return ContainerInterface
      */
-    public function set(string $id, callable $concrete): ContainerInterface
+    public function set(string $id, Closure $concrete): self
     {
-        $this->services[$id] = $concrete;
+        $this->bindings[$id] = $concrete;
         return $this;
     }
 
@@ -42,12 +45,18 @@ class Container implements ContainerInterface
      */
     public function get(string $id): mixed
     {
-        if (!$this->has($id)) {
-            throw new class ($id . ' not found in container') extends Exception implements NotFoundExceptionInterface {
+        if (isset($this->instances[$id])) {
+            return $this->instances[$id];
+        }
+
+        if (!isset($this->bindings[$id])) {
+            throw new class ('Service ' . $id . ' not found') extends Exception implements ContainerExceptionInterface {
             };
         }
 
-        return $this->services[$id]($this);
+        $this->instances[$id] = $this->bindings[$id]($this);
+
+        return $this->instances[$id];
     }
 
     /**
@@ -59,6 +68,6 @@ class Container implements ContainerInterface
      */
     public function has(string $id): bool
     {
-        return isset($this->services[$id]);
+        return isset($this->bindings[$id]) || isset($this->instances[$id]);
     }
 }

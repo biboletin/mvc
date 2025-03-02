@@ -3,7 +3,6 @@
 namespace Bibo\Core\Logger;
 
 use Bibo\Core\Interfaces\LogHandlerInterface;
-use DateTime;
 
 class FileLogHandler implements LogHandlerInterface
 {

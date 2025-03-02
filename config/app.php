@@ -16,7 +16,7 @@ return [
          * Application name
          */
 
-        'name' => 'Example Application',
+        'name' => $_ENV['APP_NAME'] ?? 'Example Application',
 
         /*
          * Application version
@@ -28,19 +28,19 @@ return [
          * Application environment
          */
 
-        'env' => 'development',
+        'env' => $_ENV['APP_ENV'] ?? 'development',
 
         /*
          * Application debug mode
          */
 
-        'debug' => true,
+        'debug' => $_ENV['APP_DEBUG'] ?? false,
 
         /*
          * Application debug level
          */
 
-        'debug_level' => 'debug',
+        'debug_level' => $_ENV['APP_DEBUG_LEVEL'] ?? 'debug',
 
         /*
          * Application timezone
@@ -70,13 +70,7 @@ return [
          * Application URL
          */
 
-        'url' => 'http://localhost',
-
-        /*
-         * Application URL with index file
-         */
-
-        'index' => 'index.php',
+        'url' => $_ENV['APP_URL'] ?? 'http://localhost',
 
         /*
          * Application key

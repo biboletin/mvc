@@ -2,7 +2,6 @@
 
 namespace Bibo\Core\Error;
 
-use Bibo\Core\Exception\AppException;
 use ErrorException;
 use Throwable;
 

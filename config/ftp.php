@@ -16,19 +16,19 @@ return [
          * Host
          */
 
-        'host' => 'ftp.example.com',
+        'host' => $_ENV['FTP_HOST'] ?? 'ftp.example.com',
 
         /*
          * Username
          */
 
-        'username' => 'username',
+        'username' => $_ENV['FTP_USER'] ?? '',
 
         /*
          * Password
          */
 
-        'password' => 'password',
+        'password' => $_ENV['FTP_PASSWORD'] ?? 'password',
 
         /*
          * Port
@@ -71,18 +71,6 @@ return [
          */
 
         'permPrivate' => 0755,
-
-        /*
-         * Transfer mode
-         */
-
-        'mode' => FTP_BINARY,
-
-        /*
-         * System type
-         */
-
-        'systemType' => FTP_AUTO_DETECT,
 
         /*
          * Ignore passive address

@@ -7,7 +7,7 @@ use Bibo\Core\View\View;
 /**
  * Controller class
  */
-abstract class Controller
+class Controller
 {
     private View $view;
     /**

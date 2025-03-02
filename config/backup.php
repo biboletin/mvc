@@ -16,13 +16,13 @@ return [
          * Enable or disable backup
          */
 
-        'enabled' => false,
+        'enabled' => $_ENV['BACKUP_ENABLED'] ?? false,
 
         /*
          * Backup path
          */
 
-        'path' => 'backup',
+        'path' => $_ENV['BACKUP_PATH'] ?? 'backup',
 
         /*
          * Backup filename

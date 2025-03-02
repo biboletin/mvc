@@ -11,6 +11,11 @@ class Config implements ConfigInterface
 {
     private array $config = [];
 
+    public function __construct()
+    {
+        $this->config = [];
+    }
+
     /**
      * Get a value from the config
      * If the key does not exist, return the default value
@@ -23,7 +28,7 @@ class Config implements ConfigInterface
      */
     public function get(string $key, ?string $default = null): mixed
     {
-        // TODO: Implement get() method.
+        return $this->config[$key] ?? $default;
     }
 
     /**
@@ -36,13 +41,13 @@ class Config implements ConfigInterface
      * If the value is an object, convert it to an array
      *
      * @param string $key
-     * @param $value
+     * @param mixed $value
      *
      * @return void
      */
     public function set(string $key, $value): void
     {
-        // TODO: Implement set() method.
+        $this->config[$key] = $value;
     }
 
     /**
@@ -76,7 +81,9 @@ class Config implements ConfigInterface
      */
     public function load(string $file): void
     {
-        // TODO: Implement load() method.
+        $key = basename($file, '.php');
+        $content = require $file;
+        $this->config[$key] = array_shift($content);
     }
 
     /**
@@ -145,5 +152,12 @@ class Config implements ConfigInterface
     public function parseFromDb(): void
     {
         // TODO: Implement parseFromDb() method.
+    }
+
+    public function parseFromEnv(): void
+    {
+        foreach ($_ENV as $key => $value) {
+            $this->set($key, $value);
+        }
     }
 }

@@ -12,43 +12,43 @@ return [
          * Session name
          */
 
-        'name' => 'ExampleSession',
+        'name' => $_ENV['SESSION_NAME'] ?? 'ExampleSession',
 
         /*
          * Session lifetime
          */
 
-        'lifetime' => 3600,
+        'lifetime' => $_ENV['SESSION_LIFETIME'] ?? 3600,
 
         /*
          * Session path
          */
 
-        'path' => '/',
+        'path' => $_ENV['SESSION_PATH'] ?? '/',
 
         /*
          * Session domain
          */
 
-        'domain' => null,
+        'domain' => $_ENV['session_domain'] ?? null,
 
         /*
          * Session secure flag
          */
 
-        'secure' => false,
+        'secure' => $_ENV['SESSION_SECURE'] ?? false,
 
         /*
          * Session HTTP only flag
          */
 
-        'httponly' => true,
+        'httponly' => $_ENV['SESSION_HTTP'] ?? true,
 
         /*
          * Session same site attribute
          */
 
-        'samesite' => 'Lax',
+        'samesite' => $_ENV['SESSION_SAMESITE'] ?? 'Lax',
 
         /*
          * Session encryption

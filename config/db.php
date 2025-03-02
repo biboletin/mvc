@@ -18,29 +18,35 @@ return [
          * Database host
          */
 
-        'host' => 'localhost',
+        'host' => $_ENV['DB_HOST'] ?? 'localhost',
 
         /*
          * Database name
          */
 
-        'database' => 'example',
+        'database' => $_ENV['DB_DATABASE'] ?? 'example',
 
         /*
          * Database username
          */
 
-        'username' => 'root',
+        'username' => $_ENV['DB_USERNAME'] ?? 'root',
 
         /*
          * Database password
          */
 
-        'password' => 'root',
+        'password' => $_ENV['DB_PASSWORD'] ?? '',
 
-        /*
-         * Database charset
+        /**
+         * Database port
          */
+
+        'port' => $_ENV['DB_PORT'] ?? 3306,
+
+            /*
+             * Database charset
+             */
 
         'charset' => 'utf8mb4',
 

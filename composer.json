@@ -36,6 +36,7 @@
             "Bibo\\Core\\Pattern\\Creational\\": "src/Core/Pattern/Creational/",
             "Bibo\\Core\\Pattern\\Structural\\": "src/Core/Pattern/Structural",
             "Bibo\\Core\\Plugin\\": "src/Core/Plugin/",
+            "Bibo\\Core\\Provider\\": "src/Core/Providers/",
             "Bibo\\Core\\Request\\": "src/Core/Request/",
             "Bibo\\Core\\Response\\": "src/Core/Response/",
             "Bibo\\Core\\Rest\\": "src/Core/Rest/",
@@ -84,6 +85,7 @@
         "psr/http-client": "^1.0@dev",
         "symfony/polyfill-iconv": "1.x-dev",
         "ext-zlib": "*",
-        "vlucas/phpdotenv": "^5.6@dev"
+        "vlucas/phpdotenv": "^5.6@dev",
+        "ext-ftp": "*"
     }
 }

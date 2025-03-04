@@ -16,7 +16,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $router = new BaseRouter(new CachedRegexMatchStrategy());
+        $container = $this->container;
+        $router = new BaseRouter($container, new CachedRegexMatchStrategy());
         Route::init($router);
 
         include __DIR__ . '/../../../routes/web.php';
@@ -28,9 +29,6 @@ class RouteServiceProvider extends ServiceProvider
     {
         include __DIR__ . '/../../../routes/web.php';
 
-        if ($_ENV['APP_DEBUG'] === true) {
-            $logger = $this->container->get('logger');
-            $logger->info('Routes booted successfully');
-        }
+        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
     }
 }

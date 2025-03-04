@@ -16,4 +16,9 @@ class ResponseServiceProvider extends ServiceProvider
     {
         $this->container->set('response', fn () => new BaseResponse());
     }
+
+    public function boot(): void
+    {
+        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+    }
 }

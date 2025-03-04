@@ -8,7 +8,9 @@ return [
 
     'log' => [
 
-        'path' => $_ENV['LOG_PATH'] ?? '',
+        'level' => $_ENV['APP_LOG_LEVEL'] ?? 'error',
+
+        'path' => $_ENV['LOG_PATH'] ?? 'app/',
 
         'rotation' => $_ENV['LOG_ROTATION'] ?? 'daily',
 

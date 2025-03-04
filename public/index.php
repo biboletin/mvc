@@ -29,5 +29,3 @@ try {
 } catch (Throwable $e) {
     ResponseExceptionHandler::handle($e);
 }
-
-// dd($app);

@@ -15,13 +15,32 @@ class Logger implements LoggerInterface
      * @var array
      */
     private array $handlersByLevel;
+    private string $minLogLevel;
+    private const LEVELS = [
+        'debug'     => 100,
+        'info'      => 200,
+        'notice'    => 250,
+        'warning'   => 300,
+        'error'     => 400,
+        'critical'  => 500,
+        'alert'     => 550,
+        'emergency' => 600,
+    ];
 
     /**
      * @param array $handlersByLevel
      */
-    public function __construct(array $handlersByLevel = [])
+    public function __construct(array $handlersByLevel = [], string $minLogLevel = LogLevel::ERROR)
     {
         $this->handlersByLevel = $handlersByLevel;
+        $this->minLogLevel = $minLogLevel;
+    }
+
+    public function setLogLevel(string $level): void
+    {
+        if (isset(self::LEVELS[$level])) {
+            $this->minLogLevel = $level;
+        }
     }
 
     /**
@@ -44,6 +63,10 @@ class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = []): void
     {
+        if (self::LEVELS[$level] < self::LEVELS[$this->minLogLevel]) {
+            return;
+        }
+
         foreach ($this->handlersByLevel[$level] ?? [] as $handler) {
             $handler->write($level, $message, $context);
         }

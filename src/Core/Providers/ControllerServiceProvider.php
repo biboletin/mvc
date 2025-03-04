@@ -14,6 +14,15 @@ class ControllerServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->container->set('controllers', fn () => new Controller());
+        $container = $this->container;
+
+        $container->set('controller', function () use ($container) {
+            new Controller($container);
+        });
+    }
+
+    public function boot(): void
+    {
+        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
     }
 }

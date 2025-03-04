@@ -16,4 +16,9 @@ class FileCacheServiceProvider extends ServiceProvider
     {
         $this->container->set('fileCache', fn () => new FileCache(CACHE_PATH));
     }
+
+    public function boot(): void
+    {
+        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+    }
 }

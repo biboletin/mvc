@@ -33,9 +33,6 @@ class ConfigServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        if ($_ENV['APP_DEBUG'] === true) {
-            $logger = $this->container->get('logger');
-            $logger->info('Config booted successfully');
-        }
+        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
     }
 }

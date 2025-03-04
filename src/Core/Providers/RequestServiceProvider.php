@@ -16,4 +16,9 @@ class RequestServiceProvider extends ServiceProvider
     {
         $this->container->set('request', fn () => new BaseRequest());
     }
+
+    public function boot(): void
+    {
+        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+    }
 }

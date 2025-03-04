@@ -15,4 +15,9 @@ class CacheServiceProvider extends ServiceProvider
     {
         // TODO: Implement register() method.
     }
+
+    public function boot(): void
+    {
+        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+    }
 }

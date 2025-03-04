@@ -16,8 +16,14 @@ class LogServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $logger = new Logger();
-        $logger->addHandler(new FileLogHandler(LOG_PATH . $_ENV['LOG_PATH']), 'info');
+        $logger = new Logger([], $_ENV['APP_LOG_LEVEL']);
+        $logger->addHandler(
+            new FileLogHandler(
+                LOG_PATH . $_ENV['LOG_PATH'],
+                $_ENV['LOG_FORMAT']
+            ),
+            $_ENV['APP_LOG_LEVEL']
+        );
 
         $this->container->set('logger', function () use ($logger) {
             return $logger;
@@ -29,9 +35,6 @@ class LogServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if ($_ENV['APP_DEBUG'] === true) {
-            $logger = $this->container->get('logger');
-            $logger->info('Logger booted successfully');
-        }
+        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
     }
 }

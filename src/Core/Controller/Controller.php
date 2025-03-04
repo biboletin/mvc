@@ -2,21 +2,24 @@
 
 namespace Bibo\Core\Controller;
 
-use Bibo\Core\View\View;
+use Psr\Container\ContainerInterface;
 
 /**
  * Controller class
  */
 class Controller
 {
-    private View $view;
+    private $view;
+
+    private ?ContainerInterface $container = null;
+
     /**
      * Controller constructor.
      */
-    public function __construct()
+    public function __construct(?ContainerInterface $container = null)
     {
-        // TODO: Implement __construct() method.
-        $this->view = new View();
+        $this->view = $container->get('views');
+        $this->container = $container;
     }
 
     /**
@@ -42,6 +45,6 @@ class Controller
      */
     public function __destruct()
     {
-        // TODO: Implement __destruct() method.
+        $this->container = null;
     }
 }

@@ -10,7 +10,9 @@ use Bibo\Core\Response\JsonResponse;
 use Bibo\Core\View\View;
 use Exception;
 use JsonException;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+
 use function array_find;
 
 /**
@@ -37,6 +39,8 @@ class BaseRouter implements RouterInterface
      */
     private string $currentRouteGroup = '';
 
+    private ContainerInterface $container;
+
     /**
      * Route strategy
      *
@@ -47,9 +51,10 @@ class BaseRouter implements RouterInterface
     /**
      * Constructor
      */
-    public function __construct(?RouteMatchingStrategyInterface $strategy = null)
+    public function __construct(ContainerInterface $container, ?RouteMatchingStrategyInterface $strategy = null)
     {
         $this->strategy = $strategy ?? new CachedRegexMatchStrategy();
+        $this->container = $container;
     }
 
     /**
@@ -232,7 +237,7 @@ class BaseRouter implements RouterInterface
             throw new Exception('Controller ' . $controller . ' not found', 500);
         }
 
-        $instance = new $controller();
+        $instance = new $controller($this->container);
 
         if (!method_exists($instance, $method)) {
             throw new Exception('Method ' . $method . ' not found in ' . $controller, 500);

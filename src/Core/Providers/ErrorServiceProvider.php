@@ -16,4 +16,9 @@ class ErrorServiceProvider extends ServiceProvider
     {
         Error::register();
     }
+
+    public function boot(): void
+    {
+        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+    }
 }

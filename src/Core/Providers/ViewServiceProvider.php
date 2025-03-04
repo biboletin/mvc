@@ -16,4 +16,9 @@ class ViewServiceProvider extends ServiceProvider
     {
         $this->container->set('views', fn () => new View());
     }
+
+    public function boot(): void
+    {
+        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+    }
 }

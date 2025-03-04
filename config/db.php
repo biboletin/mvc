@@ -38,7 +38,7 @@ return [
 
         'password' => $_ENV['DB_PASSWORD'] ?? '',
 
-        /**
+        /*
          * Database port
          */
 

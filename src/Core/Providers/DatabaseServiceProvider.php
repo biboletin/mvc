@@ -15,4 +15,9 @@ class DatabaseServiceProvider extends ServiceProvider
     {
         $this->container->set('db', fn () => null);
     }
+
+    public function boot(): void
+    {
+        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+    }
 }

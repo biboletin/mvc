@@ -66,7 +66,7 @@ class App
             // Emit the response
             $responseEmitter->emit($response);
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface | JsonException $e) {
-            $response = new JsonResponse(['error' => 'Service unavailable'], 503);
+            $response = new JsonResponse(['error' => $e->getMessage()], $e->getCode());
             $responseEmitter->emit($response);
         } catch (NotFoundException $e) {
             $response = new HtmlResponse($e->getMessage(), $e->getCode());

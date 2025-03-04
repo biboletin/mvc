@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/GrahamCampbell/Result-Type.git",
-                "reference": "9d6c1d7ce69a3329936e603617e59ba205ab0a66"
+                "reference": "bdd52c41913b414f4ca7dcb34482babcd0e9bd58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GrahamCampbell/Result-Type/zipball/9d6c1d7ce69a3329936e603617e59ba205ab0a66",
-                "reference": "9d6c1d7ce69a3329936e603617e59ba205ab0a66",
+                "url": "https://api.github.com/repos/GrahamCampbell/Result-Type/zipball/bdd52c41913b414f4ca7dcb34482babcd0e9bd58",
+                "reference": "bdd52c41913b414f4ca7dcb34482babcd0e9bd58",
                 "shasum": ""
             },
             "require": {
@@ -67,7 +67,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-02-09T22:43:44+00:00"
+            "time": "2025-03-02T21:31:24+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -1606,12 +1606,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "fe531776258bf01ee13bdc09d9fe6aea7cc6d992"
+                "reference": "2be2876143371b6995caeb6da3522318cfb6eec7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/fe531776258bf01ee13bdc09d9fe6aea7cc6d992",
-                "reference": "fe531776258bf01ee13bdc09d9fe6aea7cc6d992",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/2be2876143371b6995caeb6da3522318cfb6eec7",
+                "reference": "2be2876143371b6995caeb6da3522318cfb6eec7",
                 "shasum": ""
             },
             "require": {
@@ -1699,7 +1699,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-02-26T14:46:01+00:00"
+            "time": "2025-03-04T12:53:13+00:00"
         },
         {
             "name": "sebastian/cli-parser",

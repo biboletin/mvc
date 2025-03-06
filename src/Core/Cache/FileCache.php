@@ -212,4 +212,14 @@ class FileCache implements CacheInterface
 
         return $success;
     }
+
+    public function setPath(string $path): void
+    {
+        $this->cacheDir = $path;
+    }
+
+    public function getPath(): string
+    {
+        return $this->cacheDir;
+    }
 }

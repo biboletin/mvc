@@ -4,6 +4,7 @@ use Bibo\Core\Provider\AppServiceProvider;
 use Bibo\Core\Provider\ConfigServiceProvider;
 use Bibo\Core\Provider\ControllerServiceProvider;
 use Bibo\Core\Provider\ErrorServiceProvider;
+use Bibo\Core\Provider\FileCacheServiceProvider;
 use Bibo\Core\Provider\LogServiceProvider;
 use Bibo\Core\Provider\ModelServiceProvider;
 use Bibo\Core\Provider\RequestServiceProvider;
@@ -26,6 +27,7 @@ $providers = [
     RequestServiceProvider::class,
     ControllerServiceProvider::class,
     ModelServiceProvider::class,
+    FileCacheServiceProvider::class,
     ViewServiceProvider::class,
 ];
 

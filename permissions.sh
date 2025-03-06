@@ -9,6 +9,7 @@ find . -type f -exec chmod 644 {} \;
 find . -type d -exec chmod 755 {} \;
 
 chown -R www-data:www-data /var/www/html/mvc/storage/cache/
+#chown -R "$USER":"$USER" /var/www/html/mvc/storage/cache/
 chown -R www-data:www-data /var/www/html/mvc/storage/logs/
 chown -R www-data:www-data /var/www/html/mvc/storage/session/
 chown -R www-data:www-data /var/www/html/mvc/storage/tmp/

@@ -11,7 +11,7 @@ class Controller
 {
     private $view;
 
-    private ?ContainerInterface $container = null;
+    protected ?ContainerInterface $container = null;
 
     /**
      * Controller constructor.
@@ -30,12 +30,12 @@ class Controller
      *
      * @return string
      */
-    public function render(string $view, array $data = []): string
+    protected function render(string $view, array $data = []): string
     {
         return $this->view->render($view, $data);
     }
 
-    public function redirect(string $url): void
+    protected function redirect(string $url): void
     {
         // TODO: Implement redirect() method.
     }

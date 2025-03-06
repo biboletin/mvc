@@ -14,7 +14,7 @@ class FileCacheServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->container->set('fileCache', fn () => new FileCache(CACHE_PATH));
+        $this->container->set('file_cache', fn () => new FileCache(CACHE_PATH));
     }
 
     public function boot(): void

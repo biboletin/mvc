@@ -16,74 +16,53 @@ class Config implements ConfigInterface
         $this->config = [];
     }
 
-    /**
-     * Get a value from the config
-     * If the key does not exist, return the default value
-     * If the default value is not set, return null
-     *
-     * @param string      $key
-     * @param string|null $default
-     *
-     * @return mixed
-     */
     public function get(string $key, ?string $default = null): mixed
     {
         return $this->config[$key] ?? $default;
     }
 
-    /**
-     * Set a value in the config
-     * If the key already exists, overwrite it
-     * If the key does not exist, create it
-     * If the value is null, remove the key
-     * If the value is an array, merge it with the existing value
-     * If the value is a string, replace the existing value
-     * If the value is an object, convert it to an array
-     *
-     * @param string $key
-     * @param mixed $value
-     *
-     * @return void
-     */
     public function set(string $key, $value): void
     {
         $this->config[$key] = $value;
     }
 
-    /**
-     * Check if a key exists in the config
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
     public function has(string $key): bool
     {
-        // TODO: Implement has() method.
+        return array_key_exists($key, $this->config);
     }
 
-    /**
-     * Get all the values from the config
-     *
-     * @return array
-     */
     public function all(): array
     {
-        // TODO: Implement all() method.
+        return !empty($this->config) ? $this->config : [];
     }
 
-    /**
-     * Load a config file
-     *
-     * @param string $file
-     *
-     * @return void
-     */
     public function load(string $file): void
     {
         $key = basename($file, '.php');
         $content = require $file;
-        $this->config[$key] = array_shift($content);
+
+        if (!is_array($content)) {
+            throw new \RuntimeException("Config file {$file} must return an array.");
+        }
+
+        $this->config[$key] = $content;
+    }
+
+    public function merge(array $config): void
+    {
+        $this->config = array_merge($this->config, $config);
+    }
+
+    public function remove(string $key): void
+    {
+        unset($this->config[$key]);
+    }
+
+    public function parseFromEnv(): void
+    {
+        foreach ($_ENV as $key => $value) {
+            $this->set($key, $value);
+        }
     }
 
     /**
@@ -99,18 +78,6 @@ class Config implements ConfigInterface
     }
 
     /**
-     * Merge an array into the config
-     *
-     * @param array $config
-     *
-     * @return void
-     */
-    public function merge(array $config): void
-    {
-        // TODO: Implement merge() method.
-    }
-
-    /**
      * Merge a file into the config
      *
      * @param string $file
@@ -120,18 +87,6 @@ class Config implements ConfigInterface
     public function mergeFile(string $file): void
     {
         // TODO: Implement mergeFile() method.
-    }
-
-    /**
-     * Remove a key from the config
-     *
-     * @param string $key
-     *
-     * @return void
-     */
-    public function remove(string $key): void
-    {
-        // TODO: Implement remove() method.
     }
 
     /**
@@ -152,12 +107,5 @@ class Config implements ConfigInterface
     public function parseFromDb(): void
     {
         // TODO: Implement parseFromDb() method.
-    }
-
-    public function parseFromEnv(): void
-    {
-        foreach ($_ENV as $key => $value) {
-            $this->set($key, $value);
-        }
     }
 }

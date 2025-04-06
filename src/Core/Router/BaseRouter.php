@@ -2,6 +2,7 @@
 
 namespace Bibo\Core\BaseRouter;
 
+use Bibo\Core\Exception\NotFoundException;
 use Bibo\Core\Interfaces\RouteMatchingStrategyInterface;
 use Bibo\Core\Interfaces\RouterInterface;
 use Bibo\Core\Request\Stream;
@@ -156,7 +157,7 @@ class BaseRouter implements RouterInterface
      * @param string $uri
      *
      * @return ResponseInterface
-     * @throws Exception
+     * @throws NotFoundException|JsonException
      */
     public function match(string $method, string $uri): ResponseInterface
     {
@@ -170,7 +171,7 @@ class BaseRouter implements RouterInterface
             }
         }
 
-        throw new Exception('Route not found', 404);
+        throw new NotFoundException('Route not found', 404);
     }
 
     /**

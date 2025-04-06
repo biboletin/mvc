@@ -5,6 +5,7 @@ namespace Bibo\App\Controllers;
 use Bibo\Core\Controller\Controller;
 use Bibo\Core\Response\JsonResponse;
 use JsonException;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * Index controller
@@ -15,16 +16,31 @@ class IndexController extends Controller
      * Index
      *
      * @return string
+     * @throws InvalidArgumentException
      */
     public function index(): string
     {
-        return $this->render('index', []);
+        $data = [
+            'title' => 'Welcome',
+            'header' => 'My site',
+            'user' => 'John Doe',
+            'price' => 1234.56,
+            'items' => [
+                'Item 1',
+                'Item 2',
+                'Item 3',
+            ],
+            'year' => date('Y')
+        ];
+
+        return $this->render('home', $data);
     }
 
     /**
      * About
      *
      * @return string
+     * @throws InvalidArgumentException
      */
     public function about(): string
     {

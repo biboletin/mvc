@@ -86,6 +86,7 @@
         "symfony/polyfill-iconv": "1.x-dev",
         "ext-zlib": "*",
         "vlucas/phpdotenv": "^5.6@dev",
-        "ext-ftp": "*"
+        "ext-ftp": "*",
+        "twig/twig": "4.x-dev"
     }
 }

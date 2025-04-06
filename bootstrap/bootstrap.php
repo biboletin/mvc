@@ -9,6 +9,7 @@ use Bibo\Core\Provider\LogServiceProvider;
 use Bibo\Core\Provider\ModelServiceProvider;
 use Bibo\Core\Provider\RequestServiceProvider;
 use Bibo\Core\Provider\RouteServiceProvider;
+use Bibo\Core\Provider\TemplateServiceProvider;
 use Bibo\Core\Provider\ViewServiceProvider;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 
@@ -20,6 +21,7 @@ $container = $app->container();
 
 $providers = [
     ConfigServiceProvider::class,
+    TemplateServiceProvider::class,
     LogServiceProvider::class,
     ErrorServiceProvider::class,
     AppServiceProvider::class,

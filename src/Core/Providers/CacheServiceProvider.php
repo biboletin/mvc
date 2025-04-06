@@ -2,6 +2,7 @@
 
 namespace Bibo\Core\Provider;
 
+use Bibo\Core\Cache\Cache;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 
 class CacheServiceProvider extends ServiceProvider
@@ -13,7 +14,7 @@ class CacheServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // TODO: Implement register() method.
+        $cache = new Cache();
     }
 
     public function boot(): void

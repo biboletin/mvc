@@ -4,6 +4,7 @@ namespace Bibo\Core\Provider;
 
 use Bibo\Core\Error\Error;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
+use Psr\Container\NotFoundExceptionInterface;
 
 class ErrorServiceProvider extends ServiceProvider
 {
@@ -14,9 +15,21 @@ class ErrorServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        Error::register();
+        $this->container->set('error', function () {
+            $error = new Error();
+
+            $error->setTemplate($this->container->get('template'));
+            $error->register();
+
+            return $error;
+        });
     }
 
+    /**
+     * Boot service provider
+     *
+     * @throws NotFoundExceptionInterface
+     */
     public function boot(): void
     {
         $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');

@@ -2,32 +2,31 @@
 
 namespace Bibo\Core\Provider;
 
-use Bibo\Core\View\View;
+use Bibo\Core\Template\Template;
+use Bibo\Core\Wrapper\TwigTemplateEngine;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-class ViewServiceProvider extends ServiceProvider
+class TemplateServiceProvider extends ServiceProvider
 {
     /**
      * Register service provider
      *
-     * @return void
+     * @inheritDoc
      */
     public function register(): void
     {
-        try {
-            $view = new View($this->container);
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
-            echo $e->getMessage();
-        }
+        $templateEngine = new TwigTemplateEngine(VIEW_PATH, CACHE_PATH . 'app', $_ENV['APP_DEBUG']);
+        $template = new Template($templateEngine);
 
-        $this->container->set('views', function () use ($view) {
-            return $view;
+        $this->container->set('template', function () use ($template) {
+            return $template;
         });
     }
 
     /**
+     * Boot service provider
+     *
      * @throws NotFoundExceptionInterface
      */
     public function boot(): void

@@ -3,13 +3,12 @@
 namespace Bibo\Core\Base;
 
 use Bibo\Core\Exception\NotFoundException;
-use Bibo\Core\Response\HtmlResponse;
 use Bibo\Core\Response\JsonResponse;
 use Bibo\Core\Response\ResponseEmitter;
+use Exception;
 use JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * App class
@@ -65,12 +64,12 @@ class App
             $response = $router->match($method, $uri);
             // Emit the response
             $responseEmitter->emit($response);
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface | JsonException $e) {
+        } catch (ContainerExceptionInterface | JsonException $e) {
             $response = new JsonResponse(['error' => $e->getMessage()], $e->getCode());
             $responseEmitter->emit($response);
-        } catch (NotFoundException $e) {
-            $response = new HtmlResponse($e->getMessage(), $e->getCode());
-            $responseEmitter->emit($response);
+        } catch (Exception | NotFoundException $e) {
+            $errorHandler = $this->container->get('error')->handleException($e);
+            $responseEmitter->emit($errorHandler);
         }
     }
 }

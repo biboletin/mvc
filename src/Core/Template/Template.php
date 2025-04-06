@@ -2,26 +2,19 @@
 
 namespace Bibo\Core\Template;
 
-abstract class Template
+use Bibo\Core\Interfaces\TemplateEngineInterface;
+
+class Template
 {
-    protected string $template;
-    protected array $data = [];
+    private TemplateEngineInterface $engine;
 
-    public function __construct(string $template)
+    public function __construct(TemplateEngineInterface $engine)
     {
-        $this->template = $template;
+        $this->engine = $engine;
     }
 
-    public function assign($key, $value): void
+    public function render(string $view, array $parameters = []): string
     {
-        $this->data[$key] = $value;
-    }
-
-    public function render(): false|string
-    {
-        extract($this->data);
-        ob_start();
-        include $this->template;
-        return ob_get_clean();
+        return $this->engine->render($view, $parameters);
     }
 }

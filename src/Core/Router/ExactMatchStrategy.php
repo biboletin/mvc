@@ -5,7 +5,7 @@ namespace Bibo\Core\BaseRouter;
 /**
  * Simple route matching class
  */
-class ExactMatchStrategy extends AbstractMatchStrategy
+abstract class ExactMatchStrategy extends AbstractMatchStrategy
 {
     /**
      * Simple route matching

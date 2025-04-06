@@ -4,6 +4,7 @@ namespace Bibo\Core\Provider;
 
 use Bibo\Core\Cache\FileCache;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
+use Psr\Container\NotFoundExceptionInterface;
 
 class FileCacheServiceProvider extends ServiceProvider
 {
@@ -17,6 +18,9 @@ class FileCacheServiceProvider extends ServiceProvider
         $this->container->set('file_cache', fn () => new FileCache(CACHE_PATH));
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     */
     public function boot(): void
     {
         $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');

@@ -109,7 +109,7 @@ return [
         'exclude_files' => [
             '.gitignore',
             '.htaccess',
-            'index.php',
+            'index.tpl',
             'robots.txt',
             'web.config',
         ],

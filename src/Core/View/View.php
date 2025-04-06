@@ -2,141 +2,62 @@
 
 namespace Bibo\Core\View;
 
-use Bibo\Core\Cache\FileCache;
-use RuntimeException;
+use Bibo\Core\Template\Template;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\SimpleCache\CacheInterface;
 
+/**
+ *
+ */
 class View
 {
-    protected static array $data = [];
-    protected string $view;
+    /**
+     * @var Template|mixed
+     */
+    protected Template $template;
+    /**
+     * @var CacheInterface|mixed
+     */
+    protected CacheInterface $cache;
+    /**
+     * @var bool
+     */
+    protected bool $enableCache;
 
-    protected FileCache $cache;
-
-    public function __construct()
+    /**
+     * @param ContainerInterface $container
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function __construct(ContainerInterface $container)
     {
-        $this->cache = new FileCache(CACHE_PATH . 'app/');
+        $this->cache = $container->get('file_cache');
+        $this->cache->setPath('app/');
+        $this->template = $container->get('template');
     }
 
     /**
-     * Renders a view and caches the output if not cached.
+     * @param string $key
+     * @param mixed  $value
      *
-     * @param string     $view The view file to render
-     * @param array|null $data The data to pass to the view
-     *
-     * @return string The rendered view
-     * @throws RuntimeException if the view file does not exist
+     * @return void
      */
-    public function render(string $view, ?array $data): string
+    public function assign(string $key, mixed $value): void
     {
-        $viewPath = VIEW_PATH . $view . '.php';
-        $cacheKey = $this->getCacheKey($view, $data);
-
-        // Check if the view is cached
-        if ($cachedContent = $this->cache->get($cacheKey)) {
-            return $cachedContent;
-        }
-
-        if (!file_exists($viewPath)) {
-            throw new RuntimeException("View file '" . $view . "' not found.");
-        }
-
-        ob_start(); // Start output buffering
-        extract($data); // Extract data variables for use in the template
-        include $viewPath; // Include the view file
-        $output = ob_get_clean(); // Get the buffer content and clean it
-
-        // Cache the output for future requests
-        $this->cache->set($cacheKey, $output, 3600); // Cache for 1 hour (optional TTL)
-
-        return $output;
+        $this->template->assign($key, $value);
     }
 
     /**
-     * Generates a unique cache key based on the view name and data.
+     * @param string $templateFile
+     * @param array  $data
      *
-     * @param string     $view The view file name
-     * @param array|null $data The data for the view
-     *
-     * @return string The cache key
+     * @return string
      */
-    protected function getCacheKey(string $view, ?array $data): string
+    public function render(string $templateFile, array $data = []): string
     {
-        // Generate a hash of the view and data to create a unique cache key
-        return md5($view . serialize($data));
-    }
-
-    public function __get($key)
-    {
-        return self::$data[$key];
-    }
-
-    public function __set($key, $value)
-    {
-        self::$data[$key] = $value;
-    }
-
-    public function __isset($key)
-    {
-        return isset(self::$data[$key]);
-    }
-
-    public function __unset($key)
-    {
-        unset(self::$data[$key]);
-    }
-
-    public function __toString()
-    {
-        return $this->render();
-    }
-
-    public function __invoke(): string
-    {
-        return $this->render();
-    }
-
-    public function __call($method, $args)
-    {
-        if (isset(self::$data[$method]) && is_callable(self::$data[$method])) {
-            return call_user_func_array(self::$data[$method], $args);
-        }
-    }
-
-    public static function __callStatic($method, $args)
-    {
-        if (isset(self::$data[$method]) && is_callable(self::$data[$method])) {
-            return call_user_func_array(self::$data[$method], $args);
-        }
-    }
-
-    public function __debugInfo()
-    {
-        return self::$data;
-    }
-
-    public function __sleep()
-    {
-        return ['data'];
-    }
-
-    public function __wakeup()
-    {
-        // do nothing
-    }
-
-    public function __clone()
-    {
-        // do nothing
-    }
-
-    public function renderPartial($view, $data = [])
-    {
-        $view = new $view($data);
-        return $view->render();
-    }
-
-    public function __destruct()
-    {
-        self::$data = [];
+        return $this->template->render($templateFile, $data);
     }
 }

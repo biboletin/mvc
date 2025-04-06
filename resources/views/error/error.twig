@@ -1,0 +1,20 @@
+{% extends "index.twig" %}
+
+{% block title %}{{ code }} - {{ message }}{% endblock %}
+
+{% block content %}
+    <h2>
+        <span style="color: red">{{ code }}</span> - {{ message }}
+    </h2>
+    <p>Oops! Something went wrong on our end.</p>
+    <a href="/">Go back to homepage</a>
+
+    {% if message %}
+        <div class="error-dev-info">
+            <h3>Debug Info</h3>
+            <pre>{{ message }}</pre>
+            <pre>{{ trace }}</pre>
+        </div>
+    {% endif %}
+
+{% endblock %}

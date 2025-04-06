@@ -2,6 +2,7 @@
 
 namespace Bibo\Core\Error;
 
+use Bibo\Core\Template\Template;
 use ErrorException;
 use Throwable;
 
@@ -10,16 +11,73 @@ use Throwable;
  */
 class Error
 {
+    private Template $template;
+
+    private array $errors = [
+        400 => 'Bad Request',
+        401 => 'Unauthorized',
+        403 => 'Forbidden',
+        404 => 'Not Found',
+        405 => 'Method Not Allowed',
+        408 => 'Request Timeout',
+        409 => 'Conflict',
+        410 => 'Gone',
+        411 => 'Length Required',
+        412 => 'Precondition Failed',
+        413 => 'Payload Too Large',
+        414 => 'URI Too Long',
+        415 => 'Unsupported Media Type',
+        416 => 'Range Not Satisfiable',
+        417 => 'Expectation Failed',
+        418 => 'I\'m a teapot',
+        421 => 'Misdirected Request',
+        422 => 'Unprocessable Entity',
+        423 => 'Locked',
+        424 => 'Failed Dependency',
+        425 => 'Too Early',
+        426 => 'Upgrade Required',
+        428 => 'Precondition Required',
+        429 => 'Too Many Requests',
+        431 => 'Request Header Fields Too Large',
+        451 => 'Unavailable For Legal Reasons',
+        500 => 'Internal Server Error',
+        501 => 'Not Implemented',
+        502 => 'Bad Gateway',
+        503 => 'Service Unavailable',
+        504 => 'Gateway Timeout',
+        511 => 'Network Authentication Required',
+        520 => 'Unknown Error',
+        521 => 'Web Server Is Down',
+        522 => 'Connection Timed Out',
+        523 => 'Origin Is Unreachable',
+        524 => 'A Timeout Occurred',
+        525 => 'SSL Handshake Failed',
+        526 => 'Invalid SSL Certificate',
+        527 => 'Railgun Error',
+        530 => 'Site Is Frozen',
+        598 => 'Network Read Timeout Error',
+        599 => 'Network Connect Timeout Error',
+    ];
+
+    public function __construct()
+    {
+    }
+
     /**
      * Register error handler
      *
      * @return void
      */
-    public static function register(): void
+    public function register(): void
     {
-        set_exception_handler([self::class, 'handleException']);
-        set_error_handler([self::class, 'handleError']);
-        register_shutdown_function([self::class, 'handleShutdown']);
+        set_exception_handler([$this, 'handleException']);
+        set_error_handler([$this, 'handleError']);
+        register_shutdown_function([$this, 'handleShutdown']);
+    }
+
+    public function setTemplate(Template $template): void
+    {
+        $this->template = $template;
     }
 
     /**
@@ -29,16 +87,16 @@ class Error
      *
      * @return void
      */
-    public static function handleException(Throwable $exception): void
+    public function handleException(Throwable $exception): void
     {
         $code = $exception->getCode();
 
         http_response_code($code);
 
         if (self::isJsonRequest()) {
-            self::renderJsonError($exception);
+            $this->renderJsonError($exception);
         } else {
-            self::renderErrorPage($code);
+            $this->renderErrorPage($exception, $code);
         }
     }
 
@@ -53,7 +111,7 @@ class Error
      * @return void
      * @throws ErrorException
      */
-    public static function handleError(int $errno, string $errstr, string $errfile, int $errline): void
+    public function handleError(int $errno, string $errstr, string $errfile, int $errline): void
     {
         if (!(error_reporting() & $errno)) {
             return;
@@ -67,7 +125,7 @@ class Error
      *
      * @return void
      */
-    public static function handleShutdown(): void
+    public function handleShutdown(): void
     {
         $error = error_get_last();
         $errorTypes = [
@@ -111,7 +169,7 @@ class Error
      *
      * @return void
      */
-    private static function renderJsonError(Throwable $exception): void
+    private function renderJsonError(Throwable $exception): void
     {
         echo json_encode(
             [
@@ -126,18 +184,20 @@ class Error
     /**
      * Renders html error page
      *
-     * @param int $code
+     * @param Throwable $exception
+     * @param int       $code
      *
      * @return void
      */
-    private static function renderErrorPage(int $code): void
+    private function renderErrorPage(Throwable $exception, int $code): void
     {
-        $errorPage = VIEW_PATH . 'error/' . $code . '.php';
+        $template = 'error/error';
 
-        if (!file_exists($errorPage)) {
-            $errorPage = VIEW_PATH . 'error/500.php';
-        }
-
-        include $errorPage;
+        echo $this->template->render($template, [
+            'code' => $code,
+            'message' => $this->errors[$code],//$exception->getMessage(),
+            'trace' => $exception->getTraceAsString(),
+        ]);
+        exit;
     }
 }

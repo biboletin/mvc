@@ -1,7 +1,7 @@
 // Import JS
 import axios from "axios";
-import './js/libs/ajax';
+import './js/libs/ajax.js';
 
 // Import CSS
-import './css/index.css';
 import './css/variables.css';
+import './css/index.css';

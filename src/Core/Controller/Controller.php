@@ -2,14 +2,17 @@
 
 namespace Bibo\Core\Controller;
 
+use Bibo\Core\View\View;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Controller class
  */
 class Controller
 {
-    private $view;
+    private View $view;
 
     protected ?ContainerInterface $container = null;
 
@@ -18,7 +21,11 @@ class Controller
      */
     public function __construct(?ContainerInterface $container = null)
     {
-        $this->view = $container->get('views');
+        try {
+            $this->view = $container->get('views');
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+            echo $e->getMessage();
+        }
         $this->container = $container;
     }
 

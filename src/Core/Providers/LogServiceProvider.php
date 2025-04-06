@@ -7,6 +7,13 @@ use Bibo\Core\Logger\Logger;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\NotFoundExceptionInterface;
 
+/**
+ * Class LogServiceProvider
+ *
+ * @package Bibo\Core\Provider
+ *
+ * This service provider is responsible for setting up the logger service.
+ */
 class LogServiceProvider extends ServiceProvider
 {
     /**
@@ -31,6 +38,8 @@ class LogServiceProvider extends ServiceProvider
     }
 
     /**
+     * Boot service provider
+     *
      * @throws NotFoundExceptionInterface
      */
     public function boot(): void

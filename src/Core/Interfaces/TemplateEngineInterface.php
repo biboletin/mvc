@@ -3,11 +3,15 @@
 namespace Bibo\Core\Interfaces;
 
 /**
+ * Interface TemplateEngineInterface
  *
+ * @package Bibo\Core\Interfaces
  */
 interface TemplateEngineInterface
 {
     /**
+     * Render a template with the given data.
+     *
      * @param string $template
      * @param array  $data
      *

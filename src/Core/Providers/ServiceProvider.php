@@ -33,6 +33,11 @@ abstract class ServiceProvider
      */
     abstract public function register(): void;
 
+    /**
+     * Boot service provider
+     *
+     * @return void
+     */
     public function boot(): void
     {
     }

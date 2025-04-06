@@ -4,13 +4,49 @@ namespace Bibo\Core\Logger;
 
 use Bibo\Core\Interfaces\LogHandlerInterface;
 
+/**
+ * FileLogHandler
+ * This class is responsible for handling log messages and writing them to a file.
+ * It implements the LogHandlerInterface and provides methods for writing log messages.
+ * It also handles log rotation based on file size and date.
+ */
 class FileLogHandler implements LogHandlerInterface
 {
+    /**
+     * Log file path
+     *
+     * @var string
+     */
     protected string $logFile;
+
+    /**
+     * Log format
+     *
+     * @var string
+     */
     protected string $format;
+
+    /**
+     * Maximum file size for rotation
+     *
+     * @var int
+     */
     protected int $maxFileSize;
+
+    /**
+     * Log directory
+     *
+     * @var string
+     */
     protected string $logDir;
 
+    /**
+     * FileLogHandler constructor
+     *
+     * @param string $logDir
+     * @param string $format
+     * @param int    $maxFileSize
+     */
     public function __construct(string $logDir, string $format = 'text', int $maxFileSize = 10485760) // 10MB
     {
         $this->logDir = $logDir;
@@ -18,6 +54,15 @@ class FileLogHandler implements LogHandlerInterface
         $this->maxFileSize = $maxFileSize;
     }
 
+    /**
+     * Write a log message
+     *
+     * @param string $level
+     * @param string $message
+     * @param array  $context
+     *
+     * @return void
+     */
     public function write(string $level, string $message, array $context = []): void
     {
         $this->rotateLogFile(); // Check if file rotation is needed
@@ -25,11 +70,19 @@ class FileLogHandler implements LogHandlerInterface
         $message = $this->interpolate($message, $context);
         $logEntry = $this->format === 'json'
             ? json_encode(['date' => $date, 'level' => $level, 'message' => $message, 'context' => $context]) . PHP_EOL
-            : "[$date] [$level] $message" . PHP_EOL;
+            : '[' . $date . '] [' . $level . '] ' . $message . PHP_EOL;
 
         file_put_contents($this->logFile, $logEntry, FILE_APPEND);
     }
 
+    /**
+     * Interpolate context variables into the message
+     *
+     * @param string $message
+     * @param array  $context
+     *
+     * @return string
+     */
     private function interpolate(string $message, array $context): string
     {
         foreach ($context as $key => $value) {
@@ -38,6 +91,11 @@ class FileLogHandler implements LogHandlerInterface
         return $message;
     }
 
+    /**
+     * Rotate the log file if it exceeds the maximum size
+     *
+     * @return void
+     */
     private function rotateLogFile(): void
     {
         if (!is_dir($this->logDir)) {

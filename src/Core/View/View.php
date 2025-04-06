@@ -9,24 +9,30 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- *
+ * View
+ * This class is responsible for rendering views using a template engine.
+ * It uses a caching mechanism to store rendered views for better performance.
+ * It also provides methods to assign variables to the template and render it.
+ * The class is designed to be used within a container, allowing for dependency injection.
  */
 class View
 {
     /**
+     * Template engine instance
+     *
      * @var Template|mixed
      */
     protected Template $template;
     /**
+     * Cache instance
+     *
      * @var CacheInterface|mixed
      */
     protected CacheInterface $cache;
-    /**
-     * @var bool
-     */
-    protected bool $enableCache;
 
     /**
+     * View constructor
+     *
      * @param ContainerInterface $container
      *
      * @throws ContainerExceptionInterface
@@ -40,6 +46,8 @@ class View
     }
 
     /**
+     * Assign a variable to the template
+     *
      * @param string $key
      * @param mixed  $value
      *
@@ -51,6 +59,8 @@ class View
     }
 
     /**
+     * Render a template file
+     *
      * @param string $templateFile
      * @param array  $data
      *

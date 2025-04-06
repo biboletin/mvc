@@ -19,6 +19,8 @@ class FileCacheServiceProvider extends ServiceProvider
     }
 
     /**
+     * Boot the service provider
+     *
      * @throws NotFoundExceptionInterface
      */
     public function boot(): void

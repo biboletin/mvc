@@ -7,6 +7,14 @@ use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
+/**
+ * Class ViewServiceProvider
+ * This class is responsible for registering the view service in the container.
+ * It creates an instance of the View class and binds it to the container.
+ * It also provides a boot method to log the successful booting of the service.
+ *
+ * @package Bibo\Core\Providers
+ */
 class ViewServiceProvider extends ServiceProvider
 {
     /**
@@ -28,6 +36,8 @@ class ViewServiceProvider extends ServiceProvider
     }
 
     /**
+     * Boot the service provider
+     *
      * @throws NotFoundExceptionInterface
      */
     public function boot(): void

@@ -21,11 +21,12 @@ $kernel = new Kernel();
 try {
     $kernel->bootstrap($app);
 } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+    ResponseExceptionHandler::handle($e);
 }
 
 // Now, you can run the app and it will handle the routing and response.
 try {
     $app->run();
-} catch (Throwable $e) {
+} catch (JsonException | Throwable $e) {
     ResponseExceptionHandler::handle($e);
 }

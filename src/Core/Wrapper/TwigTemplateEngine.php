@@ -42,16 +42,6 @@ class TwigTemplateEngine implements TemplateEngineInterface
      */
     public function render(string $template, array $data = []): string
     {
-        return $this->twig->render($template . '.twig', $data);
-    }
-
-    /**
-     * Get template engine
-     *
-     * @return Environment
-     */
-    public function getTwig(): Environment
-    {
-        return $this->twig;
+        return $this->twig->render($template, $data);
     }
 }

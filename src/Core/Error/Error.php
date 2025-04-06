@@ -2,6 +2,7 @@
 
 namespace Bibo\Core\Error;
 
+use Bibo\Core\Exception\NotFoundException;
 use Bibo\Core\Template\Template;
 use ErrorException;
 use Throwable;
@@ -188,6 +189,7 @@ class Error
      * @param int       $code
      *
      * @return void
+     * @throws NotFoundException
      */
     private function renderErrorPage(Throwable $exception, int $code): void
     {
@@ -195,7 +197,8 @@ class Error
 
         echo $this->template->render($template, [
             'code' => $code,
-            'message' => $this->errors[$code],//$exception->getMessage(),
+            'message' => $this->errors[$code],
+            'exception' => $exception->getMessage(),
             'trace' => $exception->getTraceAsString(),
         ]);
         exit;

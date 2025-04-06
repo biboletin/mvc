@@ -7,13 +7,17 @@
         <span style="color: red">{{ code }}</span> - {{ message }}
     </h2>
     <p>Oops! Something went wrong on our end.</p>
+
+    <p> {{ exception }}</p>
+
+    <p>We are working to fix the issue. Please try again later.</p>
     <a href="/">Go back to homepage</a>
 
     {% if message %}
         <div class="error-dev-info">
             <h3>Debug Info</h3>
             <pre>{{ message }}</pre>
-            <pre>{{ trace }}</pre>
+            <pre style="color: #3FB8AF">{{ trace }}</pre>
         </div>
     {% endif %}
 

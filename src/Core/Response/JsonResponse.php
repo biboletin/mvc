@@ -57,6 +57,11 @@ class JsonResponse extends BaseResponse
         return $this->withBody($body);
     }
 
+    /**
+     * Send the JSON response
+     *
+     * @return void
+     */
     public function send(): void
     {
         http_response_code($this->getStatusCode()); // Ensure proper HTTP status

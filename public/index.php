@@ -15,8 +15,9 @@ $app = new App(new Container());
 
 include __DIR__ . '/../bootstrap/bootstrap.php';
 
-
-
+/*
+ * Load the application configuration
+ */
 $kernel = new Kernel();
 try {
     $kernel->bootstrap($app);

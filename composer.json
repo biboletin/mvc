@@ -21,6 +21,7 @@
             "Bibo\\Core\\Cron\\": "src/Core/Cron/",
             "Bibo\\Core\\Database\\": "src/Core/Database/",
             "Bibo\\Core\\Error\\": "src/Core/Error/",
+            "Bibo\\Core\\Enum\\": "src/Core/Enums/",
             "Bibo\\Core\\Exception\\": "src/Core/Exception/",
             "Bibo\\Core\\Extension\\": "src/Core/Extension/",
             "Bibo\\Core\\Facades\\": "src/Core/Facades/",

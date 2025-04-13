@@ -2,6 +2,7 @@
 
 namespace Bibo\Core\Error;
 
+use Bibo\Core\Enum\HttpStatus;
 use Bibo\Core\Exception\NotFoundException;
 use Bibo\Core\Template\Template;
 use ErrorException;
@@ -13,52 +14,6 @@ use Throwable;
 class Error
 {
     private Template $template;
-
-    private array $errors = [
-        400 => 'Bad Request',
-        401 => 'Unauthorized',
-        403 => 'Forbidden',
-        404 => 'Not Found',
-        405 => 'Method Not Allowed',
-        408 => 'Request Timeout',
-        409 => 'Conflict',
-        410 => 'Gone',
-        411 => 'Length Required',
-        412 => 'Precondition Failed',
-        413 => 'Payload Too Large',
-        414 => 'URI Too Long',
-        415 => 'Unsupported Media Type',
-        416 => 'Range Not Satisfiable',
-        417 => 'Expectation Failed',
-        418 => 'I\'m a teapot',
-        421 => 'Misdirected Request',
-        422 => 'Unprocessable Entity',
-        423 => 'Locked',
-        424 => 'Failed Dependency',
-        425 => 'Too Early',
-        426 => 'Upgrade Required',
-        428 => 'Precondition Required',
-        429 => 'Too Many Requests',
-        431 => 'Request Header Fields Too Large',
-        451 => 'Unavailable For Legal Reasons',
-        500 => 'Internal Server Error',
-        501 => 'Not Implemented',
-        502 => 'Bad Gateway',
-        503 => 'Service Unavailable',
-        504 => 'Gateway Timeout',
-        511 => 'Network Authentication Required',
-        520 => 'Unknown Error',
-        521 => 'Web Server Is Down',
-        522 => 'Connection Timed Out',
-        523 => 'Origin Is Unreachable',
-        524 => 'A Timeout Occurred',
-        525 => 'SSL Handshake Failed',
-        526 => 'Invalid SSL Certificate',
-        527 => 'Railgun Error',
-        530 => 'Site Is Frozen',
-        598 => 'Network Read Timeout Error',
-        599 => 'Network Connect Timeout Error',
-    ];
 
     public function __construct()
     {
@@ -87,18 +42,27 @@ class Error
      * @param Throwable $exception
      *
      * @return void
+     * @throws NotFoundException
      */
     public function handleException(Throwable $exception): void
     {
+        if (ob_get_length()) {
+            ob_clean();
+        }
+
         $code = $exception->getCode();
 
-        http_response_code($code);
+        // Try to match with HttpStatus or fallback to 500
+        $status = HttpStatus::tryFrom($code) ?? HttpStatus::InternalServerError;
+        http_response_code($status->value);
 
         if (self::isJsonRequest()) {
-            $this->renderJsonError($exception);
+            $this->renderJsonError($exception, $status);
         } else {
-            $this->renderErrorPage($exception, $code);
+            $this->renderErrorPage($exception, $status);
         }
+
+        ob_end_flush();
     }
 
     /**
@@ -114,10 +78,6 @@ class Error
      */
     public function handleError(int $errno, string $errstr, string $errfile, int $errline): void
     {
-        if (!(error_reporting() & $errno)) {
-            return;
-        }
-
         throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 
@@ -125,6 +85,7 @@ class Error
      * Shutdown function
      *
      * @return void
+     * @throws NotFoundException
      */
     public function handleShutdown(): void
     {
@@ -137,13 +98,19 @@ class Error
             E_COMPILE_ERROR,
             E_USER_ERROR,
             E_USER_WARNING,
+            E_USER_NOTICE,
+            E_RECOVERABLE_ERROR,
+            E_DEPRECATED,
+            E_USER_DEPRECATED,
+            E_NOTICE,
+            E_ALL,
         ];
 
         if ($error !== null && in_array($error['type'], $errorTypes)) {
             self::handleException(
                 new ErrorException(
                     $error['message'],
-                    0,
+                    500,
                     $error['type'],
                     $error['file'],
                     $error['line']
@@ -170,13 +137,13 @@ class Error
      *
      * @return void
      */
-    private function renderJsonError(Throwable $exception): void
+    private function renderJsonError(Throwable $exception, HttpStatus $status): void
     {
         echo json_encode(
             [
                 'error' => true,
                 'message' => $exception->getMessage(),
-                'code' => $exception->getCode(),
+                'code' => $status->value,
             ],
             JSON_PRETTY_PRINT
         );
@@ -185,19 +152,19 @@ class Error
     /**
      * Renders html error page
      *
-     * @param Throwable $exception
-     * @param int       $code
+     * @param Throwable  $exception
+     * @param HttpStatus $status
      *
      * @return void
      * @throws NotFoundException
      */
-    private function renderErrorPage(Throwable $exception, int $code): void
+    private function renderErrorPage(Throwable $exception, HttpStatus $status): void
     {
         $template = 'error/error';
 
         echo $this->template->render($template, [
-            'code' => $code,
-            'message' => $this->errors[$code],
+            'code' => $status->value,
+            'message' => $status->message(),
             'exception' => $exception->getMessage(),
             'trace' => $exception->getTraceAsString(),
         ]);

@@ -2,6 +2,7 @@
 
 namespace Bibo\Core\Exception;
 
+use Bibo\Core\Response\HtmlResponse;
 use Bibo\Core\Response\JsonResponse;
 use Bibo\Core\Response\ResponseEmitter;
 use JsonException;
@@ -23,8 +24,21 @@ class ResponseExceptionHandler extends AppException
     {
         $code = $exception->getCode() ?: 500;
 
-        $response = new JsonResponse(['error' => $exception->getMessage()], $code);
+        $response = self::isJsonRequest()
+            ? new JsonResponse(['error' => $exception->getMessage()], $code)
+            : new HtmlResponse($exception->getMessage(), $code);
         $responseEmitter = new ResponseEmitter();
         $responseEmitter->emit($response);
+    }
+
+    /**
+     * Check if the request is expecting JSON
+     *
+     * @return bool
+     */
+    private static function isJsonRequest(): bool
+    {
+        $acceptHeader = $_SERVER['HTTP_ACCEPT'] ?? '';
+        return str_contains($acceptHeader, 'application/json') !== false;
     }
 }

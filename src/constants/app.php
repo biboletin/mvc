@@ -119,4 +119,3 @@ if (!defined('MODEL_PATH')) {
 
     define('MODEL_PATH', realpath(__DIR__ . '/../../app/Models/') . DIRECTORY_SEPARATOR);
 }
-

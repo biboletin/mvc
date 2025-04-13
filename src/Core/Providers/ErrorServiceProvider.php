@@ -12,15 +12,15 @@ class ErrorServiceProvider extends ServiceProvider
      * Register service provider
      *
      * @return void
+     * @throws NotFoundExceptionInterface
      */
     public function register(): void
     {
-        $this->container->set('error', function () {
-            $error = new Error();
+        $error = new Error();
+        $error->setTemplate($this->container->get('template'));
+        $error->register();
 
-            $error->setTemplate($this->container->get('template'));
-            $error->register();
-
+        $this->container->set('error', function () use ($error) {
             return $error;
         });
     }

@@ -16,7 +16,6 @@ class IndexController extends Controller
      * Index
      *
      * @return string
-     * @throws InvalidArgumentException
      */
     public function index(): string
     {
@@ -40,7 +39,6 @@ class IndexController extends Controller
      * About
      *
      * @return string
-     * @throws InvalidArgumentException
      */
     public function about(): string
     {

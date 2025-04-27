@@ -7,8 +7,9 @@
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
+{{ include('navigation/nav.twig') }}
 <header>
-    <h1>My Website</h1>
+    <h1 class="bd-title mt-0">My Website</h1>
 </header>
 
 <main>
@@ -20,5 +21,6 @@
 <footer>
     <p>&copy; {{ "now"|date("Y") }} My Website</p>
 </footer>
+<script src="js/main.js"></script>
 </body>
 </html>

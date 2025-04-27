@@ -4,7 +4,7 @@ use Bibo\App\Controllers\IndexController;
 use Bibo\App\Controllers\InstallController;
 use Bibo\Core\Facades\Route;
 
-Route::get('/', [IndexController::class, 'index']);
+Route::get('/', [IndexController::class, 'index'], ['csrf']);
 
 Route::get('/about', [IndexController::class, 'about']);
 

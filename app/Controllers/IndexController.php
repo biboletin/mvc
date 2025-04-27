@@ -5,7 +5,6 @@ namespace Bibo\App\Controllers;
 use Bibo\Core\Controller\Controller;
 use Bibo\Core\Response\JsonResponse;
 use JsonException;
-use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * Index controller

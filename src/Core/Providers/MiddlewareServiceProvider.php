@@ -2,31 +2,30 @@
 
 namespace Bibo\Core\Provider;
 
-use Bibo\Core\BaseRouter\BaseRouter;
-use Bibo\Core\BaseRouter\CachedRegexMatchStrategy;
-use Bibo\Core\Facades\Route;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\NotFoundExceptionInterface;
 
-class RouteServiceProvider extends ServiceProvider
+class MiddlewareServiceProvider extends ServiceProvider
 {
     /**
      * Register service provider
      *
      * @return void
+     * @throws NotFoundExceptionInterface
      */
     public function register(): void
     {
-        $container = $this->container;
-        $router = new BaseRouter($container, new CachedRegexMatchStrategy());
-        Route::init($router);
+        $dispatcher = $this->container->get('middleware_dispatcher');
 
-        include __DIR__ . '/../../../routes/web.php';
-
-        $this->container->set('router', fn () => $router);
+        $this->container->set('middleware', function () use ($dispatcher) {
+            return $dispatcher;
+        });
     }
 
     /**
+     * Boot service provider
+     *
+     * @return void
      * @throws NotFoundExceptionInterface
      */
     public function boot(): void

@@ -120,7 +120,7 @@ class Error
     }
 
     /**
-     * If request is json
+     * If request is JSON
      *
      * @return bool
      */
@@ -133,7 +133,8 @@ class Error
      * If request is json
      * echo json string
      *
-     * @param Throwable $exception
+     * @param Throwable  $exception
+     * @param HttpStatus $status
      *
      * @return void
      */

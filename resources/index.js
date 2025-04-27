@@ -1,7 +1,16 @@
-// Import JS
-import axios from "axios";
+// Import JS libs
+
+// import axios from "axios";
+
+// Import CSS libs
+
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+
+// Import custom JS
+
 import './js/libs/ajax.js';
 
-// Import CSS
+// Import custom CSS
+
 import './css/variables.css';
 import './css/index.css';

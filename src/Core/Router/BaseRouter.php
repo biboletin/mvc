@@ -11,9 +11,10 @@ use Bibo\Core\Response\JsonResponse;
 use Bibo\Core\View\View;
 use Exception;
 use JsonException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
-
 use function array_find;
 
 /**
@@ -64,11 +65,16 @@ class BaseRouter implements RouterInterface
      * @param string         $method
      * @param string         $route
      * @param array|callable $handler
+     * @param array          $middleware
      *
      * @return void
      */
-    private function add(string $method, string $route, array|callable $handler): void
-    {
+    private function add(
+        string $method,
+        string $route,
+        array|callable $handler,
+        ?array $middleware = null
+    ): void {
         // $fullRoute = ($this->currentRouteGroup ? '/' . $this->currentRouteGroup : '')
         // . '/' . trim($route, '/');
         // $this->routes[] = [
@@ -76,19 +82,26 @@ class BaseRouter implements RouterInterface
         //     'route' => $fullRoute,
         //     'handler' => $callback,
         // ];
-        $this->routes[] = compact('method', 'route', 'handler');
+        $this->routes[] = compact(
+            'method',
+            'route',
+            'handler',
+            'middleware'
+        );
     }
+
     /**
      * Set GET routes
      *
      * @param string         $route
      * @param array|callable $callable
+     * @param array|null     $middleware
      *
      * @return RouterInterface
      */
-    public function get(string $route, callable|array $callable): RouterInterface
+    public function get(string $route, callable|array $callable, ?array $middleware = null): RouterInterface
     {
-        $this->add('GET', $route, $callable);
+        $this->add('GET', $route, $callable, $middleware);
         return $this;
     }
 
@@ -97,12 +110,13 @@ class BaseRouter implements RouterInterface
      *
      * @param string         $route
      * @param array|callable $callable
+     * @param array          $middleware
      *
      * @return RouterInterface
      */
-    public function post(string $route, callable|array $callable): RouterInterface
+    public function post(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
-        $this->add('POST', $route, $callable);
+        $this->add('POST', $route, $callable, $middleware);
         return $this;
     }
 
@@ -111,12 +125,13 @@ class BaseRouter implements RouterInterface
      *
      * @param string         $route
      * @param array|callable $callable
+     * @param array          $middleware
      *
      * @return RouterInterface
      */
-    public function put(string $route, callable|array $callable): RouterInterface
+    public function put(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
-        $this->add('PUT', $route, $callable);
+        $this->add('PUT', $route, $callable, $middleware);
         return $this;
     }
 
@@ -125,12 +140,13 @@ class BaseRouter implements RouterInterface
      *
      * @param string         $route
      * @param array|callable $callable
+     * @param array          $middleware
      *
      * @return RouterInterface
      */
-    public function delete(string $route, callable|array $callable): RouterInterface
+    public function delete(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
-        $this->add('DELETE', $route, $callable);
+        $this->add('DELETE', $route, $callable, $middleware);
         return $this;
     }
 
@@ -179,21 +195,35 @@ class BaseRouter implements RouterInterface
      *
      * @throws JsonException
      * @throws Exception
+     * @throws NotFoundExceptionInterface|ContainerExceptionInterface
      */
     protected function handleRoute(array $route, array $params = []): ResponseInterface
     {
         $handler = $route['handler'];
 
-        if (is_callable($handler)) {
-            return $this->handleCallable($handler, $params);
-        }
+        $coreHandler = function () use ($handler, $params) {
+            if (is_callable($handler)) {
+                return $this->handleCallable($handler, $params);
+            }
 
-        if (is_array($handler) && count($handler) === 2) {
-            return $this->handleController($handler, $params);
-        }
+            if (is_array($handler) && count($handler) === 2) {
+                return $this->handleController($handler, $params);
+            }
 
-        throw new Exception('Invalid route handler');
+            throw new Exception('Invalid route handler');
+        };
+
+        // You must create or inject the current request here
+        $request = $this->container->get('request');
+
+        return $this->container->get('middleware_dispatcher')->dispatch(
+            $request,
+            $coreHandler,
+            $route['middleware'] ?? []
+        );
     }
+
+
 
     /**
      * Handles callables and wraps responses properly
@@ -206,7 +236,7 @@ class BaseRouter implements RouterInterface
         $response = call_user_func_array($handler, $params);
         $output = ob_get_clean(); // Get the output
 
-        // If handler returns a ResponseInterface, return it
+        // If the handler returns a ResponseInterface, return it
         if ($response instanceof ResponseInterface) {
             return $response;
         }

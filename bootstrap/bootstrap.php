@@ -6,6 +6,8 @@ use Bibo\Core\Provider\ControllerServiceProvider;
 use Bibo\Core\Provider\ErrorServiceProvider;
 use Bibo\Core\Provider\FileCacheServiceProvider;
 use Bibo\Core\Provider\LogServiceProvider;
+use Bibo\Core\Provider\MiddlewareDispatcherServiceProvider;
+use Bibo\Core\Provider\MiddlewareServiceProvider;
 use Bibo\Core\Provider\ModelServiceProvider;
 use Bibo\Core\Provider\RequestServiceProvider;
 use Bibo\Core\Provider\RouteServiceProvider;
@@ -24,6 +26,8 @@ $providers = [
     TemplateServiceProvider::class,
     LogServiceProvider::class,
     ErrorServiceProvider::class,
+    MiddlewareDispatcherServiceProvider::class,
+    MiddlewareServiceProvider::class,
     AppServiceProvider::class,
     RouteServiceProvider::class,
     RequestServiceProvider::class,

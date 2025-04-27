@@ -40,12 +40,13 @@ class Route
      *
      * @param string         $path
      * @param array|callable $handler
+     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function get(string $path, array|callable $handler): BaseRouter
+    public static function get(string $path, array|callable $handler, ?array $middleware = null): BaseRouter
     {
-        return self::getInstance()->get($path, $handler);
+        return self::getInstance()->get($path, $handler, $middleware);
     }
 
     /**
@@ -53,12 +54,13 @@ class Route
      *
      * @param string         $path
      * @param array|callable $handler
+     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function post(string $path, array|callable $handler): BaseRouter
+    public static function post(string $path, array|callable $handler, array $middleware): BaseRouter
     {
-        return self::getInstance()->post($path, $handler);
+        return self::getInstance()->post($path, $handler, $middleware);
     }
 
     /**
@@ -66,12 +68,13 @@ class Route
      *
      * @param string         $path
      * @param array|callable $handler
+     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function put(string $path, array|callable $handler): BaseRouter
+    public static function put(string $path, array|callable $handler, array $middleware): BaseRouter
     {
-        return self::getInstance()->put($path, $handler);
+        return self::getInstance()->put($path, $handler, $middleware);
     }
 
     /**
@@ -79,12 +82,13 @@ class Route
      *
      * @param string         $path
      * @param array|callable $handler
+     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function delete(string $path, array|callable $handler): BaseRouter
+    public static function delete(string $path, array|callable $handler, array $middleware): BaseRouter
     {
-        return self::getInstance()->delete($path, $handler);
+        return self::getInstance()->delete($path, $handler, $middleware);
     }
 
     /**

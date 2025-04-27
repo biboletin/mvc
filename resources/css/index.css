@@ -1,5 +1,5 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-    background-color: var(--light-background);
-    color: var(--dark-text);
+    background-color: var(--dark-theme-background);
+    color: var(--dark-theme-text);
 }

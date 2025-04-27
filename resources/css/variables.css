@@ -16,7 +16,7 @@
     --dark-theme-border: #f5f5f5;
 
     /*Light theme*/
-    --light-background: #f5f5f5;
-    --light-text: #1a1a1a;
-    --light-border: #1a1a1a;
+    --light-theme-background: #f5f5f5;
+    --light-theme-text: #1a1a1a;
+    --light-theme-border: #1a1a1a;
 }

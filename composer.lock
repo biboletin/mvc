@@ -1099,12 +1099,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/vlucas/phpdotenv.git",
-                "reference": "a59a13791077fe3d44f90e7133eb68e7d22eaff2"
+                "reference": "20d6a1bdfd62910da28b447b2ccb39ac542e96b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/a59a13791077fe3d44f90e7133eb68e7d22eaff2",
-                "reference": "a59a13791077fe3d44f90e7133eb68e7d22eaff2",
+                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/20d6a1bdfd62910da28b447b2ccb39ac542e96b2",
+                "reference": "20d6a1bdfd62910da28b447b2ccb39ac542e96b2",
                 "shasum": ""
             },
             "require": {
@@ -1164,7 +1164,7 @@
             ],
             "support": {
                 "issues": "https://github.com/vlucas/phpdotenv/issues",
-                "source": "https://github.com/vlucas/phpdotenv/tree/v5.6.1"
+                "source": "https://github.com/vlucas/phpdotenv/tree/master"
             },
             "funding": [
                 {
@@ -1176,7 +1176,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-07-20T21:52:34+00:00"
+            "time": "2025-04-16T09:40:23+00:00"
         }
     ],
     "packages-dev": [
@@ -1747,12 +1747,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "3ef7e2b5b88f991188a17d665681eb5989499456"
+                "reference": "ca562763f1ac33c9123743b02f4cbf5b95a160f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/3ef7e2b5b88f991188a17d665681eb5989499456",
-                "reference": "3ef7e2b5b88f991188a17d665681eb5989499456",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ca562763f1ac33c9123743b02f4cbf5b95a160f4",
+                "reference": "ca562763f1ac33c9123743b02f4cbf5b95a160f4",
                 "shasum": ""
             },
             "require": {
@@ -1848,7 +1848,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-04-13T12:13:19+00:00"
+            "time": "2025-04-26T13:44:02+00:00"
         },
         {
             "name": "sebastian/cli-parser",

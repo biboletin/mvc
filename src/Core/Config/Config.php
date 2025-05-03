@@ -2,11 +2,21 @@
 
 namespace Bibo\Core\Config;
 
+use Bibo\Core\Cache\FileCache;
 use Bibo\Core\Interfaces\ConfigInterface;
 use RuntimeException;
 
 /**
- * Config
+ * Configuration class for managing application settings and options.
+ *
+ * TODO: Add support for loading configuration from different sources (e.g., database, API)
+ * TODO: Load configuration files from a specific directory
+ * TODO: Add support for environment-specific configuration files
+ * TODO: Add support for configuration caching
+ * TODO: Add support for configuration validation
+ * TODO: Add support for configuration merging
+ * TODO: Add support for configuration overrides
+ * TODO: Add support for configuration serialization
  */
 class Config implements ConfigInterface
 {
@@ -16,6 +26,7 @@ class Config implements ConfigInterface
      * @var array
      */
     private static array $config = [];
+    private static FileCache $cache;
 
     /**
      * Get a configuration value
@@ -59,6 +70,54 @@ class Config implements ConfigInterface
         return !empty(self::$config) ? self::$config : [];
     }
 
+    public static function load(): void
+    {
+        $configFiles = glob(CONFIG_PATH . '*.php');
+
+        $config = [];
+        foreach ($configFiles as $file) {
+            $name = basename($file, '.php');
+            $contents = include $file;
+
+            if (is_array($contents)) {
+                // Flatten if the array has only one top-level key (e.g., 'app' => [...])
+                if (count($contents) === 1 && isset($contents[$name])) {
+                    $config[$name] = $contents[$name];
+                } else {
+                    $config[$name] = $contents;
+                }
+            }
+        }
+
+        self::format($config);
+    }
+
+    private static function format(array $config): void
+    {
+        foreach ($config as $name => $conf) {
+            foreach ($conf as $key => $value) {
+                $key = trim(strtoupper($name . '_' . $key));
+                if (is_array($value)) {
+                    self::$config[$key] = $value;
+                } elseif (is_bool($value)) {
+                    self::$config[$key] = $value ? 'true' : 'false';
+                } elseif (is_null($value)) {
+                    self::$config[$key] = 'null';
+                } else {
+                    self::$config[$key] = $value;
+                }
+            }
+        }
+
+        if (file_exists(CACHE_PATH . '/config/config.php')) {
+            $cache = CACHE_PATH . 'config/config.php';
+            file_put_contents(
+                $cache,
+                "<?php\n\nreturn " . var_export(self::$config, true) . ";\n",
+                LOCK_EX
+            );
+        }
+    }
     /**
      * Load a configuration file
      *
@@ -67,7 +126,7 @@ class Config implements ConfigInterface
      * @return void
      * @throws RuntimeException
      */
-    public static function load(string $file): void
+    public static function loadFromFile(string $file): void
     {
         if (!file_exists($file)) {
             throw new RuntimeException("Configuration file not found: {$file}");
@@ -106,7 +165,12 @@ class Config implements ConfigInterface
         }
     }
 
-    public function generateConstants(): void
+    /**
+     * Convert configuration values to constants
+     *
+     * @return void
+     */
+    public function toConstants(): void
     {
         if (empty(self::$config)) {
             return;

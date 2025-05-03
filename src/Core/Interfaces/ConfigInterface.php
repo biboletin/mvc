@@ -36,11 +36,18 @@ interface ConfigInterface
     public static function all(): array;
 
     /**
+     * Load the config files from the config directory
+     *
+     * @return void
+     */
+    public static function load(): void;
+
+    /**
      * Load a config file
      *
      * @param string $file
      *
      * @return void
      */
-    public static function load(string $file): void;
+    public static function loadFromFile(string $file): void;
 }

@@ -28,7 +28,7 @@ return [
          * Application version
          */
 
-        'version' => '1.0.0',
+        'version' => config('app_version', '1.0.0'),
 
         /*
          * Application environment
@@ -52,7 +52,7 @@ return [
          * Application timezone
          */
 
-        'timezone' => date_default_timezone_set(config('app_timezone', 'UTC')),
+        'timezone' => date_default_timezone_set(config('app_timezone', 'Europe/Sofia')),
 
         /*
          * Application locale

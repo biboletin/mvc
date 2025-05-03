@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Log config
+ * Log config file
  */
 
 return [

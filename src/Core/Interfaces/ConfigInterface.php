@@ -17,23 +17,7 @@ interface ConfigInterface
      *
      * @return mixed
      */
-    public function get(string $key, ?string $default = null): mixed;
-
-    /**
-     * Set a value in the config
-     * If the key already exists, overwrite it
-     * If the key does not exist, create it
-     * If the value is null, remove the key
-     * If the value is an array, merge it with the existing value
-     * If the value is a string, replace the existing value
-     * If the value is an object, convert it to an array
-     *
-     * @param string $key
-     * @param $value
-     *
-     * @return void
-     */
-    public function set(string $key, $value): void;
+    public static function get(string $key, ?string $default = null): mixed;
 
     /**
      * Check if a key exists in the config
@@ -42,14 +26,14 @@ interface ConfigInterface
      *
      * @return bool
      */
-    public function has(string $key): bool;
+    public static function has(string $key): bool;
 
     /**
      * Get all the values from the config
      *
      * @return array
      */
-    public function all(): array;
+    public static function all(): array;
 
     /**
      * Load a config file
@@ -58,55 +42,5 @@ interface ConfigInterface
      *
      * @return void
      */
-    public function load(string $file): void;
-
-    /**
-     * Save the config to a file
-     *
-     * @param string $file
-     *
-     * @return void
-     */
-    public function save(string $file): void;
-
-    /**
-     * Merge an array into the config
-     *
-     * @param array $config
-     *
-     * @return void
-     */
-    public function merge(array $config): void;
-
-    /**
-     * Merge a file into the config
-     *
-     * @param string $file
-     *
-     * @return void
-     */
-    public function mergeFile(string $file): void;
-
-    /**
-     * Remove a key from the config
-     *
-     * @param string $key
-     *
-     * @return void
-     */
-    public function remove(string $key): void;
-
-    /**
-     * Parse the config from an ini file
-     *
-     * @return void
-     */
-    public function parseFromIni(): void;
-
-    /**
-     * Parse the config from database config settings
-     *
-     * @return void
-     */
-    public function parseFromDb(): void;
+    public static function load(string $file): void;
 }

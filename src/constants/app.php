@@ -77,7 +77,7 @@ if (!defined('ROOT_PATH')) {
      * Root directory path
      */
 
-    define('ROOT_PATH', realpath(__DIR__ . '/../../'));
+    define('ROOT_PATH', realpath(__DIR__ . '/../../') . DIRECTORY_SEPARATOR);
 }
 
 if (!defined('VENDOR_PATH')) {
@@ -118,4 +118,28 @@ if (!defined('BOOTSTRAP_PATH')) {
      */
 
     define('BOOTSTRAP_PATH', realpath(__DIR__ . '/../../bootstrap') . DIRECTORY_SEPARATOR);
+}
+
+if (!defined('APP_CACHE_PATH')) {
+    /*
+     * Application cache directory path
+     */
+
+    define('APP_CACHE_PATH', CACHE_PATH . '/app' . DIRECTORY_SEPARATOR);
+}
+
+if (!defined('CONFIG_CACHE_PATH')) {
+    /*
+     * Config cache directory path
+     */
+
+    define('CONFIG_CACHE_PATH', CACHE_PATH . '/config' . DIRECTORY_SEPARATOR);
+}
+
+if (!defined('ROUTES_CACHE_PATH')) {
+    /*
+     * Routes cache directory path
+     */
+
+    define('ROUTES_CACHE_PATH', CACHE_PATH . '/routes' . DIRECTORY_SEPARATOR);
 }

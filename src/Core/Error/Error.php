@@ -3,6 +3,7 @@
 namespace Bibo\Core\Error;
 
 use Bibo\Core\Enum\HttpStatus;
+use Bibo\Core\Exception\AppException;
 use Bibo\Core\Exception\NotFoundException;
 use Bibo\Core\Template\Template;
 use ErrorException;
@@ -167,7 +168,10 @@ class Error
             'code' => $status->value,
             'message' => $status->message(),
             'exception' => $exception->getMessage(),
-            'trace' => $exception->getTraceAsString(),
+            'debug' => config('app_debug'),
+            'trace' => config('app_debug')
+                ? $exception->getTraceAsString()
+                : '',
         ]);
         exit;
     }

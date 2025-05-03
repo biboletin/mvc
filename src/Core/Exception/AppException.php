@@ -10,6 +10,9 @@ use Throwable;
  */
 class AppException extends Exception
 {
+    protected $code = 500;
+
+    protected $message = 'Internal Server Error!';
     /**
      * Constructor
      *
@@ -17,8 +20,20 @@ class AppException extends Exception
      * @param int            $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $message = '', int $code = 500, ?Throwable $previous = null)
+    public function __construct(string $message = '', int $code = 404, ?Throwable $previous = null)
     {
+        if (empty($message)) {
+            $message = $this->message;
+        }
+
+        if (empty($code)) {
+            $code = $this->code;
+        }
+
+        if (empty($previous)) {
+            $previous = $this;
+        }
+
         parent::__construct($message, $code, $previous);
     }
 }

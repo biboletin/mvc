@@ -15,17 +15,7 @@ class Config implements ConfigInterface
      *
      * @var array
      */
-    private array $config = [];
-
-    /**
-     * Config constructor
-     *
-     * Initializes the configuration array.
-     */
-    public function __construct()
-    {
-        $this->config = [];
-    }
+    private static array $config = [];
 
     /**
      * Get a configuration value
@@ -35,22 +25,9 @@ class Config implements ConfigInterface
      *
      * @return mixed
      */
-    public function get(string $key, ?string $default = null): mixed
+    public static function get(string $key, ?string $default = null): mixed
     {
-        return $this->config[$key] ?? $default;
-    }
-
-    /**
-     * Set a configuration value
-     *
-     * @param string $key
-     * @param mixed $value
-     *
-     * @return void
-     */
-    public function set(string $key, $value): void
-    {
-        $this->config[$key] = $value;
+        return self::$config[trim(strtoupper($key))] ?? $default;
     }
 
     /**
@@ -60,9 +37,9 @@ class Config implements ConfigInterface
      *
      * @return bool
      */
-    public function has(string $key): bool
+    public static function has(string $key): bool
     {
-        return array_key_exists($key, $this->config);
+        return array_key_exists($key, self::$config);
     }
 
     /**
@@ -70,9 +47,16 @@ class Config implements ConfigInterface
      *
      * @return array
      */
-    public function all(): array
+    public static function all(): array
     {
-        return !empty($this->config) ? $this->config : [];
+        if (file_exists(CONFIG_CACHE_PATH . 'config.php')) {
+            $config = include CONFIG_CACHE_PATH . 'config.php';
+
+            if (is_array($config)) {
+                self::$config = $config;
+            }
+        }
+        return !empty(self::$config) ? self::$config : [];
     }
 
     /**
@@ -83,95 +67,69 @@ class Config implements ConfigInterface
      * @return void
      * @throws RuntimeException
      */
-    public function load(string $file): void
+    public static function load(string $file): void
     {
-        $key = basename($file, '.php');
-        $content = require($file);
-
-        if (!is_array($content)) {
-            throw new RuntimeException('Configuration file ' . $file . ' must return an array');
+        if (!file_exists($file)) {
+            throw new RuntimeException("Configuration file not found: {$file}");
         }
 
-        $this->config[$key] = $content;
-    }
+        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-    /**
-     * Merge configuration values
-     *
-     * @param array $config
-     *
-     * @return void
-     */
-    public function merge(array $config): void
-    {
-        $this->config = array_merge($this->config, $config);
-    }
+        foreach ($lines as $line) {
+            $line = trim($line);
 
-    /**
-     * Remove a configuration value
-     *
-     * @param string $key
-     *
-     * @return void
-     */
-    public function remove(string $key): void
-    {
-        unset($this->config[$key]);
-    }
+            if ($line === '' || str_starts_with($line, '#')) {
+                continue;
+            }
 
-    /**
-     * Parse the config from environment variables
-     *
-     * @return void
-     */
-    public function parseFromEnv(): void
-    {
-        foreach ($_ENV as $key => $value) {
-            $this->set($key, $value);
+            [$key, $value] = array_pad(explode('=', $line, 2), 2, null);
+            $key = trim($key);
+            $value = trim($value);
+
+            if (in_array(strtolower($value), ['true', 'false', 'null'], true)) {
+                $value = strtolower($value) === 'true';
+            } elseif (is_numeric($value)) {
+                $value = $value + 0;
+            } elseif (preg_match('/^["\'](.*)["\']$/', $value, $matches)) {
+                $value = $matches[1];
+            }
+            self::$config[$key] = $value;
+
+            if (file_exists(CACHE_PATH . '/config/config.php')) {
+                $cache = CACHE_PATH . 'config/config.php';
+                file_put_contents(
+                    $cache,
+                    "<?php\n\nreturn " . var_export(self::$config, true) . ";\n",
+                    LOCK_EX
+                );
+            }
         }
     }
 
-    /**
-     * Save the config to a file
-     *
-     * @param string $file
-     *
-     * @return void
-     */
-    public function save(string $file): void
+    public function generateConstants(): void
     {
-        // TODO: Implement save() method.
-    }
+        if (empty(self::$config)) {
+            return;
+        }
 
-    /**
-     * Merge a file into the config
-     *
-     * @param string $file
-     *
-     * @return void
-     */
-    public function mergeFile(string $file): void
-    {
-        // TODO: Implement mergeFile() method.
-    }
+        foreach (self::$config as $key => $value) {
+            $name = strtoupper(trim($key));
 
-    /**
-     * Parse the config from an ini file
-     *
-     * @return void
-     */
-    public function parseFromIni(): void
-    {
-        // TODO: Implement parseFromIni() method.
-    }
+            if (defined($name)) {
+                continue;
+            }
 
-    /**
-     * Parse the config from database config settings
-     *
-     * @return void
-     */
-    public function parseFromDb(): void
-    {
-        // TODO: Implement parseFromDb() method.
+            if (is_array($value)) {
+                $value = var_export($value, true);
+            } elseif (is_bool($value)) {
+                $value = $value ? 'true' : 'false';
+            } elseif (is_null($value)) {
+                $value = 'null';
+            } else {
+                $value = var_export($value, true);
+            }
+
+            define($name, $value);
+        }
     }
 }

@@ -4,11 +4,11 @@ namespace Bibo\Core\Provider;
 
 use Bibo\Core\Config\Config;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
-use Dotenv\Dotenv;
+use Psr\Container\NotFoundExceptionInterface;
 
 class ConfigServiceProvider extends ServiceProvider
 {
-    private const string CACHE_FILE = CACHE_PATH . '/config/config.php';
+    private const string CACHE_FILE = CONFIG_CACHE_PATH . 'config.php';
 
     /**
      * Register service provider
@@ -17,49 +17,19 @@ class ConfigServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $dotenv = Dotenv::createImmutable(ROOT_PATH);
-        $dotenv->load();
+        Config::load(ROOT_PATH . '.env');
 
-        $config = new Config();
-        $config->parseFromEnv();
+        $config = Config::all();
 
-        // Check if cache exists and is still valid
-        if (file_exists(self::CACHE_FILE)) {
-            $cachedData = json_decode(file_get_contents(self::CACHE_FILE), true);
-
-            if (is_array($cachedData) && isset($cachedData['timestamp'])) {
-                $cacheAge = time() - $cachedData['timestamp'];
-
-                if ($cacheAge < $_ENV['CACHE_TTL']) {
-                    $config->merge($cachedData['config']);
-                } else {
-                    unlink(self::CACHE_FILE);
-                }
-            }
-        }
-
-        // If cache does not exist or was deleted, regenerate it
-        if (!file_exists(self::CACHE_FILE)) {
-            $configs = glob(ROOT_PATH . 'config/*.php');
-
-            foreach ($configs as $file) {
-                $config->load($file);
-            }
-
-            // Save config with timestamp
-            $cacheData = [
-                'timestamp' => time(),
-                'config' => $config->all()
-            ];
-
-            file_put_contents(self::CACHE_FILE, json_encode($cacheData));
-        }
-
-        $this->container->set('config', fn () => $config);
+        $this->container->set('config', function () use ($config) {
+            return $config;
+        });
     }
 
 
-
+    /**
+     * @throws NotFoundExceptionInterface
+     */
     public function boot(): void
     {
         $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');

@@ -6,7 +6,7 @@ use Bibo\Core\Facades\Route;
 
 Route::get('/', [IndexController::class, 'index'], ['csrf']);
 
-Route::get('/about', [IndexController::class, 'about']);
+Route::get('/about', [IndexController::class, 'about']);//->middleware('csrf');
 
 Route::get('/contacts', [IndexController::class, 'contacts']);
 

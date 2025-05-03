@@ -23,13 +23,10 @@ class LogServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $logger = new Logger([], $_ENV['APP_LOG_LEVEL']);
+        $logger = new Logger([], config('app_log_level'));
         $logger->addHandler(
-            new FileLogHandler(
-                LOG_PATH . $_ENV['LOG_PATH'],
-                $_ENV['LOG_FORMAT']
-            ),
-            $_ENV['APP_LOG_LEVEL']
+            new FileLogHandler(LOG_PATH . config('log_path'), config('log_format')),
+            config('app_log_level')
         );
 
         $this->container->set('logger', function () use ($logger) {

@@ -26,13 +26,13 @@ class ViewServiceProvider extends ServiceProvider
     {
         try {
             $view = new View($this->container);
+
+            $this->container->set('views', function () use ($view) {
+                return $view;
+            });
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             echo $e->getMessage();
         }
-
-        $this->container->set('views', function () use ($view) {
-            return $view;
-        });
     }
 
     /**

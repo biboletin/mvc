@@ -15,6 +15,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
+
 use function array_find;
 
 /**
@@ -173,7 +174,7 @@ class BaseRouter implements RouterInterface
      * @param string $uri
      *
      * @return ResponseInterface
-     * @throws NotFoundException|JsonException
+     * @throws NotFoundException|JsonException|ContainerExceptionInterface|NotFoundExceptionInterface
      */
     public function match(string $method, string $uri): ResponseInterface
     {

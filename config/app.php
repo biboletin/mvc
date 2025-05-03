@@ -16,7 +16,13 @@ return [
          * Application name
          */
 
-        'name' => $_ENV['APP_NAME'] ?? 'Example Application',
+        'name' => config('app_name', 'Example Application'),
+
+        /*
+         * Application URL
+         */
+
+        'url' => config('app_url', 'http://localhost'),
 
         /*
          * Application version
@@ -28,25 +34,25 @@ return [
          * Application environment
          */
 
-        'env' => $_ENV['APP_ENV'] ?? 'development',
+        'env' => config('app_env', 'development'),
 
         /*
          * Application debug mode
          */
 
-        'debug' => $_ENV['APP_DEBUG'] ?? false,
+        'debug' => config('app_debug', false),
 
         /*
          * Application debug level
          */
 
-        'debug_level' => $_ENV['APP_DEBUG_LEVEL'] ?? 'debug',
+        'debug_level' => config('app_debug_level', 'debug'),
 
         /*
          * Application timezone
          */
 
-        'timezone' => 'UTC',
+        'timezone' => date_default_timezone_set(config('app_timezone', 'UTC')),
 
         /*
          * Application locale
@@ -65,12 +71,6 @@ return [
          */
 
         'fallback_timezone' => 'UTC',
-
-        /*
-         * Application URL
-         */
-
-        'url' => $_ENV['APP_URL'] ?? 'http://localhost',
 
         /*
          * Application key

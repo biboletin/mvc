@@ -1,22 +1,33 @@
 {% extends "index.twig" %}
 
-{% block title %}{{ code }} - {{ message }}{% endblock %}
+{% block title %}
+    {% if code == 0 %}
+        {{ message }}
+    {% else %}
+        {{ code }} - {{ message }}
+    {% endif %}
+{% endblock %}
 
 {% block content %}
     <h2>
-        <span style="color: red">{{ code }}</span> - {{ message }}
+        {% if code == 0 %}
+            {{ message }}
+        {% else %}
+            <span style="color: red"> {{ code }}</span> - {{ message }}
+        {% endif %}
     </h2>
+
     <p>Oops! Something went wrong.</p>
 
-    <p> {{ exception }}</p>
+    <p style="color: red"> {{ exception }}</p>
 
     <p>We are working to fix the issue. Please try again later.</p>
     <a href="/">Go back to homepage</a>
 
-    {% if message %}
+    {% if debug == true %}
         <div class="error-dev-info">
             <h3>Debug Info</h3>
-            <pre>{{ message }}</pre>
+{#            <pre>{{ message }}</pre>#}
             <pre style="color: #3FB8AF">{{ trace }}</pre>
         </div>
     {% endif %}

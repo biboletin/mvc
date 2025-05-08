@@ -1,26 +1,131 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{% block title %}Default Title{% endblock %}</title>
     <link rel="stylesheet" href="css/main.css">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            padding-top: 70px;
+        }
+        main {
+            flex: 1;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-body text-body">
+
 {{ include('navigation/nav.twig') }}
-<header>
-    <h1 class="bd-title mt-0">My Website</h1>
-</header>
+
+<!-- <section>
+  {% block content %}
+      <p>This is the default content.</p>
+  {% endblock %}
+</section> -->
 
 <main>
-    {% block content %}
-        <p>This is the default content.</p>
-    {% endblock %}
+    <!-- Hero Section -->
+    <section class="py-5 text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Welcome to Biboletin</h1>
+            <p class="lead">Your unified dashboard to manage tools, servers, and integrations efficiently.</p>
+            <a href="#install" class="btn btn-primary btn-lg mt-3">Install Now</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container text-center">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h5>🧠 Smart Admin</h5>
+                    <p>Manage systems, users, and logs in one panel.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>🌐 Cloudflare Tools</h5>
+                    <p>DNS and security settings at your fingertips.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>📊 Google Ads Insight</h5>
+                    <p>Monitor and optimize campaigns without leaving.</p>
+                </div>
+
+                <div class="col-md-4">
+                    <h5>📊 Google Cloud</h5>
+                    <p>Monitor and optimize campaigns without leaving.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>📊 Google Analytics</h5>
+                    <p>Monitor and optimize campaigns without leaving.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>🔒 Security & Access</h5>
+                    <p>Monitor and optimize campaigns without leaving.</p>
+                </div>
+
+                <div class="col-md-4">
+                    <h5>⚙️ Core System Management</h5>
+                    <p>Monitor and optimize campaigns without leaving.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>🧩 User & Team Management</h5>
+                    <p>Monitor and optimize campaigns without leaving.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>🧪 Dev & QA Tools</h5>
+                    <p>Monitor and optimize campaigns without leaving.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Install Section -->
+    <section class="py-5 text-center" id="install">
+        <div class="container">
+            <h2 class="mb-4">Installing Biboletin...</h2>
+            <div class="progress" style="height: 25px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar"
+                     style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                    75% Complete
+                </div>
+            </div>
+        </div>
+    </section>
 </main>
 
-<footer>
-    <p>&copy; {{ "now"|date("Y") }} My Website</p>
+<!-- Sticky Footer -->
+<footer class="text-center py-4 border-top bg-body text-body">
+    <div class="container">
+        <p class="mb-0">© 2025 Biboletin. All rights reserved.</p>
+    </div>
 </footer>
+
 <script src="js/main.js"></script>
+<script>
+    const toggleTheme = document.getElementById('toggleTheme');
+    const htmlEl = document.documentElement;
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        htmlEl.setAttribute('data-bs-theme', savedTheme);
+        toggleTheme.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    }
+
+    // Toggle and save theme
+    toggleTheme.addEventListener('click', () => {
+        const current = htmlEl.getAttribute('data-bs-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        htmlEl.setAttribute('data-bs-theme', next);
+        localStorage.setItem('theme', next);
+        toggleTheme.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+</script>
 </body>
 </html>

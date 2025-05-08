@@ -1,18 +1,20 @@
 <?php
 
+use Bibo\App\Middleware\CorsMiddleware;
 use Bibo\App\Middleware\CsrfMiddleware;
 
 return [
     // Global middleware
     'global' => [
         // Add your global middleware here
+        'cors' => CorsMiddleware::class,
     ],
 
     // Middleware groups
     'groups' => [
-        // 'web' => [
-        //     // Add your web middleware here
-        // ],
+        'web' => [
+            // Add your web middleware here
+        ],
         // 'api' => [
         //     // Add your API middleware here
         // ],
@@ -21,6 +23,7 @@ return [
     // Route middleware
     'route' => [
         'csrf' => CsrfMiddleware::class,
+        'cors' => CorsMiddleware::class,
         // 'auth' => [
         //     // Add your auth middleware here
         // ],

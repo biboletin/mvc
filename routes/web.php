@@ -2,9 +2,22 @@
 
 use Bibo\App\Controllers\IndexController;
 use Bibo\App\Controllers\InstallController;
+use Bibo\App\Controllers\TestController;
 use Bibo\Core\Facades\Route;
+use Bibo\Core\Response\JsonResponse;
 
 Route::get('/', [IndexController::class, 'index'], ['csrf']);
+
+
+Route::get('/api/ping', [TestController::class, 'ping'], ['cors']);
+
+// Route::get('/api/ping', function () {
+//     return new JsonResponse([
+//         'status' => 'success',
+//         'message' => 'pong',
+//     ]);
+// }, ['cors']);
+
 
 Route::get('/about', [IndexController::class, 'about']);//->middleware('csrf');
 

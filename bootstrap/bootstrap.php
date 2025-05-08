@@ -24,22 +24,18 @@ $container = $app->container();
 $providers = [
     // Core service providers
     ConfigServiceProvider::class,
+    TemplateServiceProvider::class,
     LogServiceProvider::class,
     ErrorServiceProvider::class,
-    // Utility service providers
-    TemplateServiceProvider::class,
-    ViewServiceProvider::class,
-    FileCacheServiceProvider::class,
-    // Middleware service providers
     MiddlewareDispatcherServiceProvider::class,
     MiddlewareServiceProvider::class,
-    // HTTP service providers
+    AppServiceProvider::class,
+    RouteServiceProvider::class,
     RequestServiceProvider::class,
     ControllerServiceProvider::class,
-    RouteServiceProvider::class,
-    // Application service providers
     ModelServiceProvider::class,
-    AppServiceProvider::class,
+    FileCacheServiceProvider::class,
+    ViewServiceProvider::class,
 ];
 
 $registeredProviders = [];

@@ -2,6 +2,7 @@
 
 namespace Bibo\Core\Container;
 
+use Bibo\Core\Exception\NotFoundException;
 use Closure;
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
@@ -42,6 +43,7 @@ class Container implements ContainerInterface
      *
      * @return mixed
      * @throws NotFoundExceptionInterface
+     * @throws Exception
      */
     public function get(string $id): mixed
     {
@@ -50,8 +52,7 @@ class Container implements ContainerInterface
         }
 
         if (!isset($this->bindings[$id])) {
-            throw new class ('Service ' . $id . ' not found') extends Exception implements ContainerExceptionInterface {
-            };
+            throw new NotFoundException('Service ' . $id . ' not found!');
         }
 
         $this->instances[$id] = $this->bindings[$id]($this);

@@ -8,6 +8,6 @@ class InstallController extends Controller
 {
     public function index(): string
     {
-        return $this->render('install', []);
+        return $this->render('install');
     }
 }

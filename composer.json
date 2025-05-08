@@ -43,6 +43,7 @@
             "Bibo\\Core\\Request\\": "src/Core/Request/",
             "Bibo\\Core\\Response\\": "src/Core/Response/",
             "Bibo\\Core\\Rest\\": "src/Core/Rest/",
+            "Bibo\\Core\\Rest\\Message\\": "src/Core/Rest/Message/",
             "Bibo\\Core\\BaseRouter\\": "src/Core/Router/",
             "Bibo\\Core\\Security\\": "src/Core/Security/",
             "Bibo\\Core\\Service\\": "src/Core/Service/",
@@ -89,6 +90,7 @@
         "symfony/polyfill-iconv": "1.x-dev",
         "ext-zlib": "*",
         "ext-ftp": "*",
-        "twig/twig": "4.x-dev"
+        "twig/twig": "4.x-dev",
+        "ext-curl": "*"
     }
 }

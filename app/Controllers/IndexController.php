@@ -4,6 +4,7 @@ namespace Bibo\App\Controllers;
 
 use Bibo\Core\Controller\Controller;
 use Bibo\Core\Response\JsonResponse;
+use Bibo\Core\Rest\Client;
 use JsonException;
 
 /**
@@ -31,6 +32,9 @@ class IndexController extends Controller
             'year' => date('Y')
         ];
 
+        $rest = new Client();
+        $response = $rest->get('https://jsonplaceholder.typicode.com/posts/1');
+        dd($response, (string) $response->getBody());
         return $this->render('home', $data);
     }
 

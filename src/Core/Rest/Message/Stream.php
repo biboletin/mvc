@@ -7,44 +7,71 @@ use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 
 /**
- *
+ * Stream class that implements the StreamInterface.
  */
 class Stream implements StreamInterface
 {
     /**
-     * @var
+     * Stream resource
+     *
+     * @var resource|null
      */
     private $stream;
+
     /**
-     * @var
+     * Stream size
+     *
+     * @var int|null
      */
     private ?int $size;
+
     /**
+     * Stream position
+     *
      * @var int
      */
     private int $position = 0;
+
     /**
+     * Whether the stream is seekable
+     *
      * @var bool
      */
     private bool $isSeekable = true;
+
     /**
+     * Whether the stream is writable
+     *
      * @var bool
      */
     private bool $isWritable = true;
+
     /**
+     * Whether the stream is readable
+     *
      * @var bool
      */
     private bool $isReadable = true;
+
     /**
+     * Stream metadata
+     *
      * @var array
      */
     private array $metadata = [];
 
     /**
+     * Stream URI
+     *
      * @var string|null
      */
     private ?string $uri = null;
 
+    /**
+     * Stream constructor.
+     *
+     * @param string $stream
+     */
     public function __construct(string $stream = '')
     {
         if (is_string($stream)) {
@@ -79,8 +106,8 @@ class Stream implements StreamInterface
      * This method MUST NOT raise an exception in order to conform with PHP's
      * string casting operations.
      *
-     * @see    http://php.net/manual/en/language.oop5.magic.php#object.tostring
      * @return string
+     * @see    http://php.net/manual/en/language.oop5.magic.php#object.tostring
      */
     public function __toString(): string
     {
@@ -169,8 +196,6 @@ class Stream implements StreamInterface
     /**
      * Seek to a position in the stream.
      *
-     * @link http://www.php.net/manual/en/function.fseek.php
-     *
      * @param int $offset Stream offset
      * @param int $whence Specifies how the cursor position will be calculated
      *                    based on the seek offset. Valid values are identical to the built-in
@@ -179,6 +204,7 @@ class Stream implements StreamInterface
      *                    SEEK_END: Set position to end-of-stream plus offset.
      *
      * @throws RuntimeException on failure.
+     * @link   http://www.php.net/manual/en/function.fseek.php
      */
     public function seek(int $offset, int $whence = SEEK_SET): void
     {
@@ -287,13 +313,12 @@ class Stream implements StreamInterface
      * The keys returned are identical to the keys returned from PHP's
      * stream_get_meta_data() function.
      *
-     * @link http://php.net/manual/en/function.stream-get-meta-data.php
-     *
      * @param string|null $key Specific metadata to retrieve.
      *
      * @return array|mixed|null Returns an associative array if no key is
      *     provided. Returns a specific key value if a key is provided and the
      *     value is found, or null if the key is not found.
+     * @link   http://php.net/manual/en/function.stream-get-meta-data.php
      */
     public function getMetadata(?string $key = null): mixed
     {
@@ -304,6 +329,11 @@ class Stream implements StreamInterface
         return $this->metadata[$key] ?? null;
     }
 
+    /**
+     * Get the URI of the stream.
+     *
+     * @return string|null
+     */
     public function getStreamUri(): ?string
     {
         return $this->uri;

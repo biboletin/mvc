@@ -2,6 +2,7 @@
 
 namespace Bibo\Core\Rest\Message;
 
+use InvalidArgumentException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -273,7 +274,7 @@ class Response implements ResponseInterface
      * @param string|string[] $value Header value(s).
      *
      * @return static
-     * @throws \InvalidArgumentException for invalid header names or values.
+     * @throws InvalidArgumentException for invalid header names or values.
      */
     public function withHeader(string $name, $value): MessageInterface
     {
@@ -298,7 +299,7 @@ class Response implements ResponseInterface
      * @param string|string[] $value Header value(s).
      *
      * @return static
-     * @throws \InvalidArgumentException for invalid header names or values.
+     * @throws InvalidArgumentException for invalid header names or values.
      */
     public function withAddedHeader(string $name, $value): MessageInterface
     {
@@ -353,7 +354,7 @@ class Response implements ResponseInterface
      * @param StreamInterface $body Body.
      *
      * @return static
-     * @throws \InvalidArgumentException When the body is not valid.
+     * @throws InvalidArgumentException When the body is not valid.
      */
     public function withBody(StreamInterface $body): MessageInterface
     {
@@ -387,16 +388,17 @@ class Response implements ResponseInterface
      * immutability of the message, and MUST return an instance that has the
      * updated status and reason phrase.
      *
-     * @link http://tools.ietf.org/html/rfc7231#section-6
-     * @link http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
-     *
      * @param int    $code         The 3-digit integer result code to set.
      * @param string $reasonPhrase The reason phrase to use with the
      *                             provided status code; if none is provided, implementations MAY
      *                             use the defaults as suggested in the HTTP specification.
      *
      * @return static
-     * @throws \InvalidArgumentException For invalid status code arguments.
+     *
+     * @throws InvalidArgumentException For invalid status code arguments.
+     *
+     * @link http://tools.ietf.org/html/rfc7231#section-6
+     * @link http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
      */
     public function withStatus(int $code, string $reasonPhrase = ''): ResponseInterface
     {

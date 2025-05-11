@@ -6,45 +6,70 @@ use InvalidArgumentException;
 use Psr\Http\Message\UriInterface;
 
 /**
- *
+ * Class Uri
  */
 class Uri implements UriInterface
 {
     /**
+     * Scheme of the URI
+     *
      * @var string
      */
     protected string $scheme = '';
+
     /**
+     * User information of the URI
+     *
      * @var string
      */
     protected string $userInfo = '';
+
     /**
+     * Host of the URI
+     *
      * @var string
      */
     protected string $host = '';
+
     /**
+     * Port of the URI
+     *
      * @var int|null
      */
     protected ?int $port = null;
+
     /**
+     * Path of the URI
+     *
      * @var string
      */
     protected string $path = '';
+
     /**
+     * Query string of the URI
+     *
      * @var string
      */
     protected string $query = '';
+
     /**
+     * Fragment of the URI
+     *
      * @var string
      */
     protected string $fragment = '';
 
+    /**
+     * Uri constructor.
+     *
+     * @param string $uri
+     */
     public function __construct(string $uri)
     {
         if ($uri !== '') {
             $parts = parse_url($uri);
             if ($parts === false) {
-                throw new InvalidArgumentException("Invalid URI: $uri");
+                throw new InvalidArgumentException('Invalid URI: ' . $uri);
             }
 
             $this->scheme = isset($parts['scheme']) ? strtolower($parts['scheme']) : '';
@@ -338,7 +363,7 @@ class Uri implements UriInterface
     public function withPort(?int $port): UriInterface
     {
         if ($port !== null && ($port < 1 || $port > 65535)) {
-            throw new InvalidArgumentException("Invalid port: $port");
+            throw new InvalidArgumentException('Invalid port: ' . $port);
         }
 
         $new = clone $this;
@@ -484,18 +509,25 @@ class Uri implements UriInterface
         return $uri;
     }
 
+    /**
+     * Get the default port for a given scheme.
+     *
+     * @param string $scheme
+     *
+     * @return int|null
+     */
     private function getDefaultPort(string $scheme): ?int
     {
         $defaults = [
-            'http'  => 80,
+            'http' => 80,
             'https' => 443,
-            'ftp'   => 21,
-            'ftps'  => 990,
-            'ssh'   => 22,
+            'ftp' => 21,
+            'ftps' => 990,
+            'ssh' => 22,
             'telnet' => 23,
-            'smtp'  => 25,
-            'imap'  => 143,
-            'pop3'  => 110,
+            'smtp' => 25,
+            'imap' => 143,
+            'pop3' => 110,
         ];
 
         $scheme = strtolower($scheme);

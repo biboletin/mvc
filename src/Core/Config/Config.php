@@ -101,7 +101,7 @@ class Config implements ConfigInterface
                     self::$config[$key] = $value;
                 } elseif (is_bool($value)) {
                     self::$config[$key] = $value ? 'true' : 'false';
-                } elseif (is_null($value)) {
+                } elseif ($value === null) {
                     self::$config[$key] = 'null';
                 } else {
                     self::$config[$key] = $value;
@@ -129,7 +129,7 @@ class Config implements ConfigInterface
     public static function loadFromFile(string $file): void
     {
         if (!file_exists($file)) {
-            throw new RuntimeException("Configuration file not found: {$file}");
+            throw new RuntimeException('Configuration file not found: ' . $file);
         }
 
         $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -187,7 +187,7 @@ class Config implements ConfigInterface
                 $value = var_export($value, true);
             } elseif (is_bool($value)) {
                 $value = $value ? 'true' : 'false';
-            } elseif (is_null($value)) {
+            } elseif ($value === null) {
                 $value = 'null';
             } else {
                 $value = var_export($value, true);

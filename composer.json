@@ -91,6 +91,7 @@
         "ext-zlib": "*",
         "ext-ftp": "*",
         "twig/twig": "4.x-dev",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "illuminate/database": "10.x-dev"
     }
 }

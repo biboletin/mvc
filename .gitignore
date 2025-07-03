@@ -1,8 +1,9 @@
 .code/
 .idea/
 .git/
+.junie/
+.phive/
 node_modules/
 vendor/
 .env
 .php-cs-fixer.cache
-.composer.lock

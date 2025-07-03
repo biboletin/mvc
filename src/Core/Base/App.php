@@ -2,13 +2,13 @@
 
 namespace Bibo\Core\Base;
 
-use Bibo\Core\Exception\NotFoundException;
 use Bibo\Core\Response\JsonResponse;
 use Bibo\Core\Response\ResponseEmitter;
 use Exception;
 use JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * App class
@@ -47,6 +47,8 @@ class App
      *
      * @return void
      * @throws JsonException
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
      */
     public function run(): void
     {
@@ -67,7 +69,7 @@ class App
         } catch (ContainerExceptionInterface | JsonException $e) {
             $response = new JsonResponse(['error' => $e->getMessage()], $e->getCode());
             $responseEmitter->emit($response);
-        } catch (Exception | NotFoundException $e) {
+        } catch (Exception $e) {
             $errorHandler = $this->container->get('error')->handleException($e);
             $responseEmitter->emit($errorHandler);
         }

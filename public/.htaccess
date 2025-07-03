@@ -1,12 +1,100 @@
+# ---------------------------------------------
+# Enable Rewrite Engine
+# ---------------------------------------------
 RewriteEngine On
+RewriteBase /
 
-# Check if request doesn't point to actual dir, file or symlink
-RewriteCond %{REQUEST_FILENAME} !-d
+# ---------------------------------------------
+# Route All Requests to index.php (Front Controller)
+# Exclude existing files/directories
+# ---------------------------------------------
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-l
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
 
+# ---------------------------------------------
+# Optional HTTP Basic Authentication (example)
+# Uncomment to enable
+# ---------------------------------------------
+#AuthType Basic
+#AuthName "Restricted Area"
+#AuthUserFile /full/path/to/mvc/secure/.htpasswd
+#Require valid-user
 
-# http://localhost/foo/bar => http://localhost/index.php?request=foo/bar
-RewriteRule ^(.+)$ index.php?request=$1 [QSA,L]
+# ---------------------------------------------
+# PHP Settings
+# ---------------------------------------------
+php_value memory_limit 256M
+php_value max_execution_time 60
+php_value max_input_time 60
+php_value post_max_size 32M
+php_value upload_max_filesize 32M
+php_value max_input_vars 1000
+php_value pcre.backtrack_limit 1000000
 
-php_value pcre.jit 0
+# ---------------------------------------------
+# Static Asset Caching
+# ---------------------------------------------
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+    ExpiresByType text/html "access plus 1 hour"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType video/mp4 "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+</IfModule>
+
+# ---------------------------------------------
+# MIME and Content-Type Security
+# ---------------------------------------------
+AddType application/javascript .js
+AddType text/css .css
+
+# ---------------------------------------------
+# Basic Security Headers
+# ---------------------------------------------
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "no-referrer-when-downgrade"
+    Header set Permissions-Policy "geolocation=(), microphone=()"
+</IfModule>
+
+# ---------------------------------------------
+# Prevent Directory Listing
+# ---------------------------------------------
+Options -Indexes
+
+# ---------------------------------------------
+# Block Some Bad Bots (basic list)
+# ---------------------------------------------
+SetEnvIfNoCase User-Agent "MJ12bot" bad_bot
+SetEnvIfNoCase User-Agent "AhrefsBot" bad_bot
+SetEnvIfNoCase User-Agent "SemrushBot" bad_bot
+SetEnvIfNoCase User-Agent "DotBot" bad_bot
+SetEnvIfNoCase User-Agent "Baiduspider" bad_bot
+SetEnvIfNoCase User-Agent "crawler" bad_bot
+Deny from env=bad_bot
+
+# ---------------------------------------------
+# Optional: Disable XSS in URLs (basic pattern match)
+# ---------------------------------------------
+RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} (\<|%3C).*iframe.*(\>|%3E) [NC]
+RewriteRule ^.*$ - [F,L]
+
+# ---------------------------------------------
+# Optional: Basic SQL Injection Blocker
+# (Only a heuristic! Backend validation still required)
+# ---------------------------------------------
+RewriteCond %{QUERY_STRING} (\%27)|(\')|(\-\-)|(%23)|(#) [NC,OR]
+RewriteCond %{QUERY_STRING} ((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;)) [NC,OR]
+RewriteCond %{QUERY_STRING} \w+(\s)*=(\s)*select(\s)+ [NC]
+RewriteRule ^.*$ - [F,L]

@@ -3,7 +3,6 @@
 namespace Bibo\Core\Error;
 
 use Bibo\Core\Enum\HttpStatus;
-use Bibo\Core\Exception\AppException;
 use Bibo\Core\Exception\NotFoundException;
 use Bibo\Core\Template\Template;
 use ErrorException;

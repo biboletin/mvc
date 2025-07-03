@@ -2,268 +2,183 @@
 
 namespace Bibo\Core\Wrapper;
 
-class CurlWrapper
+use Bibo\Core\Interfaces\CurlInterface;
+use CurlHandle;
+use RuntimeException;
+
+/**
+ *
+ */
+class CurlWrapper implements CurlInterface
 {
-    private $ch;
+    /**
+     * @var mixed|CurlHandle|false
+     */
+    protected mixed $handle;
 
-    private $multiHandle;
+    /**
+     * @var array
+     */
+    protected array $headers = [];
 
-    private $active;
+    /**
+     * @var string
+     */
+    protected string $body = '';
 
+    /**
+     * @var array
+     */
+    protected array $responseHeaders = [];
+
+    /**
+     *
+     */
     public function __construct()
     {
-        $this->ch = curl_init();
-        $this->multiHandle = curl_multi_init();
-        $this->active = 0;
+        $this->handle = curl_init();
+        if ($this->handle === false) {
+            throw new RuntimeException('Unable to initialize cURL handle');
+        }
+
+        // Setup header capture
+        curl_setopt($this->handle, CURLOPT_HEADERFUNCTION, [$this, 'captureHeaderLine']);
+        curl_setopt($this->handle, CURLOPT_RETURNTRANSFER, true);
     }
 
-    public function setOption(int $option, $value): self
-    {
-        curl_setopt($this->ch, $option, $value);
-        return $this;
-    }
-
+    /**
+     * @param string $url
+     *
+     * @return CurlWrapper
+     */
     public function setUrl(string $url): self
     {
-        $this->setOption(CURLOPT_URL, $url);
+        curl_setopt($this->handle, CURLOPT_URL, $url);
 
         return $this;
     }
 
+    /**
+     * @param string $method
+     *
+     * @return CurlWrapper
+     */
     public function setMethod(string $method): self
     {
-        $this->setOption(CURLOPT_CUSTOMREQUEST, $method);
-
-        return $this;
+        switch (strtoupper($method)) {
+            case 'GET':
+                curl_setopt($this->handle, CURLOPT_HTTPGET, true);
+                break;
+            case 'POST':
+                curl_setopt($this->handle, CURLOPT_POST, true);
+                break;
+            default:
+                curl_setopt($this->handle, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+                break;
+        }
     }
 
+    /**
+     * @param array $headers
+     *
+     * @return CurlWrapper
+     */
     public function setHeaders(array $headers): self
     {
-        $formattedHeaders = [];
-        foreach ($headers as $name => $value) {
-            $formattedHeaders[] = "$name: $value";
+        $formatted = [];
+        foreach ($headers as $key => $value) {
+            $formatted[] = "{$key}: {$value}";
         }
-        $this->setOption(CURLOPT_HTTPHEADER, $formattedHeaders);
+
+        curl_setopt($this->handle, CURLOPT_HTTPHEADER, $formatted);
 
         return $this;
     }
 
-    public function setPostFields($fields): self
+    /**
+     * @param string $body
+     *
+     * @return void
+     */
+    public function setBody(string $body): void
     {
-        $this->setOption(CURLOPT_POSTFIELDS, $fields);
-
-        return $this;
+        curl_setopt($this->handle, CURLOPT_POSTFIELDS, $body);
     }
 
+    /**
+     * @return string
+     */
     public function execute(): string
     {
-        $this->setOption(CURLOPT_RETURNTRANSFER, true);
-        $this->setOption(CURLOPT_HEADER, false);
+        $this->responseHeaders = []; // Reset headers
+        $this->body = curl_exec($this->handle);
 
-        $this->active = curl_multi_exec($this->multiHandle, $this->active);
-
-        if ($this->active > 0) {
-            $response = curl_multi_getcontent($this->multiHandle);
-            return $response;
+        if ($this->body === false) {
+            throw new RuntimeException('cURL error: ' . curl_error($this->handle));
         }
 
-        return '';
+        return $this->body;
     }
 
-    public function addHandle(): self
+    /**
+     * @return int
+     */
+    public function getStatusCode(): int
     {
-        curl_multi_add_handle($this->multiHandle, $this->ch);
-        return $this;
+        return curl_getinfo($this->handle, CURLINFO_HTTP_CODE);
     }
 
-    public function removeHandle(): self
+    /**
+     * @return array
+     */
+    public function getResponseHeaders(): array
     {
-        curl_multi_remove_handle($this->multiHandle, $this->ch);
-        return $this;
+        return $this->responseHeaders;
     }
 
+    /**
+     * @return CurlHandle|false|mixed
+     */
+    public function getHandle(): mixed
+    {
+        return $this->handle;
+    }
+
+    /**
+     * @return void
+     */
     public function close(): void
     {
-        curl_multi_close($this->multiHandle);
-        curl_close($this->ch);
+        curl_close($this->handle);
     }
 
-    public function getInfo(int $option): mixed
+    /**
+     * @param        $curlHandler
+     * @param string $headerLine
+     *
+     * @return int
+     */
+    protected function captureHeaderLine($curlHandler, string $headerLine): int
     {
-        return curl_getinfo($this->ch, $option);
+        $trimmed = trim($headerLine);
+
+        if ($trimmed === '') {
+            return strlen($headerLine); // End of headers
+        }
+
+        if (str_contains($trimmed, ':')) {
+            [$key, $value] = explode(':', $trimmed, 2);
+            $this->responseHeaders[trim($key)] = trim($value);
+        } else {
+            // Handle status line, e.g., "HTTP/1.1 200 OK"
+            $this->responseHeaders[] = $trimmed;
+        }
+
+        return strlen($headerLine);
     }
 
-    public function getError(): string
+    public function setOption(int $option, $value): bool
     {
-        return curl_error($this->ch);
-    }
-
-    public function getErrorNo(): int
-    {
-        return curl_errno($this->ch);
-    }
-
-    public function getMultiInfo(): array
-    {
-        return curl_multi_info_read($this->multiHandle);
-    }
-
-    public function getActive(): int
-    {
-        return $this->active;
-    }
-
-    public function getHandle()
-    {
-        return $this->ch;
-    }
-
-    public function getMultiHandle()
-    {
-        return $this->multiHandle;
-    }
-
-    public function setOptArray(array $options): self
-    {
-        curl_setopt_array($this->ch, $options);
-        return $this;
-    }
-
-    public function setOpt(int $option, $value): self
-    {
-        curl_setopt($this->ch, $option, $value);
-        return $this;
-    }
-
-    public function setOptArrayMulti(array $options): self
-    {
-        curl_multi_setopt($this->multiHandle, $options);
-        return $this;
-    }
-
-    public function setOptMulti(int $option, $value): self
-    {
-        curl_multi_setopt($this->multiHandle, $option, $value);
-        return $this;
-    }
-
-    public function setOptPostFields($fields): self
-    {
-        $this->setOption(CURLOPT_POSTFIELDS, $fields);
-        return $this;
-    }
-
-    public function setOptReturnTransfer(bool $returnTransfer): self
-    {
-        $this->setOption(CURLOPT_RETURNTRANSFER, $returnTransfer);
-        return $this;
-    }
-
-    public function setOptHeader(bool $header): self
-    {
-        $this->setOption(CURLOPT_HEADER, $header);
-        return $this;
-    }
-
-    public function setOptFollowLocation(bool $followLocation): self
-    {
-        $this->setOption(CURLOPT_FOLLOWLOCATION, $followLocation);
-        return $this;
-    }
-
-    public function setOptTimeout(int $timeout): self
-    {
-        $this->setOption(CURLOPT_TIMEOUT, $timeout);
-        return $this;
-    }
-
-    public function setOptConnectTimeout(int $connectTimeout): self
-    {
-        $this->setOption(CURLOPT_CONNECTTIMEOUT, $connectTimeout);
-        return $this;
-    }
-
-    public function setOptUserAgent(string $userAgent): self
-    {
-        $this->setOption(CURLOPT_USERAGENT, $userAgent);
-        return $this;
-    }
-
-    public function setOptProxy(string $proxy): self
-    {
-        $this->setOption(CURLOPT_PROXY, $proxy);
-        return $this;
-    }
-
-    public function setOptProxyAuth(string $proxyAuth): self
-    {
-        $this->setOption(CURLOPT_PROXYAUTH, $proxyAuth);
-        return $this;
-    }
-
-    public function setOptProxyUserPwd(string $proxyUserPwd): self
-    {
-        $this->setOption(CURLOPT_PROXYUSERPWD, $proxyUserPwd);
-        return $this;
-    }
-
-    public function setOptProxyType(int $proxyType): self
-    {
-        $this->setOption(CURLOPT_PROXYTYPE, $proxyType);
-        return $this;
-    }
-
-    public function setOptSslVerifyPeer(bool $sslVerifyPeer): self
-    {
-        $this->setOption(CURLOPT_SSL_VERIFYPEER, $sslVerifyPeer);
-        return $this;
-    }
-
-    public function setOptSslVerifyHost(int $sslVerifyHost): self
-    {
-        $this->setOption(CURLOPT_SSL_VERIFYHOST, $sslVerifyHost);
-        return $this;
-    }
-
-    public function setOptSslCert(string $sslCert): self
-    {
-        $this->setOption(CURLOPT_SSLCERT, $sslCert);
-        return $this;
-    }
-
-    public function setOptSslKey(string $sslKey): self
-    {
-        $this->setOption(CURLOPT_SSLKEY, $sslKey);
-        return $this;
-    }
-
-    public function setOptSslKeyPass(string $sslKeyPass): self
-    {
-        $this->setOption(CURLOPT_SSLKEYPASSWD, $sslKeyPass);
-        return $this;
-    }
-
-    public function setOptSslCafile(string $sslCafile): self
-    {
-        $this->setOption(CURLOPT_CAINFO, $sslCafile);
-        return $this;
-    }
-
-    public function setOptSslCapath(string $sslCapath): self
-    {
-        $this->setOption(CURLOPT_CAPATH, $sslCapath);
-        return $this;
-    }
-
-    public function setOptSslCipherList(string $sslCipherList): self
-    {
-        $this->setOption(CURLOPT_SSL_CIPHER_LIST, $sslCipherList);
-        return $this;
-    }
-
-    public function __destruct()
-    {
-        curl_multi_close($this->multiHandle);
-        curl_close($this->ch);
+        return curl_setopt($this->handle, $option, $value);
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Bibo\Core\Rest\Message;
 
-use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 

@@ -21,8 +21,8 @@ if (!isset($app)) {
 
 $container = $app->container();
 
+// Core service providers
 $providers = [
-    // Core service providers
     ConfigServiceProvider::class,
     TemplateServiceProvider::class,
     LogServiceProvider::class,

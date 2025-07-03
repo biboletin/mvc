@@ -8,14 +8,14 @@ return [
 
     'log' => [
 
-        'level' => $_ENV['APP_LOG_LEVEL'] ?? 'error',
+        'level' => config('app_log_level', 'error'),
 
-        'path' => $_ENV['LOG_PATH'] ?? 'app/',
+        'path' => config('log_path', 'app/'),
 
-        'rotation' => $_ENV['LOG_ROTATION'] ?? 'daily',
+        'rotation' => config('log_rotation', 'daily'),
 
-        'format' => $_ENV['LOG_FORMAT'] ?? 'text',
+        'format' => config('log_format', 'text'),
 
-        'max_file_size' => $_ENV['LOG_MAX_SIZE'] ?? 0,
+        'max_file_size' => config('log_max_size', 1024),
     ],
 ];

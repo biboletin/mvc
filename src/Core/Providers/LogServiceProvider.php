@@ -20,13 +20,18 @@ class LogServiceProvider extends ServiceProvider
      * Register service provider
      *
      * @return void
+     * @throws NotFoundExceptionInterface
      */
     public function register(): void
     {
-        $logger = new Logger([], config('app_log_level'));
+        $config = $this->container->get('config');
+        $logger = new Logger([], $config->get('app_log_level'));
         $logger->addHandler(
-            new FileLogHandler(LOG_PATH . config('log_path'), config('log_format')),
-            config('app_log_level')
+            new FileLogHandler(
+                LOG_PATH . $config->get('log_path'),
+                $config->get('log_format')
+            ),
+            $config->get('app_log_level')
         );
 
         $this->container->set('logger', function () use ($logger) {

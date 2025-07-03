@@ -4,7 +4,7 @@ namespace Bibo\App\Controllers;
 
 use Bibo\Core\Controller\Controller;
 use Bibo\Core\Response\JsonResponse;
-use Bibo\Core\Rest\Client;
+use Bibo\Core\Rest\HttpClient;
 use JsonException;
 
 /**
@@ -19,22 +19,12 @@ class IndexController extends Controller
      */
     public function index(): string
     {
-        $data = [
-            'title' => 'Welcome',
-            'header' => 'My site',
-            'user' => 'John Doe',
-            'price' => 1234.56,
-            'items' => [
-                'Item 1',
-                'Item 2',
-                'Item 3',
-            ],
-            'year' => date('Y')
-        ];
+        $client = new HttpClient();
+        $response = $client->get('https://jsonplaceholder.typicode.com/posts/3');
+        $json = json_decode($response->getBody(), true);
 
-        $rest = new Client();
-        $response = $rest->get('https://jsonplaceholder.typicode.com/posts/1');
-        dd($response, (string) $response->getBody());
+        $data = [];
+
         return $this->render('home', $data);
     }
 
@@ -65,7 +55,12 @@ class IndexController extends Controller
      */
     public function json(): JsonResponse
     {
-        return new JsonResponse(['message' => 'JSON']);
+        $client = new HttpClient();
+        $response = $client->get('https://jsonplaceholder.typicode.com/posts/3');
+
+        $json = json_decode($response->getBody(), JSON_PRETTY_PRINT);
+
+        return new JsonResponse($json);
     }
 
     /**

@@ -13,10 +13,15 @@ class TemplateServiceProvider extends ServiceProvider
      * Register service provider
      *
      * @inheritDoc
+     * @throws NotFoundExceptionInterface
      */
     public function register(): void
     {
-        $templateEngine = new TwigTemplateEngine(VIEW_PATH, APP_CACHE_PATH, config('app_debug'));
+        $templateEngine = new TwigTemplateEngine(
+            VIEW_PATH,
+            APP_CACHE_PATH,
+            $this->container->get('config')->get('app_debug')
+        );
         $template = new Template($templateEngine);
 
         $this->container->set('template', function () use ($template) {

@@ -17,7 +17,7 @@ interface ConfigInterface
      *
      * @return mixed
      */
-    public static function get(string $key, ?string $default = null): mixed;
+    public function get(string $key, ?string $default = null): mixed;
 
     /**
      * Check if a key exists in the config
@@ -26,21 +26,21 @@ interface ConfigInterface
      *
      * @return bool
      */
-    public static function has(string $key): bool;
+    public function has(string $key): bool;
 
     /**
      * Get all the values from the config
      *
      * @return array
      */
-    public static function all(): array;
+    public function all(): array;
 
     /**
      * Load the config files from the config directory
      *
      * @return void
      */
-    public static function load(): void;
+    public function load(): void;
 
     /**
      * Load a config file
@@ -49,5 +49,5 @@ interface ConfigInterface
      *
      * @return void
      */
-    public static function loadFromFile(string $file): void;
+    public function loadFromFile(string $file): void;
 }

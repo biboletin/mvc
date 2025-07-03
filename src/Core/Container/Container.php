@@ -5,7 +5,6 @@ namespace Bibo\Core\Container;
 use Bibo\Core\Exception\NotFoundException;
 use Closure;
 use Exception;
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 

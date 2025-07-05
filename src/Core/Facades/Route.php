@@ -4,6 +4,7 @@ namespace Bibo\Core\Facades;
 
 use Bibo\Core\BaseRouter\BaseRouter;
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -40,7 +41,7 @@ class Route
      *
      * @param string         $path
      * @param array|callable $handler
-     * @param array          $middleware
+     * @param array|null     $middleware
      *
      * @return BaseRouter
      */
@@ -112,6 +113,7 @@ class Route
      *
      * @return ResponseInterface
      * @throws Exception
+     * @throws ContainerExceptionInterface
      */
     public static function match(string $method, string $uri): ResponseInterface
     {

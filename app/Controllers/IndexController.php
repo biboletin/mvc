@@ -22,7 +22,7 @@ class IndexController extends Controller
         $client = new HttpClient();
         $response = $client->get('https://jsonplaceholder.typicode.com/posts/3');
         $json = json_decode($response->getBody(), true);
-
+// dd($json);
         $data = [];
 
         return $this->render('home', $data);

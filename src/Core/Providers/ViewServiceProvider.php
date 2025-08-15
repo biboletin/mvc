@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Provider;
+namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Core\View\View;
+use Bibo\Mvc\Core\View\View;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;

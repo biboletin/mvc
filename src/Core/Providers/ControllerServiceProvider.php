@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Provider;
+namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Core\Controller\Controller;
+use Bibo\Mvc\Core\Controller\Controller;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 
 class ControllerServiceProvider extends ServiceProvider

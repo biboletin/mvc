@@ -1,9 +1,9 @@
 <?php
 
-namespace Bibo\Core\Config;
+namespace Bibo\Mvc\Core\Config;
 
-use Bibo\Core\Cache\FileCache;
-use Bibo\Core\Interfaces\ConfigInterface;
+use Bibo\Mvc\Core\Cache\FileCache;
+use Bibo\Mvc\Core\Interfaces\ConfigInterface;
 use Exception;
 use RuntimeException;
 

@@ -1,14 +1,14 @@
 <?php
 
-namespace Bibo\Core\Rest;
+namespace Bibo\Mvc\Core\Rest;
 
-use Bibo\Core\Enum\CurlStrategyType;
-use Bibo\Core\Rest\Message\Request;
-use Bibo\Core\Rest\Message\Response;
-use Bibo\Core\Rest\Message\Stream;
-use Bibo\Core\Rest\Message\Uri;
-use Bibo\Core\Wrapper\Curl\CurlStrategyFactory;
-use Bibo\Core\Wrapper\CurlWrapper;
+use Bibo\Mvc\Core\Enum\CurlStrategyType;
+use Bibo\Mvc\Core\Rest\Message\Request;
+use Bibo\Mvc\Core\Rest\Message\Response;
+use Bibo\Mvc\Core\Rest\Message\Stream;
+use Bibo\Mvc\Core\Rest\Message\Uri;
+use Bibo\Mvc\Core\Wrapper\Curl\CurlStrategyFactory;
+use Bibo\Mvc\Core\Wrapper\CurlWrapper;
 use RuntimeException;
 
 /**

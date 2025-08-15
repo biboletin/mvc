@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Ajax;
+namespace Bibo\Mvc\Core\Ajax;
 
 use Bibo\Core\Interfaces\AjaxInterface;
 

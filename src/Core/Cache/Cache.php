@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Cache;
+namespace Bibo\Mvc\Core\Cache;
 
 class Cache
 {

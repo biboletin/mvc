@@ -1,14 +1,15 @@
 <?php
 
-use Bibo\Core\Base\App;
-use Bibo\Core\Base\Kernel;
-use Bibo\Core\Container\Container;
-use Bibo\Core\Exception\ResponseExceptionHandler;
+use Bibo\Mvc\Core\Base\App;
+use Bibo\Mvc\Core\Base\Kernel;
+use Bibo\Mvc\Core\Container\Container;
+use Bibo\Mvc\Core\Exception\ResponseExceptionHandler;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 include __DIR__ . '/../vendor/autoload.php';
 
+define('APP_START', microtime(true));
 
 $app = new App(new Container());
 
@@ -22,7 +23,7 @@ include __DIR__ . '/../bootstrap/bootstrap.php';
 $kernel = new Kernel();
 try {
     $kernel->bootstrap($app);
-} catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+} catch (NotFoundExceptionInterface | ContainerExceptionInterface | JsonException $e) {
     ResponseExceptionHandler::handle($e);
 }
 

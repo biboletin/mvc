@@ -1,215 +1,240 @@
 <?php
 
-namespace Bibo\Core\Logger;
+namespace Bibo\Mvc\Core\Logger;
 
-use Bibo\Core\Interfaces\LogHandlerInterface;
+use Bibo\Mvc\Core\Logger\Handler\RotatingFileHandler;
+use Bibo\Mvc\Core\Interfaces\FormatterInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Stringable;
 
 /**
- * Logger
- * This class is responsible for logging messages at different levels.
- * It uses a set of handlers to write log messages to different destinations.
- * It implements the PSR-3 LoggerInterface.
- * It allows for adding custom handlers and setting the minimum log level.
- * It also provides methods for logging messages at different levels.
- * The class is designed to be used within a container, allowing for dependency injection.
- * The log levels are defined as constants for better readability.
- * The class is designed to be extensible, allowing for custom log handlers to be added.
- * It provides a flexible and powerful logging solution for applications.
+ * Logger class that implements PSR-3 LoggerInterface.
+ * This class provides methods for logging messages at various levels
+ * and uses a formatter to format the log messages.
+ * It supports log rotation through a RotatingFileHandler.
  */
 class Logger implements LoggerInterface
 {
     /**
-     * Array of handlers indexed by log level
+     * Formatter instance used to format log messages.
+     * This should implement FormatterInterface.
      *
-     * @var array
+     * @var FormatterInterface
      */
-    private array $handlersByLevel;
+    protected FormatterInterface $formatter;
 
     /**
-     * Minimum log level
+     * RotatingFileHandler instance used to handle log writing.
+     * This should implement LogHandlerInterface.
+     * If null, no handler is set.
+     * If a handler is not provided, an exception will be thrown
+     * when trying to log messages.
+     * If you want to use a handler, you must pass an instance of RotatingFileHandler.
      *
-     * @var string
+     * @var RotatingFileHandler|null
      */
-    private string $minLogLevel;
+    protected ?RotatingFileHandler $handler;
 
     /**
-     * Log levels
+     * Flag to indicate whether to use JSON format for log messages.
+     * This is set to false by default.
+     * If you want to use JSON format,
+     * you must pass an instance of JSONFormatter to the constructor.
+     * This flag is not used in this class,
+     * but it can be used in subclasses or when extending the functionality.
      *
-     * @var array
+     * @param FormatterInterface       $formatter
+     * @param RotatingFileHandler|null $handler
      */
-    private const LEVELS = [
-        'debug'     => 100,
-        'info'      => 200,
-        'notice'    => 250,
-        'warning'   => 300,
-        'error'     => 400,
-        'critical'  => 500,
-        'alert'     => 550,
-        'emergency' => 600,
-    ];
-
-    /**
-     * Logger constructor
-     *
-     * @param array  $handlersByLevel
-     * @param string $minLogLevel
-     */
-    public function __construct(array $handlersByLevel = [], string $minLogLevel = LogLevel::ERROR)
+    public function __construct(FormatterInterface $formatter, RotatingFileHandler $handler = null)
     {
-        $this->handlersByLevel = $handlersByLevel;
-        $this->minLogLevel = $minLogLevel;
+        $this->formatter = $formatter;
+        $this->handler = $handler;
     }
 
     /**
-     * Set the minimum log level
+     * Logs a message at the emergency level.
+     * This method is used for critical errors that require immediate attention.
+     * It will log the message using the configured handler
+     * and format it using the formatter.
      *
-     * @param string $level
-     *
-     * @return void
-     */
-    public function setLogLevel(string $level): void
-    {
-        if (isset(self::LEVELS[$level])) {
-            $this->minLogLevel = $level;
-        }
-    }
-
-    /**
-     * Add a log handler for a specific log level
-     *
-     * @param LogHandlerInterface $handler
-     * @param string              $level
+     * @param string|Stringable $message
+     * @param array             $context
      *
      * @return void
      */
-    public function addHandler(LogHandlerInterface $handler, string $level): void
-    {
-        $this->handlersByLevel[$level][] = $handler;
-    }
-
-    /**
-     * Log a message at a specific log level
-     *
-     * @param $level
-     * @param $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function log($level, $message, array $context = []): void
-    {
-        if (self::LEVELS[$level] < self::LEVELS[$this->minLogLevel]) {
-            return;
-        }
-
-        foreach ($this->handlersByLevel[$level] ?? [] as $handler) {
-            $handler->write($level, $message, $context);
-        }
-    }
-
-    /**
-     * Log a message at the emergency level
-     *
-     * @param $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function emergency($message, array $context = []): void
+    public function emergency(string|Stringable $message, array $context = []): void
     {
         $this->log(LogLevel::EMERGENCY, $message, $context);
     }
 
     /**
-     * Alert a message at the alert level
+     * Logs a message at the alert level.
+     * This method is used for urgent issues that need immediate attention.
+     * It will log the message using the configured handler
+     * and format it using the formatter.
      *
-     * @param $message
-     * @param array $context
+     * @param string|Stringable $message
+     * @param array             $context
      *
      * @return void
      */
-    public function alert($message, array $context = []): void
+    public function alert(string|Stringable $message, array $context = []): void
     {
         $this->log(LogLevel::ALERT, $message, $context);
     }
 
     /**
-     * Log a message at the critical level
+     * Logs a message at the critical level.
+     * This method is used for critical errors that may cause the application to stop.
+     * It will log the message using the configured handler
+     * and format it using the formatter.
      *
-     * @param $message
-     * @param array $context
+     * @param string|Stringable $message
+     * @param array             $context
      *
      * @return void
      */
-    public function critical($message, array $context = []): void
+    public function critical(string|Stringable $message, array $context = []): void
     {
         $this->log(LogLevel::CRITICAL, $message, $context);
     }
 
     /**
-     * Log a message at the error level
+     * Logs a message at the error level.
+     * This method is used for errors that do not require immediate attention
+     * but should be investigated.
+     * It will log the message using the configured handler
+     * and format it using the formatter.
      *
-     * @param $message
-     * @param array $context
+     * @param string|Stringable $message
+     * @param array             $context
      *
      * @return void
      */
-    public function error($message, array $context = []): void
+    public function error(string|Stringable $message, array $context = []): void
     {
         $this->log(LogLevel::ERROR, $message, $context);
     }
 
     /**
-     * Log a message at the warning level
+     * Logs a message at the warning level.
+     * This method is used for warnings that may indicate a potential problem
+     * but do not require immediate action.
+     * It will log the message using the configured handler
+     * and format it using the formatter.
      *
-     * @param $message
-     * @param array $context
+     * @param string|Stringable $message
+     * @param array             $context
      *
      * @return void
      */
-    public function warning($message, array $context = []): void
+    public function warning(string|Stringable $message, array $context = []): void
     {
         $this->log(LogLevel::WARNING, $message, $context);
     }
 
     /**
-     * Log a message at the notice level
+     * Logs a message at the notice level.
+     * This method is used for normal but significant events
+     * that should be logged.
+     * It will log the message using the configured handler
+     * and format it using the formatter.
      *
-     * @param $message
-     * @param array $context
+     * @param string|Stringable $message
+     * @param array             $context
      *
      * @return void
      */
-    public function notice($message, array $context = []): void
+    public function notice(string|Stringable $message, array $context = []): void
     {
         $this->log(LogLevel::NOTICE, $message, $context);
     }
 
     /**
-     * Log a message at the info level
+     * Logs a message at the info level.
+     * This method is used for informational messages
+     * that do not indicate an error or warning.
+     * It will log the message using the configured handler
+     * and format it using the formatter.
      *
-     * @param $message
-     * @param array $context
+     * @param string|Stringable $message
+     * @param array             $context
      *
      * @return void
      */
-    public function info($message, array $context = []): void
+    public function info(string|Stringable $message, array $context = []): void
     {
         $this->log(LogLevel::INFO, $message, $context);
     }
 
     /**
-     * Log a message at the debug level
+     * Logs a message at the debug level.
+     * This method is used for debugging messages
+     * that provide detailed information
+     * about the application's state.
+     * It will log the message using the configured handler
+     * and format it using the formatter.
+     * This level is typically used during development
+     * and may not be enabled in production environments.
      *
-     * @param $message
-     * @param array $context
+     * @param string|Stringable $message
+     * @param array             $context
      *
      * @return void
      */
-    public function debug($message, array $context = []): void
+    public function debug(string|Stringable $message, array $context = []): void
     {
         $this->log(LogLevel::DEBUG, $message, $context);
+    }
+
+    /**
+     * Logs a message at the specified level.
+     * This method is the core logging method
+     * that handles the actual logging process.
+     * It formats the message using the provided formatter
+     * and writes it to the configured handler.
+     * If no handler is set, an exception will be thrown.
+     *
+     * @param $level
+     * @param string|Stringable $message
+     * @param array             $context
+     *
+     * @return void
+     */
+    public function log($level, string|Stringable $message, array $context = []): void
+    {
+        $interpolated = $this->interpolate($message, $context);
+        $formattedMessage = $this->formatter->format($level, $interpolated, $context);
+
+        $this->handler->write($formattedMessage);
+    }
+
+    /**
+     * Interpolates the message with the provided context.
+     * This method replaces placeholders in the message
+     * with values from the context array.
+     * Placeholders are in the format {{key}},
+     * where key is a key in the context array.
+     * If a key in the context array is not found in the message, it will be ignored.
+     * This method is used to prepare the message for logging
+     * and to ensure that all context values
+     * are included in the final log message.
+     * It is a private method and should not be called directly outside of this class.
+     *
+     * @param string|Stringable $message
+     * @param array             $context
+     *
+     * @return string
+     */
+    private function interpolate(string|Stringable $message, array $context = []): string
+    {
+        $replace = [];
+        foreach ($context as $key => $value) {
+            $replace['{{' . $key . '}}'] = $value;
+        }
+
+        return strtr($message, $replace);
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Facades;
+namespace Bibo\Mvc\Core\Facades;
 
-use Bibo\Core\BaseRouter\BaseRouter;
+use Bibo\Mvc\Core\BaseRouter\BaseRouter;
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Http\Message\ResponseInterface;

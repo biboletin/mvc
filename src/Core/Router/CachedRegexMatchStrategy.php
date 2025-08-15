@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\BaseRouter;
+namespace Bibo\Mvc\Core\Router;
 
 use Bibo\Core\Interfaces\RouteMatchingStrategyInterface;
 

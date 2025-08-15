@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Rest\Message;
+namespace Bibo\Mvc\Core\Rest\Message;
 
 use InvalidArgumentException;
 use Psr\Http\Message\MessageInterface;

@@ -1,12 +1,12 @@
 <?php
 
-namespace Bibo\Core\Wrapper\Curl;
+namespace Bibo\Mvc\Core\Wrapper\Curl;
 
-use Bibo\Core\Enum\CurlStrategyType;
-use Bibo\Core\Interfaces\CurlInterface;
+use Bibo\Mvc\Core\Enum\CurlStrategyType;
+use Bibo\Mvc\Core\Interfaces\CurlInterface;
 use InvalidArgumentException;
-use Bibo\Core\Wrapper\Curl\CurlSingleWrapper;
-use Bibo\Core\Wrapper\Curl\CurlMultiWrapper;
+use Bibo\Mvc\Core\Wrapper\Curl\CurlSingleWrapper;
+use Bibo\Mvc\Core\Wrapper\Curl\CurlMultiWrapper;
 
 class CurlStrategyFactory
 {

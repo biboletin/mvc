@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\BaseRouter;
+namespace Bibo\Mvc\Core\Router;
 
 /**
  * Simple route matching class

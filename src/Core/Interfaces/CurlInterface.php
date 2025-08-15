@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Interfaces;
+namespace Bibo\Mvc\Core\Interfaces;
 
 /**
  * Interface CurlInterface
@@ -52,7 +52,7 @@ interface CurlInterface
      * The body can be a JSON string, form data, or any other format
      * supported by the API being called.
      *
-     * @param string $body The request body content
+     * @param  string $body The request body content
      * @return void
      */
     public function setBody(string $body): void;

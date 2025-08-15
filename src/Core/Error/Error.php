@@ -1,10 +1,10 @@
 <?php
 
-namespace Bibo\Core\Error;
+namespace Bibo\Mvc\Core\Error;
 
-use Bibo\Core\Enum\HttpStatus;
-use Bibo\Core\Exception\NotFoundException;
-use Bibo\Core\Template\Template;
+use Bibo\Mvc\Core\Enum\HttpStatus;
+use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
+use Bibo\Mvc\Core\Template\Template;
 use ErrorException;
 use Throwable;
 

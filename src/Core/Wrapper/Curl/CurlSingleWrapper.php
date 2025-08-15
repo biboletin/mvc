@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Wrapper\Curl;
+namespace Bibo\Mvc\Core\Wrapper\Curl;
 
-use Bibo\Core\Interfaces\CurlExtendedInterface;
+use Bibo\Mvc\Core\Interfaces\CurlExtendedInterface;
 use CurlHandle;
 use InvalidArgumentException;
 
@@ -400,4 +400,5 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
     public function execute(): string
     {
         // TODO: Implement execute() method.
-}}
+    }
+}

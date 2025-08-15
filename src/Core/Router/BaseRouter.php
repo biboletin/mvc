@@ -1,14 +1,14 @@
 <?php
 
-namespace Bibo\Core\BaseRouter;
+namespace Bibo\Mvc\Core\Router;
 
-use Bibo\Core\Exception\NotFoundException;
-use Bibo\Core\Interfaces\RouteMatchingStrategyInterface;
-use Bibo\Core\Interfaces\RouterInterface;
-use Bibo\Core\Request\Stream;
-use Bibo\Core\Response\HtmlResponse;
-use Bibo\Core\Response\JsonResponse;
-use Bibo\Core\View\View;
+use Bibo\Mvc\Core\Exception\NotFoundException;
+use Bibo\Mvc\Core\Interfaces\RouteMatchingStrategyInterface;
+use Bibo\Mvc\Core\Interfaces\RouterInterface;
+use Bibo\Mvc\Core\Request\Stream;
+use Bibo\Mvc\Core\Response\HtmlResponse;
+use Bibo\Mvc\Core\Response\JsonResponse;
+use Bibo\Mvc\Core\View\View;
 use Exception;
 use JsonException;
 use Psr\Container\ContainerExceptionInterface;

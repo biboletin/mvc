@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Wrapper;
+namespace Bibo\Mvc\Core\Wrapper;
 
-use Bibo\Core\Interfaces\CurlInterface;
+use Bibo\Mvc\Core\Interfaces\CurlInterface;
 use CurlHandle;
 use RuntimeException;
 
@@ -153,7 +153,7 @@ class CurlWrapper implements CurlInterface
     }
 
     /**
-     * @param        $curlHandler
+     * @param $curlHandler
      * @param string $headerLine
      *
      * @return int

@@ -1,9 +1,9 @@
 <?php
 
-namespace Bibo\Core\Provider;
+namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Core\Cache\FileCache;
-use Bibo\Core\Config\Config;
+use Bibo\Mvc\Core\Cache\FileCache;
+use Bibo\Mvc\Core\Config\Config;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Exception;
 use Psr\Container\NotFoundExceptionInterface;

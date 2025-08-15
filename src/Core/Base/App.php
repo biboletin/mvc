@@ -1,9 +1,9 @@
 <?php
 
-namespace Bibo\Core\Base;
+namespace Bibo\Mvc\Core\Base;
 
-use Bibo\Core\Response\JsonResponse;
-use Bibo\Core\Response\ResponseEmitter;
+use Bibo\Mvc\Core\Response\JsonResponse;
+use Bibo\Mvc\Core\Response\ResponseEmitter;
 use Exception;
 use JsonException;
 use Psr\Container\ContainerExceptionInterface;

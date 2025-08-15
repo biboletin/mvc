@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Response;
+namespace Bibo\Mvc\Core\Response;
 
 class RedirectResponse extends BaseResponse
 {

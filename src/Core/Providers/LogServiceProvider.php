@@ -1,9 +1,9 @@
 <?php
 
-namespace Bibo\Core\Provider;
+namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Core\Logger\FileLogHandler;
-use Bibo\Core\Logger\Logger;
+use Bibo\Mvc\Core\Logger\FileLogHandler;
+use Bibo\Mvc\Core\Logger\Logger;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\NotFoundExceptionInterface;
 

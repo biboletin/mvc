@@ -1,9 +1,9 @@
 <?php
 
-namespace Bibo\Core\Template;
+namespace Bibo\Mvc\Core\Template;
 
 use Bibo\Core\Exception\NotFoundException;
-use Bibo\Core\Interfaces\TemplateEngineInterface;
+use Bibo\Mvc\Core\Interfaces\TemplateEngineInterface;
 use InvalidArgumentException;
 
 /**

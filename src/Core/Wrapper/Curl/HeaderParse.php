@@ -1,13 +1,13 @@
 <?php
 
-namespace Bibo\Core\Wrapper\Curl;
+namespace Bibo\Mvc\Core\Wrapper\Curl;
 
 class HeaderParse
 {
     /**
      * Parses raw HTTP response headers into an associative array.
      *
-     * @param string $rawHeaders Raw header string (e.g., from cURL's header output).
+     * @param  string $rawHeaders Raw header string (e.g., from cURL's header output).
      * @return array Parsed headers in ['Header-Name' => ['value1', 'value2']] format.
      */
     public static function parse(string $rawHeaders): array

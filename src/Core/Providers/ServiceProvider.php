@@ -2,7 +2,7 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Core\Container\Container;
+use Bibo\Mvc\Core\Container\Container;
 
 /**
  * Service provider class

@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Facades;
+namespace Bibo\Mvc\Core\Facades;
 
-use Bibo\Core\Request\BaseRequest;
+use Bibo\Mvc\Core\Request\BaseRequest;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Response;
+namespace Bibo\Mvc\Core\Response;
 
-use Bibo\Core\Request\Stream;
+use Bibo\Mvc\Core\Request\Stream;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 

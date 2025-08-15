@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Request;
+namespace Bibo\Mvc\Core\Request;
 
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;

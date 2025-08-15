@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Wrapper\Curl;
+namespace Bibo\Mvc\Core\Wrapper\Curl;
 
-use Bibo\Core\Interfaces\CurlInterface;
+use Bibo\Mvc\Core\Interfaces\CurlInterface;
 use RuntimeException;
 
 class CurlMultiWrapper extends AbstractCurlWrapper
@@ -114,6 +114,5 @@ class CurlMultiWrapper extends AbstractCurlWrapper
 
     public function init()
     {
-
     }
 }

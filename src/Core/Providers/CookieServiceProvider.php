@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Provider;
+namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 

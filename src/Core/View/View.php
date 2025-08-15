@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\View;
+namespace Bibo\Mvc\Core\View;
 
-use Bibo\Core\Template\Template;
+use Bibo\Mvc\Core\Template\Template;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;

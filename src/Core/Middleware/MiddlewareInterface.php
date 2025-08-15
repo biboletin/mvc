@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Middleware;
+namespace Bibo\Mvc\Core\Middleware;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

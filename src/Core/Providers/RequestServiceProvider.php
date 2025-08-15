@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Provider;
+namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Core\Request\BaseRequest;
+use Bibo\Mvc\Core\Request\BaseRequest;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 
 class RequestServiceProvider extends ServiceProvider

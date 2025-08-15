@@ -1,10 +1,10 @@
 <?php
 
-namespace Bibo\Core\Provider;
+namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Core\BaseRouter\BaseRouter;
-use Bibo\Core\BaseRouter\CachedRegexMatchStrategy;
-use Bibo\Core\Facades\Route;
+use Bibo\Mvc\Core\BaseRouter\BaseRouter;
+use Bibo\Mvc\Core\BaseRouter\CachedRegexMatchStrategy;
+use Bibo\Mvc\Core\Facades\Route;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\NotFoundExceptionInterface;
 

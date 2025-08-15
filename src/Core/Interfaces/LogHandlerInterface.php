@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Interfaces;
+namespace Bibo\Mvc\Core\Interfaces;
 
 /**
  * Provides a contract for logging handlers to implement custom log writing functionality.

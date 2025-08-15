@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Model;
+namespace Bibo\Mvc\Core\Model;
 
 abstract class Model
 {

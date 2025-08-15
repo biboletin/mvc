@@ -1,9 +1,9 @@
 <?php
 
-namespace Bibo\Core\Provider;
+namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Core\Template\Template;
-use Bibo\Core\Wrapper\TwigTemplateEngine;
+use Bibo\Mvc\Core\Template\Template;
+use Bibo\Mvc\Core\Wrapper\TwigTemplateEngine;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -13,7 +13,7 @@ class TemplateServiceProvider extends ServiceProvider
      * Register service provider
      *
      * @inheritDoc
-     * @throws NotFoundExceptionInterface
+     * @throws     NotFoundExceptionInterface
      */
     public function register(): void
     {

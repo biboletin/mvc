@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Logger;
+namespace Bibo\Mvc\Core\Logger\Handler;
 
-use Bibo\Core\Interfaces\LogHandlerInterface;
+use Bibo\Mvc\Core\Interfaces\LogHandlerInterface;
 
 /**
  * Class SyslogHandler

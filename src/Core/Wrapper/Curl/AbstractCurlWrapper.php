@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Wrapper\Curl;
+namespace Bibo\Mvc\Core\Wrapper\Curl;
 
 abstract class AbstractCurlWrapper
 {

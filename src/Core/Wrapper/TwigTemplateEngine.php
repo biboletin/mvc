@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Wrapper;
+namespace Bibo\Mvc\Core\Wrapper;
 
-use Bibo\Core\Interfaces\TemplateEngineInterface;
+use Bibo\Mvc\Core\Interfaces\TemplateEngineInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;

@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Provider;
+namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Core\Middleware\MiddlewareDispatcher;
+use Bibo\Mvc\Core\Middleware\MiddlewareDispatcher;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\NotFoundExceptionInterface;
 

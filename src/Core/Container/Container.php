@@ -1,8 +1,8 @@
 <?php
 
-namespace Bibo\Core\Container;
+namespace Bibo\Mvc\Core\Container;
 
-use Bibo\Core\Exception\NotFoundException;
+use Bibo\Mvc\Core\Exception\Custom\Container\ContainerItemNotFoundException;
 use Closure;
 use Exception;
 use Psr\Container\ContainerInterface;
@@ -51,7 +51,7 @@ class Container implements ContainerInterface
         }
 
         if (!isset($this->bindings[$id])) {
-            throw new NotFoundException('Service ' . $id . ' not found!');
+            throw new ContainerItemNotFoundException('Service ' . $id . ' not found!');
         }
 
         $this->instances[$id] = $this->bindings[$id]($this);

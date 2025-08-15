@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Interfaces;
+namespace Bibo\Mvc\Core\Interfaces;
 
 /**
  * Config Interface

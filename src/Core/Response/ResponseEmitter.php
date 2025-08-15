@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Response;
+namespace Bibo\Mvc\Core\Response;
 
 use Psr\Http\Message\ResponseInterface;
 

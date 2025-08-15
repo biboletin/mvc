@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Middleware;
+namespace Bibo\Mvc\Core\Middleware;
 
 use Exception;
 use Psr\Container\ContainerInterface;

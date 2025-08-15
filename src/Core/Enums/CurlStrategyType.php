@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Core\Enum;
+namespace Bibo\Mvc\Core\Enums;
 
 use InvalidArgumentException;
 
@@ -9,12 +9,12 @@ use InvalidArgumentException;
  */
 enum CurlStrategyType: string
 {
-    /**
+    /*
      * Single cURL handle strategy.
      */
     case SINGLE = 'single';
 
-    /**
+    /*
      * Multi cURL handle strategy.
      */
     case MULTI = 'multi';
@@ -34,5 +34,4 @@ enum CurlStrategyType: string
             default => throw new InvalidArgumentException("Invalid strategy type: $value"),
         };
     }
-
 }

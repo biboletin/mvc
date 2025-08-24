@@ -3,7 +3,6 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Middleware\MiddlewareDispatcher;
-use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\NotFoundExceptionInterface;
 
 class MiddlewareDispatcherServiceProvider extends ServiceProvider

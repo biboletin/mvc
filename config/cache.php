@@ -1,7 +1,21 @@
 <?php
 
 return [
+
     'cache' => [
-        'cache_ttl' => $_ENV['CACHE_TTL'] ?? 3600,
+
+        'enabled' => '',
+
+        'driver' => '',
+
+        'prefix' => '',
+
+        'ttl' => '',
+
+        'path' => '',
+
+        'compression' => '',
+
+        'encryption' => '',
     ],
 ];

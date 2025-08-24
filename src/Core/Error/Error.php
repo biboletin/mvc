@@ -2,87 +2,138 @@
 
 namespace Bibo\Mvc\Core\Error;
 
-use Bibo\Mvc\Core\Enum\HttpStatus;
+use Bibo\Mvc\Core\Enums\HttpStatus;
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Template\Template;
 use ErrorException;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
-/**
- * Application error handler
- */
 class Error
 {
-    private Template $template;
+    /**
+     * Error class to handle errors and exceptions in a PHP application.
+     *
+     * This class registers custom error and exception handlers, logs errors,
+     * and displays error messages based on the environment (development or production).
+     *
+     * @var LoggerInterface
+     */
+    protected LoggerInterface $logger;
 
-    public function __construct()
+    /**
+     * The environment in which the application is running.
+     * Can be 'development' or 'production'.
+     *
+     * @var string
+     */
+    protected string $environment;
+
+    /**
+     * The path to the error template file for displaying errors.
+     * If not set, a default error message will be displayed.
+     *
+     * @var Template
+     */
+    protected Template $errorTemplate;
+
+    /**
+     * Error constructor.
+     *
+     * @param LoggerInterface $logger      The logger instance to log errors.
+     * @param string          $environment The environment in which the application is running (default: 'production').
+     */
+    public function __construct(LoggerInterface $logger, string $environment = 'production')
     {
+        $this->logger = $logger;
+        $this->environment = $environment;
     }
 
     /**
-     * Register error handler
+     * Sets the error template for displaying errors.
      *
-     * @return void
+     * @param Template $errorTemplate The path to the error template file.
+     */
+    public function setErrorTemplate(Template $errorTemplate): void
+    {
+        $this->errorTemplate = $errorTemplate;
+    }
+
+    /**
+     * Registers the error and exception handlers.
+     *
+     * This method sets up the custom error handler, exception handler,
+     * and shutdown function to handle errors and exceptions gracefully.
      */
     public function register(): void
     {
-        set_exception_handler([$this, 'handleException']);
         set_error_handler([$this, 'handleError']);
+        set_exception_handler([$this, 'handleException']);
         register_shutdown_function([$this, 'handleShutdown']);
-    }
 
-    public function setTemplate(Template $template): void
-    {
-        $this->template = $template;
+        ini_set('display_errors', $this->isDev() ? '1' : '0');
+        ini_set('log_errors', '1');
+        error_reporting(E_ALL);
     }
 
     /**
-     * Handle exceptions
+     * Handles PHP errors.
+     * This method converts PHP errors into ErrorException instances
+     * and throws them for consistent handling.
      *
-     * @param Throwable $exception
+     * @param int $level The level of the error raised.
+     * This can be one of the E_* constants.
+     *
+     * @param string $message The error message.
+     * @param string $file The filename where the error occurred.
+     * @param int $line The line number where the error occurred.
+     *
+     * @return bool Returns false if the error is not handled, true otherwise.
+     *
+     * @throws ErrorException If the error is handled, it throws an ErrorException.
+     */
+    public function handleError(int $level, string $message, string $file, int $line): bool
+    {
+        if (!(error_reporting() & $level)) {
+            return false;
+        }
+
+        throw new ErrorException($message, 0, $level, $file, $line);
+    }
+
+    /**
+     * Handles uncaught exceptions.
+     * This method logs the exception and displays an error message
+     * based on the environment (development or production).
+     *
+     * @param Throwable $exception The uncaught exception to handle.
+     *                             This can be any Throwable instance,
+     *                             including ErrorException.
+     *
+     * @throws Throwable Rethrows the exception if needed.
      *
      * @return void
-     * @throws NotFoundException
      */
     public function handleException(Throwable $exception): void
     {
-        if (ob_get_length()) {
-            ob_clean();
-        }
+        $this->logger->error($this->formatThrowable($exception));
 
-        $code = $exception->getCode();
+        http_response_code(HttpStatus::InternalServerError->value);
 
-        // Try to match with HttpStatus or fallback to 500
-        $status = HttpStatus::tryFrom($code) ?? HttpStatus::InternalServerError;
-        http_response_code($status->value);
-
-        if (self::isJsonRequest()) {
-            $this->renderJsonError($exception, $status);
+        if ($this->wantsJson()) {
+            $this->jsonResponse($exception);
         } else {
-            $this->renderErrorPage($exception, $status);
+            $this->htmlResponse($exception);
         }
-
-        ob_end_flush();
     }
 
     /**
-     * Handle errors
+     * Handles shutdown events.
+     * This method checks for fatal errors that occurred during script execution
+     * and logs them. It also displays an error message based on the environment.
      *
-     * @param int    $errno
-     * @param string $errstr
-     * @param string $errfile
-     * @param int    $errline
-     *
-     * @return void
-     * @throws ErrorException
-     */
-    public function handleError(int $errno, string $errstr, string $errfile, int $errline): void
-    {
-        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-    }
-
-    /**
-     * Shutdown function
+     * This method is called when the script execution ends,
+     * allowing for cleanup and final error handling.
      *
      * @return void
      * @throws NotFoundException
@@ -107,71 +158,146 @@ class Error
         ];
 
         if ($error !== null && in_array($error['type'], $errorTypes)) {
-            self::handleException(
-                new ErrorException(
-                    $error['message'],
-                    500,
-                    $error['type'],
-                    $error['file'],
-                    $error['line']
-                )
-            );
+            $message = "Fatal Error: {$error['message']} in {$error['file']} on line {$error['line']}";
+            $this->logger->critical($message);
+
+            http_response_code(HttpStatus::InternalServerError->value);
+
+            if ($this->wantsJson()) {
+                $this->jsonResponse(null, $message);
+            } else {
+                $this->htmlResponse(null, $message);
+            }
         }
     }
 
     /**
-     * If request is JSON
+     * Checks if the application is running in development mode.
      *
-     * @return bool
+     * @return bool Returns true if the environment is 'development', false otherwise.
      */
-    private static function isJsonRequest(): bool
+    protected function isDev(): bool
     {
-        return isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json');
+        return $this->environment === 'development';
     }
 
     /**
-     * If request is json
-     * echo json string
+     * Checks if the request expects a JSON response.
      *
-     * @param Throwable  $exception
-     * @param HttpStatus $status
+     * This method checks the 'Accept' header to determine if the client
+     * expects a JSON response.
+     *
+     * @return bool Returns true if the request expects JSON, false otherwise.
+     */
+    protected function wantsJson(): bool
+    {
+        return isset($_SERVER['HTTP_ACCEPT']) &&
+            str_contains($_SERVER['HTTP_ACCEPT'], 'application/json');
+    }
+
+    /**
+     * Sends a JSON response for errors.
+     *
+     * This method formats the error message as JSON and sends it to the client.
+     *
+     * @param Throwable|null $e
+     * @param string|null    $fatal
      *
      * @return void
      */
-    private function renderJsonError(Throwable $exception, HttpStatus $status): void
+    protected function jsonResponse(?Throwable $e = null, ?string $fatal = null): void
     {
-        echo json_encode(
-            [
-                'error' => true,
-                'message' => $exception->getMessage(),
-                'code' => $status->value,
-            ],
-            JSON_PRETTY_PRINT
-        );
+        header('Content-Type: application/json');
+
+        $response = ['error' => true];
+
+        if ($this->isDev()) {
+            if ($e) {
+                $response['exception'] = [
+                    'type'    => get_class($e),
+                    'message' => $e->getMessage(),
+                    'file'    => $e->getFile(),
+                    'line'    => $e->getLine(),
+                    'trace'   => explode("\n", $e->getTraceAsString()),
+                ];
+            } elseif ($fatal) {
+                $response['fatal'] = $fatal;
+            }
+        } else {
+            $response['message'] = 'An internal server error occurred.';
+        }
+
+        echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     /**
-     * Renders html error page
+     * Sends an HTML response for errors.
      *
-     * @param Throwable  $exception
-     * @param HttpStatus $status
+     * This method formats the error message as HTML and sends it to the client.
+     *
+     * @param Throwable|null $e
+     * @param string|null    $fatal
      *
      * @return void
      * @throws NotFoundException
      */
-    private function renderErrorPage(Throwable $exception, HttpStatus $status): void
+    protected function htmlResponse(?Throwable $e = null, ?string $fatal = null): void
     {
-        $template = 'error/error';
+        if ($this->isDev()) {
+            if ($e) {
+                echo $this->formatExceptionHtml($e);
+            } elseif ($fatal) {
+                echo "<pre>$fatal</pre>";
+            }
+        } else {
+            echo $this->errorTemplate->render('error/error', [
+                'code' => $e->getCode(),
+                'message' => $e->getMessage(),
+                'exception' => get_class($e),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
+    }
 
-        echo $this->template->render($template, [
-            'code' => $status->value,
-            'message' => $status->message(),
-            'exception' => $exception->getMessage(),
-            'debug' => config('app_debug'),
-            'trace' => config('app_debug')
-                ? $exception->getTraceAsString()
-                : '',
-        ]);
-        exit;
+    /**
+     * Formats a Throwable instance into a string for logging.
+     *
+     * This method is used to create a consistent log message format
+     * for exceptions and errors.
+     *
+     * @param Throwable $e The Throwable instance to format.
+     *
+     * @return string The formatted error message.
+     */
+    private function formatThrowable(Throwable $e): string
+    {
+        return sprintf(
+            "[%s] %s: %s in %s on line %d\n%s",
+            date('Y-m-d H:i:s'),
+            get_class($e),
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine(),
+            $e->getTraceAsString()
+        );
+    }
+
+    /**
+     * Formats an exception into an HTML string for display.
+     *
+     * This method is used to create a detailed HTML representation
+     * of an exception for development environments.
+     *
+     * @param Throwable $e The Throwable instance to format.
+     *
+     * @return string The formatted HTML string.
+     */
+    protected function formatExceptionHtml(Throwable $e): string
+    {
+        return '<pre>' .
+            get_class($e) . ': ' . $e->getMessage() . "\n" .
+            'In ' . $e->getFile() . ' on line ' . $e->getLine() . "\n" .
+            "Stack trace:\n" . $e->getTraceAsString() .
+            '</pre>';
     }
 }

@@ -4,8 +4,8 @@ namespace Bibo\Mvc\Core\Crypto;
 
 use Bibo\Mvc\Core\Enums\CryptoVersion;
 use Bibo\Mvc\Core\Enums\HashAlgorithm;
-use Bibo\Mvc\Core\Exceptions\Custom\Crypto\DecryptException;
-use Bibo\Mvc\Core\Exceptions\Custom\Crypto\EncryptException;
+use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
+use Bibo\Mvc\Core\Exception\Custom\Crypto\EncryptException;
 use Bibo\Mvc\Core\Enums\CipherAlgorithm;
 use InvalidArgumentException;
 use Random\RandomException;
@@ -90,6 +90,115 @@ class Crypto
         }
 
         $this->ivLength = openssl_cipher_iv_length($this->cipherAlgorithm->value);
+        $this->useHmac = $useHmac;
+    }
+
+    /**
+     * Getters for the properties.
+     */
+    /**
+     * Returns the encryption key.
+     * This key is used for deriving the actual encryption key
+     * used in the encryption and decryption processes.
+     * It is important to keep this key secure and not expose it publicly.
+     *
+     * @return string The encryption key.
+     */
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    /**
+     * Returns the cipher algorithm used for encryption and decryption.
+     * This algorithm defines the method of encryption, such as AES-256-GCM.
+     * It is crucial to ensure that the cipher algorithm is supported by the OpenSSL library.
+     *
+     * @return CipherAlgorithm The cipher algorithm.
+     */
+    public function getCipherAlgorithm(): CipherAlgorithm
+    {
+        return $this->cipherAlgorithm;
+    }
+
+    /**
+     * Returns the length of the initialization vector (IV) in bytes.
+     * The IV is used to ensure that the same plaintext encrypted multiple times
+     * will produce different ciphertexts, enhancing security.
+     * The length is determined by the cipher algorithm used.
+     *
+     * @return int The length of the IV in bytes.
+     */
+    public function getIvLength(): int
+    {
+        return $this->ivLength;
+    }
+
+    /**
+     * Returns whether HMAC is used for integrity verification.
+     * If true, an HMAC is calculated and appended to the encrypted data
+     * to ensure that the data has not been tampered with.
+     * This adds an additional layer of security to the encryption process.
+     *
+     * @return bool True if HMAC is used, false otherwise.
+     */
+    public function isUseHmac(): bool
+    {
+        return $this->useHmac;
+    }
+
+    /**
+     * Setters for the properties.
+     */
+    /**
+     * Sets the encryption key.
+     * This key is used for deriving the actual encryption key
+     * used in the encryption and decryption processes.
+     * It is important to keep this key secure and not expose it publicly.
+     *
+     * @param  string $key The encryption key to set.
+     * @throws InvalidArgumentException If the key is empty or invalid.
+     */
+    public function setKey(string $key): void
+    {
+        $this->key = $key;
+    }
+
+    /**
+     * Sets the cipher algorithm to be used for encryption and decryption.
+     * This method validates that the provided cipher algorithm is supported by OpenSSL.
+     *
+     * @param  CipherAlgorithm $cipherAlgorithm The cipher algorithm to set.
+     * @throws InvalidArgumentException If the cipher algorithm is not supported.
+     */
+    public function setCipherAlgorithm(CipherAlgorithm $cipherAlgorithm): void
+    {
+        $this->cipherAlgorithm = $cipherAlgorithm;
+        $this->ivLength = openssl_cipher_iv_length($this->cipherAlgorithm->value);
+    }
+
+    /**
+     * Sets the length of the initialization vector (IV) in bytes.
+     * This method allows customization of the IV length, which is used in the encryption process.
+     *
+     * @param  int $ivLength The length of the IV in bytes.
+     * @throws InvalidArgumentException If the IV length is not valid for the cipher algorithm.
+     */
+    public function setIvLength(int $ivLength): void
+    {
+        $this->ivLength = $ivLength;
+    }
+
+    /**
+     * Sets whether to use HMAC for integrity verification.
+     * If true, an HMAC is calculated and appended to the encrypted data
+     * to ensure that the data has not been tampered with.
+     * This adds an additional layer of security to the encryption process.
+     *
+     * @param bool $useHmac True to use HMAC, false otherwise.
+     */
+    public function setUseHmac(bool $useHmac): void
+    {
         $this->useHmac = $useHmac;
     }
 

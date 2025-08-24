@@ -111,7 +111,7 @@ return [
             '.htaccess',
             'index.tpl',
             'robots.txt',
-            'web.config',
+            'web.envig',
         ],
 
         /*

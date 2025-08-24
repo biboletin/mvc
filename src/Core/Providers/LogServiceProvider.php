@@ -2,9 +2,9 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Mvc\Core\Logger\FileLogHandler;
+use Bibo\Mvc\Core\Logger\Formatter\LineFormatter;
+use Bibo\Mvc\Core\Logger\Handler\RotatingFileHandler;
 use Bibo\Mvc\Core\Logger\Logger;
-use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
@@ -25,13 +25,21 @@ class LogServiceProvider extends ServiceProvider
     public function register(): void
     {
         $config = $this->container->get('config');
-        $logger = new Logger([], $config->get('app_log_level'));
-        $logger->addHandler(
-            new FileLogHandler(
-                LOG_PATH . $config->get('log_path'),
-                $config->get('log_format')
-            ),
-            $config->get('app_log_level')
+
+        $formatter = new LineFormatter(
+            $config->get('log.date_format'),
+            $config->get('log.include_context')
+        );
+
+        $rotatingLogHandler = new RotatingFileHandler(
+            LOG_PATH . 'app',
+            'error.log',
+            $config->get('log.max_files', 5)
+        );
+
+        $logger = new Logger(
+            $formatter,
+            $rotatingLogHandler
         );
 
         $this->container->set('logger', function () use ($logger) {

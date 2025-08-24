@@ -2,10 +2,9 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Mvc\Core\BaseRouter\BaseRouter;
-use Bibo\Mvc\Core\BaseRouter\CachedRegexMatchStrategy;
+use Bibo\Mvc\Core\Router\BaseRouter;
+use Bibo\Mvc\Core\Router\CachedRegexMatchStrategy;
 use Bibo\Mvc\Core\Facades\Route;
-use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\NotFoundExceptionInterface;
 
 class RouteServiceProvider extends ServiceProvider

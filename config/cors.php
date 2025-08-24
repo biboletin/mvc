@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CORS Middleware Configuration
+ * CORS Middleware configuration
  *
  * This file contains the configuration for the CORS middleware.
  * It defines the allowed origins, methods, headers, and other settings.

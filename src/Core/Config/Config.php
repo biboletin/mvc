@@ -56,8 +56,13 @@ class Config implements ConfigInterface
     public function __construct(?FileCache $cache = null, ?string $configPath = null, ?string $cachePath = null)
     {
         $this->cache = $cache;
-        $this->configPath = $configPath ?? (defined('CONFIG_PATH') ? CONFIG_PATH : __DIR__ . '/../../config/');
-        $this->cachePath = $cachePath ?? (defined('CACHE_PATH') ? CACHE_PATH . '/config/' : __DIR__ . '/../../cache/config/');
+        $this->configPath = $configPath
+            ?? (defined('CONFIG_PATH')
+                ? CONFIG_PATH
+                : __DIR__ . '/../../config/');
+        $this->cachePath = $cachePath ?? (defined('CACHE_PATH')
+            ? CACHE_PATH . 'config/'
+            : __DIR__ . '/../../cache/config/');
 
         // Ensure the cache directory exists
         if (!is_null($this->cache) && !file_exists($this->cachePath)) {
@@ -76,11 +81,32 @@ class Config implements ConfigInterface
      *
      * @return mixed The configuration value or default if not found
      */
-    public function get(string $key, ?string $default = null): mixed
+    public function get(string $key, mixed $default = null): mixed
     {
-        $formattedKey = trim(strtoupper($key));
-        return $this->config[$formattedKey] ?? $default;
+        // Normalize key
+        $key = trim(strtoupper($key));
+
+        // if is UPPER_CASE (ENV style)
+        if (preg_match('/^[A-Z0-9_]+$/', $key)) {
+            $segments = explode('_', strtolower($key));
+        } else {
+            // dot notation
+            $segments = explode('.', strtolower($key));
+        }
+
+        $value = $this->config;
+
+        foreach ($segments as $segment) {
+            if (!is_array($value) || !array_key_exists($segment, $value)) {
+                return $default;
+            }
+            $value = $value[$segment];
+        }
+
+        return $value;
     }
+
+
 
     /**
      * Check if a configuration key exists.
@@ -146,16 +172,16 @@ class Config implements ConfigInterface
      * Load configuration files from the config directory.
      *
      * Scans the config directory for PHP files and loads them into the configuration array.
-     * Each file should return an array of configuration values.
+     * Each file should return an array of configuration values. Also caches the configuration.
      *
      * @return void
      */
     public function load(): void
     {
         // Try to load from the cache first
-        if ($this->loadFromCache()) {
-            return;
-        }
+        // if ($this->loadFromCache()) {
+        //     return;
+        // }
 
         $configFiles = glob($this->configPath . '*.php');
         if ($configFiles === false) {
@@ -165,6 +191,7 @@ class Config implements ConfigInterface
         $config = [];
         foreach ($configFiles as $file) {
             $name = basename($file, '.php');
+            $this->config = $config;
             $contents = include $file;
 
             if (is_array($contents)) {
@@ -175,16 +202,18 @@ class Config implements ConfigInterface
                     $config[$name] = $contents;
                 }
             }
+            $this->config = $config;
         }
 
         $this->format($config);
+        $this->cacheConfig();
     }
 
     /**
      * Format configuration values and store them in the config array.
      *
      * Processes the configuration array to standardize the format of values
-     * and stores them in the config property. Also caches the configuration.
+     * and stores them in the config property.
      *
      * @param array<string, array<string, mixed>> $config The configuration array to format
      *
@@ -192,23 +221,14 @@ class Config implements ConfigInterface
      */
     private function format(array $config): void
     {
-        foreach ($config as $name => $conf) {
-            if (!is_array($conf)) {
+        // dd($config);
+        foreach ($config as $key => $value) {
+            if (!is_array($value)) {
                 continue;
             }
-
-            foreach ($conf as $key => $value) {
-                $formattedKey = trim(strtolower($name));
-
-                if (is_array($value)) {
-                    $this->config[$formattedKey][$key] = $value;
-                } else {
-                    $this->config[$formattedKey][$key] = $value;
-                }
-            }
+            $formattedKey = trim(strtolower($key));
+            $this->config[$formattedKey] = $value;
         }
-
-        $this->cacheConfig();
     }
 
     /**
@@ -289,7 +309,10 @@ class Config implements ConfigInterface
                 $value = $matches[1];
             }
 
-            $this->config[$key] = $value;
+            // $this->config[$key] = $value;
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+            putenv("$key=$value");
         }
 
         $this->cacheConfig();

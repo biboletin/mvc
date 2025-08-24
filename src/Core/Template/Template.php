@@ -2,7 +2,7 @@
 
 namespace Bibo\Mvc\Core\Template;
 
-use Bibo\Core\Exception\NotFoundException;
+use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Interfaces\TemplateEngineInterface;
 use InvalidArgumentException;
 

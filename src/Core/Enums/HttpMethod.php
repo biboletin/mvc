@@ -41,7 +41,7 @@ enum HttpMethod: string
 
     public function isSafe(): bool
     {
-        return in_array($this, [self::GET, self::HEAD, self::OPTIONS, self::TRACE]);
+        return in_array($this, [self::GET, self::HEAD, self::OPTIONS, self::TRACE], true);
     }
 
     /**
@@ -52,7 +52,7 @@ enum HttpMethod: string
 
     public function isIdempotent(): bool
     {
-        return in_array($this, [self::GET, self::PUT, self::DELETE, self::HEAD, self::OPTIONS, self::TRACE]);
+        return in_array($this, [self::GET, self::PUT, self::DELETE, self::HEAD, self::OPTIONS, self::TRACE], true);
     }
 
     /**

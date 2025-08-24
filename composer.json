@@ -46,6 +46,7 @@
         "illuminate/database": "10.x-dev",
         "ext-dom": "*",
         "ext-json": "*",
-        "ext-libxml": "*"
+        "ext-libxml": "*",
+        "ext-openssl": "*"
     }
 }

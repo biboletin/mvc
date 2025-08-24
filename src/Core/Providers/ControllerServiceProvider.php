@@ -3,7 +3,6 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Controller\Controller;
-use Bibo\Mvc\Core\Providers\ServiceProvider;
 
 class ControllerServiceProvider extends ServiceProvider
 {

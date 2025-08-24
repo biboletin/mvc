@@ -2,7 +2,7 @@
 
 namespace Bibo\Mvc\Core\Rest;
 
-use Bibo\Mvc\Core\Enum\CurlStrategyType;
+use Bibo\Mvc\Core\Enums\CurlStrategyType;
 use Bibo\Mvc\Core\Rest\Message\Request;
 use Bibo\Mvc\Core\Rest\Message\Response;
 use Bibo\Mvc\Core\Rest\Message\Stream;

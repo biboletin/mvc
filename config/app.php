@@ -16,43 +16,43 @@ return [
          * Application name
          */
 
-        'name' => config('app_name', 'Example Application'),
+        'name' => get_env('app.name', 'Example Application'),
 
         /*
          * Application URL
          */
 
-        'url' => config('app_url', 'http://localhost'),
+        'url' => get_env('app.url', 'http://localhost'),
 
         /*
          * Application version
          */
 
-        'version' => config('app_version', '1.0.0'),
+        'version' => get_env('app.version', '1.0.0'),
 
         /*
          * Application environment
          */
 
-        'env' => config('app_env', 'development'),
+        'env' => get_env('app.env', 'development'),
 
         /*
          * Application debug mode
          */
 
-        'debug' => config('app_debug', false),
+        'debug' => get_env('app.debug', false),
 
         /*
          * Application debug level
          */
 
-        'debug_level' => config('app_debug_level', 'debug'),
+        'debug_level' => get_env('app.debug_level', 'debug'),
 
         /*
          * Application timezone
          */
 
-        'timezone' => date_default_timezone_set(config('app_timezone', 'Europe/Sofia')),
+        'timezone' => get_env('app.timezone', 'Europe/Sofia'),
 
         /*
          * Application locale

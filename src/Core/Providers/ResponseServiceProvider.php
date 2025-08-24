@@ -3,7 +3,6 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Response\BaseResponse;
-use Bibo\Mvc\Core\Providers\ServiceProvider;
 
 class ResponseServiceProvider extends ServiceProvider
 {

@@ -3,6 +3,7 @@
 use Bibo\Mvc\Core\Providers\AppServiceProvider;
 use Bibo\Mvc\Core\Providers\ConfigServiceProvider;
 use Bibo\Mvc\Core\Providers\ControllerServiceProvider;
+use Bibo\Mvc\Core\Providers\CryptoServiceProvider;
 use Bibo\Mvc\Core\Providers\ErrorServiceProvider;
 use Bibo\Mvc\Core\Providers\FileCacheServiceProvider;
 use Bibo\Mvc\Core\Providers\LogServiceProvider;
@@ -14,19 +15,17 @@ use Bibo\Mvc\Core\Providers\RouteServiceProvider;
 use Bibo\Mvc\Core\Providers\TemplateServiceProvider;
 use Bibo\Mvc\Core\Providers\ViewServiceProvider;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
-use RuntimeException;
 
 if (!isset($app)) {
     throw new RuntimeException('App not configured');
 }
 
-$container = $app->container();
-
 // Core service providers
 $providers = [
     ConfigServiceProvider::class,
-    TemplateServiceProvider::class,
+    CryptoServiceProvider::class,
     LogServiceProvider::class,
+    TemplateServiceProvider::class,
     ErrorServiceProvider::class,
     MiddlewareDispatcherServiceProvider::class,
     MiddlewareServiceProvider::class,
@@ -39,7 +38,9 @@ $providers = [
     ViewServiceProvider::class,
 ];
 
+$container = $app->container();
 $registeredProviders = [];
+
 foreach ($providers as $providerClass) {
     $provider = new $providerClass($container);
     $provider->register();

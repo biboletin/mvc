@@ -3,7 +3,6 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Error\Error;
-use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\NotFoundExceptionInterface;
 
 class ErrorServiceProvider extends ServiceProvider
@@ -16,8 +15,12 @@ class ErrorServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $error = new Error();
-        $error->setTemplate($this->container->get('template'));
+        $error = new Error(
+            $this->container->get('logger'),
+            $this->container->get('config')->get('app.env', 'production')
+        );
+
+        $error->setErrorTemplate($this->container->get('template'));
         $error->register();
 
         $this->container->set('error', function () use ($error) {

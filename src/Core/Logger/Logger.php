@@ -2,8 +2,8 @@
 
 namespace Bibo\Mvc\Core\Logger;
 
-use Bibo\Mvc\Core\Logger\Handler\RotatingFileHandler;
 use Bibo\Mvc\Core\Interfaces\FormatterInterface;
+use Bibo\Mvc\Core\Logger\Handler\RotatingFileHandler;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Stringable;

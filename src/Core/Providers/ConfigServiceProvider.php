@@ -4,7 +4,6 @@ namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Cache\FileCache;
 use Bibo\Mvc\Core\Config\Config;
-use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Exception;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -28,15 +27,14 @@ class ConfigServiceProvider extends ServiceProvider
         // Create a config instance with cache
         $config = new Config($cache);
 
-        // Load configuration
-        $config->load();
-
-/*
-    // Load the environment file if it exists
+        // Load the environment file if it exists
         if (defined('ROOT_PATH') && file_exists(ROOT_PATH . '.env')) {
             $config->loadFromFile(ROOT_PATH . '.env');
         }
-*/
+
+        // Load configuration
+        $config->load();
+
         // Register the config instance in the container
         $this->container->set('config', function () use ($config) {
             return $config;

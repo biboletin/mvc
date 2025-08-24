@@ -3,8 +3,8 @@
 use Bibo\App\Controllers\IndexController;
 use Bibo\App\Controllers\InstallController;
 use Bibo\App\Controllers\TestController;
-use Bibo\Core\Facades\Route;
-use Bibo\Core\Response\JsonResponse;
+use Bibo\Mvc\Core\Facades\Route;
+use Bibo\Mvc\Core\Response\JsonResponse;
 
 Route::get('/', [IndexController::class, 'index'], ['csrf']);
 

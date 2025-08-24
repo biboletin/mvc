@@ -3,7 +3,6 @@
 namespace Bibo\Mvc\Core\Session;
 
 use Bibo\Mvc\Core\Crypto\Crypto;
-use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
 use Bibo\Mvc\Core\Exception\Custom\Crypto\EncryptException;
 use InvalidArgumentException;
 use Random\RandomException;

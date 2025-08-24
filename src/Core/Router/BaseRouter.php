@@ -2,7 +2,7 @@
 
 namespace Bibo\Mvc\Core\Router;
 
-use Bibo\Mvc\Core\Exception\NotFoundException;
+use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Interfaces\RouteMatchingStrategyInterface;
 use Bibo\Mvc\Core\Interfaces\RouterInterface;
 use Bibo\Mvc\Core\Request\Stream;
@@ -66,7 +66,7 @@ class BaseRouter implements RouterInterface
      * @param string         $method
      * @param string         $route
      * @param array|callable $handler
-     * @param array          $middleware
+     * @param array|null     $middleware
      *
      * @return void
      */
@@ -266,13 +266,13 @@ class BaseRouter implements RouterInterface
         [$controller, $method] = $handler;
 
         if (!class_exists($controller)) {
-            throw new Exception('Controller ' . $controller . ' not found', 500);
+            throw new NotFoundException('Controller ' . $controller . ' not found');
         }
 
         $instance = new $controller($this->container);
 
         if (!method_exists($instance, $method)) {
-            throw new Exception('Method ' . $method . ' not found in ' . $controller, 500);
+            throw new NotFoundException('Method ' . $method . ' not found in ' . $controller);
         }
 
         $response = call_user_func_array([$instance, $method], $params);

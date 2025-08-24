@@ -2,9 +2,9 @@
 
 namespace Bibo\App\Controllers;
 
-use Bibo\Core\Controller\Controller;
-use Bibo\Core\Response\JsonResponse;
-use Bibo\Core\Rest\HttpClient;
+use Bibo\Mvc\Core\Controller\Controller;
+use Bibo\Mvc\Core\Response\JsonResponse;
+use Bibo\Mvc\Core\Rest\HttpClient;
 use JsonException;
 
 /**

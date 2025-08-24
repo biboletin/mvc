@@ -3,7 +3,6 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Request\BaseRequest;
-use Bibo\Mvc\Core\Providers\ServiceProvider;
 
 class RequestServiceProvider extends ServiceProvider
 {

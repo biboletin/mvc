@@ -4,6 +4,7 @@ namespace Bibo\Mvc\Core\Cache;
 
 use DateInterval;
 use DateTime;
+use InvalidArgumentException;
 use Psr\SimpleCache\CacheInterface;
 
 /**
@@ -22,10 +23,16 @@ class FileCache implements CacheInterface
     /**
      * Constructor
      *
-     * @param string|null $cacheDir
+     * @param string $cacheDir
+     *
+     * @throws InvalidArgumentException
      */
-    public function __construct(?string $cacheDir = '')
+    public function __construct(string $cacheDir = '')
     {
+        if (trim($cacheDir) === '') {
+            throw new InvalidArgumentException('Cache directory must be specified.');
+        }
+
         // Ensure cache directory exists
         if (!is_dir($cacheDir)) {
             mkdir($cacheDir, 0777, true);

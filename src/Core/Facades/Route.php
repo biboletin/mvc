@@ -2,7 +2,7 @@
 
 namespace Bibo\Mvc\Core\Facades;
 
-use Bibo\Mvc\Core\BaseRouter\BaseRouter;
+use Bibo\Mvc\Core\Router\BaseRouter;
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Http\Message\ResponseInterface;

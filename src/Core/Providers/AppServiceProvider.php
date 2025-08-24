@@ -2,8 +2,6 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Mvc\Core\Providers\ServiceProvider;
-
 class AppServiceProvider extends ServiceProvider
 {
     /**

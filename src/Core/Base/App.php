@@ -43,6 +43,21 @@ class App
     }
 
     /**
+     * Get item from container
+     *
+     * @param string $item
+     *
+     * @return mixed
+     *
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     */
+    public function get(string $item): mixed
+    {
+        return $this->container->get($item);
+    }
+
+    /**
      * Run app
      *
      * @return void

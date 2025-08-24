@@ -2,7 +2,7 @@
 
 namespace Bibo\Mvc\Core\Router;
 
-use Bibo\Core\Interfaces\RouteMatchingStrategyInterface;
+use Bibo\Mvc\Core\Interfaces\RouteMatchingStrategyInterface;
 
 /**
  * Caching routes strategy class

@@ -12,7 +12,7 @@ if (!function_exists('formatBytes')) {
     function formatBytes(int $bytes, int $decimals = 2): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        $factor = floor((strlen($bytes) - 1) / 3);
+        $factor = floor((strlen((string) $bytes) - 1) / 3);
         return sprintf("%.{$decimals}f %s", $bytes / pow(1024, $factor), $units[$factor]);
     }
 }

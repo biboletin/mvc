@@ -3,7 +3,7 @@
 use Bibo\Mvc\Core\Base\App;
 use Bibo\Mvc\Core\Base\Kernel;
 use Bibo\Mvc\Core\Container\Container;
-use Bibo\Mvc\Core\Exception\ResponseExceptionHandler;
+use Bibo\Mvc\Core\Exception\Custom\Http\ResponseExceptionHandler;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 

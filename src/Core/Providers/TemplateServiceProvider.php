@@ -4,7 +4,6 @@ namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Template\Template;
 use Bibo\Mvc\Core\Wrapper\TwigTemplateEngine;
-use Bibo\Mvc\Core\Providers\ServiceProvider;
 use Psr\Container\NotFoundExceptionInterface;
 
 class TemplateServiceProvider extends ServiceProvider
@@ -20,7 +19,7 @@ class TemplateServiceProvider extends ServiceProvider
         $templateEngine = new TwigTemplateEngine(
             VIEW_PATH,
             APP_CACHE_PATH,
-            $this->container->get('config')->get('app_debug')
+            $this->container->get('config')->get('app_debug') ?? false
         );
         $template = new Template($templateEngine);
 

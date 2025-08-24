@@ -2,7 +2,7 @@
 
 namespace Bibo\Mvc\Core\Logger\Formatter;
 
-use Bibo\Mvc\Core\Logger\Interfaces\FormatterInterface;
+use Bibo\Mvc\Core\Interfaces\FormatterInterface;
 use Stringable;
 
 /**

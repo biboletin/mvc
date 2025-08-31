@@ -72,4 +72,10 @@ return [
      */
 
     'partitioned' => get_env('cookie.partitioned', false),
+
+    /**
+     * Cookie Jar path
+     */
+
+    'jar_path' => get_env('cookie.jar_path'),
 ];

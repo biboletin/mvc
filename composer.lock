@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "662178cd20ec6247b7dde15175d8233b",
+    "content-hash": "dc2de1edc5ce9421e019396c067f3c7e",
     "packages": [
         {
             "name": "brick/math",
@@ -1731,12 +1731,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "c649c1658b2510c7dccd7cbab1834254f4cb80bd"
+                "reference": "4ad55ff4c9a2c2a563c3dbd276b2f8d8772c66b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/c649c1658b2510c7dccd7cbab1834254f4cb80bd",
-                "reference": "c649c1658b2510c7dccd7cbab1834254f4cb80bd",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/4ad55ff4c9a2c2a563c3dbd276b2f8d8772c66b1",
+                "reference": "4ad55ff4c9a2c2a563c3dbd276b2f8d8772c66b1",
                 "shasum": ""
             },
             "require": {
@@ -1796,7 +1796,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-07-29T08:27:55+00:00"
+            "time": "2025-08-17T17:19:20+00:00"
         },
         {
             "name": "voku/portable-ascii",
@@ -3773,7 +3773,9 @@
         "ext-dom": "*",
         "ext-json": "*",
         "ext-libxml": "*",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "ext-bz2": "*",
+        "ext-intl": "*"
     },
     "platform-dev": {},
     "plugin-api-version": "2.6.0"

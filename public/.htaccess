@@ -55,6 +55,7 @@ php_value pcre.backtrack_limit 1000000
 # ---------------------------------------------
 AddType application/javascript .js
 AddType text/css .css
+AddType text/html .html
 
 # ---------------------------------------------
 # Basic Security Headers

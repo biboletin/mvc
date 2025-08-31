@@ -13,6 +13,13 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]
 
 # ---------------------------------------------
+# Make docs folder public and redirect /documentation → /docs/
+# ---------------------------------------------
+RedirectMatch ^/documentation/?$ /docs/
+
+DirectoryIndex index.php index.html
+
+# ---------------------------------------------
 # Optional HTTP Basic Authentication (example)
 # Uncomment to enable
 # ---------------------------------------------

@@ -4,6 +4,7 @@ namespace Bibo\Mvc\Core\Base;
 
 use Bibo\Mvc\Core\Response\JsonResponse;
 use Bibo\Mvc\Core\Response\ResponseEmitter;
+use Bibo\Mvc\Core\Traits\NameAwareTrait;
 use Exception;
 use JsonException;
 use Psr\Container\ContainerExceptionInterface;
@@ -15,6 +16,8 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class App
 {
+    use NameAwareTrait;
+
     /**
      * Container
      *

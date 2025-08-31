@@ -14,9 +14,8 @@ class ScriptExecutionTimerServiceProvider extends ServiceProvider
     public function register(): void
     {
         $scriptExecutionTimer = new ScriptExecutionTimer();
-        $scriptExecutionTimer->start('Total Execution Time');
 
-        $this->container->set(ScriptExecutionTimer::class, function () use ($scriptExecutionTimer) {
+        $this->container->set('timer', function () use ($scriptExecutionTimer) {
             return $scriptExecutionTimer;
         });
     }

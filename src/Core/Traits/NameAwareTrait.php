@@ -2,6 +2,9 @@
 
 namespace Bibo\Mvc\Core\Traits;
 
+use Bibo\Mvc\Core\Base\App;
+use Bibo\Mvc\Core\Cookie\CookieHandler;
+
 /**
  * Trait NameAwareTrait
  *
@@ -33,7 +36,7 @@ trait NameAwareTrait
      */
     public function getName(): string
     {
-        return $this->name;
+        return $this->getPrefix() . $this->name;
     }
 
     /**
@@ -41,11 +44,12 @@ trait NameAwareTrait
      *
      * @param string $name The name to set.
      *
-     * @return self Returns the current instance for method chaining.
+     * @return CookieHandler|App|NameAwareTrait
      */
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -62,12 +66,11 @@ trait NameAwareTrait
     /**
      * Clears the name by setting it to an empty string.
      *
-     * @return self Returns the current instance for method chaining.
+     * @return void
      */
-    public function clearName(): self
+    public function clearName(): void
     {
         $this->name = '';
-        return $this;
     }
 
     /**

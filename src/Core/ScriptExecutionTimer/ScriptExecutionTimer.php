@@ -103,30 +103,6 @@ class ScriptExecutionTimer
     }
 
     /**
-     * Retrieves the memory usage of the timer with the given name in kilobytes.
-     *
-     * @param string $name The name of the timer.
-     *
-     * @return float The memory usage in kilobytes.
-     */
-    public function getMemoryUsageInKB(string $name): float
-    {
-        return round(($this->memoryUsage[$name] ?? 0) / 1024, 2);
-    }
-
-    /**
-     * Retrieves the peak memory usage of the timer with the given name in kilobytes.
-     *
-     * @param string $name The name of the timer.
-     *
-     * @return float The peak memory usage in kilobytes.
-     */
-    public function getMemoryPeakUsageInKB(string $name): float
-    {
-        return round(($this->memoryPeak[$name] ?? 0) / 1024, 2);
-    }
-
-    /**
      * Generates the Server-Timing header value based on the recorded timers.
      *
      * @return string The Server-Timing header value.
@@ -136,14 +112,14 @@ class ScriptExecutionTimer
         $parts = [];
         foreach ($this->durations as $name => $duration) {
             $dur = round($duration, 2);
-            $mem = $this->getMemoryUsageInKB($name);
-            $peak = $this->getMemoryPeakUsageInKB($name);
+            $mem = $this->getMemoryInfo();
             $parts[] = sprintf(
-                '%s;dur=%.2f ms;desc="Memory Usage: %.2f KB, Peak Memory: %.2f KB"',
+                '%s;dur=%.2f ms;desc="Memory Usage: Real: %s, Allocated: %s, Peak: %s"',
                 $name,
                 $dur,
-                $mem,
-                $peak
+                $mem['real'],
+                $mem['allocated'],
+                $mem['peak']
             );
         }
         return implode(', ', $parts);
@@ -254,5 +230,40 @@ class ScriptExecutionTimer
     public function getAllDurations(): array
     {
         return $this->durations;
+    }
+
+    /**
+     * Format bytes to human-readable format
+     *
+     * @param int $bytes
+     *
+     * @return string
+     */
+    private function formatBytes(int $bytes): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $i = 0;
+        while ($bytes >= 1024 && $i < count($units) - 1) {
+            $bytes /= 1024;
+            $i++;
+        }
+        return sprintf('%.2f %s', $bytes, $units[$i]);
+    }
+
+    /**
+     * Get real memory info
+     *
+     * @return array
+     */
+    private function getMemoryInfo(): array
+    {
+        return [
+            // actual used memory
+            'real' => $this->formatBytes(memory_get_usage(false)),
+            // allocated by PHP engine
+            'allocated' => $this->formatBytes(memory_get_usage(true)),
+            // peak actual usage
+            'peak' => $this->formatBytes(memory_get_peak_usage(false)),
+        ];
     }
 }

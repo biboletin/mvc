@@ -13,7 +13,7 @@ include __DIR__ . '/../vendor/autoload.php';
 define('APP_START', microtime(true));
 
 $timer = new ScriptExecutionTimer();
-$timer->start('Total Execution Time');
+$timer->start('total_execution_time');
 
 $app = new App(new Container());
 
@@ -31,9 +31,8 @@ try {
     ResponseExceptionHandler::handle($e);
 }
 
-$timer->stop('Total Execution Time');
+$timer->stop('total_execution_time');
 $timer->sendHeader();
-// dd($timer);
 
 // Now, you can run the app and it will handle the routing and response.
 try {

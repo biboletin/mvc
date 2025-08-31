@@ -181,9 +181,9 @@ class NullCache implements CacheInterface
     /**
      * Get cache path
      *
-     * @return string
+     * @return void
      */
-    public function getPath(): string
+    public function getPath(): void
     {
     }
 

@@ -118,8 +118,6 @@ class Error
     {
         $this->logger->error($this->formatThrowable($exception));
 
-        http_response_code(HttpStatus::InternalServerError->value);
-
         if ($this->wantsJson()) {
             $this->jsonResponse($exception);
         } else {
@@ -158,15 +156,22 @@ class Error
         ];
 
         if ($error !== null && in_array($error['type'], $errorTypes)) {
-            $message = "Fatal Error: {$error['message']} in {$error['file']} on line {$error['line']}";
-            $this->logger->critical($message);
+            $message = "{$error['message']} in {$error['file']} on line {$error['line']}";
+            $this->logger->error($message);
 
-            http_response_code(HttpStatus::InternalServerError->value);
-
-            if ($this->wantsJson()) {
-                $this->jsonResponse(null, $message);
+            if ($this->isDev()) {
+                echo $this->errorTemplate->render('error/error', [
+                    'code' => $error['type'],
+                    'message' => $message,
+                    'exception' => '',
+                    'trace' => '',
+                ]);
             } else {
-                $this->htmlResponse(null, $message);
+                if ($this->wantsJson()) {
+                    $this->jsonResponse(null, $message);
+                } else {
+                    $this->htmlResponse(null, $message);
+                }
             }
         }
     }
@@ -207,6 +212,7 @@ class Error
      */
     protected function jsonResponse(?Throwable $e = null, ?string $fatal = null): void
     {
+        http_response_code(HttpStatus::InternalServerError->value);
         header('Content-Type: application/json');
 
         $response = ['error' => true];
@@ -243,6 +249,9 @@ class Error
      */
     protected function htmlResponse(?Throwable $e = null, ?string $fatal = null): void
     {
+        header('Content-Type: text/html');
+        http_response_code(HttpStatus::InternalServerError->value);
+
         if ($this->isDev()) {
             if ($e) {
                 echo $this->formatExceptionHtml($e);

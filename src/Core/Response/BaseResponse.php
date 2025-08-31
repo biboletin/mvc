@@ -5,6 +5,7 @@ namespace Bibo\Mvc\Core\Response;
 use Bibo\Mvc\Core\Request\Stream;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use RuntimeException;
 
 /**
  * Base response class
@@ -276,7 +277,7 @@ class BaseResponse implements ResponseInterface
     public function send(): void
     {
         if (headers_sent()) {
-            throw new \RuntimeException('Headers already sent');
+            throw new RuntimeException('Headers already sent');
         }
 
         http_response_code($this->getStatusCode());

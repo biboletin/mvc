@@ -2,11 +2,10 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Mvc\Core\Error\Error;
-use Bibo\Mvc\Core\Facades\Env;
+use Locale;
 use Psr\Container\NotFoundExceptionInterface;
 
-class ErrorServiceProvider extends ServiceProvider
+class StartupConfigServiceProvider extends ServiceProvider
 {
     /**
      * Register service provider
@@ -16,22 +15,22 @@ class ErrorServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $error = new Error(
-            $this->container->get('logger'),
-            Env::get()->value
-        );
+        $config = $this->container->get('config');
 
-        $error->setErrorTemplate($this->container->get('template'));
-        $error->register();
+        // Any startup code can go here
+        date_default_timezone_set($config->get('app.timezone'));
 
-        $this->container->set('error', function () use ($error) {
-            return $error;
-        });
+        setlocale(LC_ALL, $config->get('app.locale'));
+
+        if (class_exists(Locale::class)) {
+            Locale::setDefault($config->get('app.locale'));
+        }
     }
 
     /**
      * Boot service provider
      *
+     * @return void
      * @throws NotFoundExceptionInterface
      */
     public function boot(): void

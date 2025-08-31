@@ -123,7 +123,8 @@ enum HttpStatus: int
     /*
      * 305 Use Proxy
      * The requested resource is available only through a proxy, the address for which is provided in the response.
-     * Many HTTP clients (such as Mozilla Firefox and Internet Explorer) do not correctly handle responses with this status code.
+     * Many HTTP clients (such as Mozilla Firefox and Internet Explorer)
+     * do not correctly handle responses with this status code.
      *
      * @deprecated Due to security concerns regarding in-band configuration of a proxy
      */
@@ -132,7 +133,8 @@ enum HttpStatus: int
 
     /*
      * 307 Temporary Redirect
-     * In this case, the request should be repeated with another URI; however, future requests should still use the original URI.
+     * In this case, the request should be repeated with another URI;
+     * however, future requests should still use the original URI.
      * In contrast to 302, the request method should not be changed when reissuing the original request.
      */
 
@@ -158,15 +160,18 @@ enum HttpStatus: int
 
     /*
      * 401 Unauthorized
-     * Similar to 403 Forbidden, but specifically for use when authentication is required and has failed or has not yet been provided.
-     * The response must include a WWW-Authenticate header field containing a challenge applicable to the requested resource.
+     * Similar to 403 Forbidden, but specifically for use when authentication is
+     * required and has failed or has not yet been provided.
+     * The response must include a WWW-Authenticate header field containing
+     * a challenge applicable to the requested resource.
      */
 
     case Unauthorized = 401;
 
     /*
      * 402 Payment Required
-     * Reserved for future use. The original intention was that this code might be used as part of some form of digital cash or micropayment scheme.
+     * Reserved for future use. The original intention was that this code
+     * might be used as part of some form of digital cash or micropayment scheme.
      */
 
     case PaymentRequired = 402;
@@ -190,14 +195,16 @@ enum HttpStatus: int
     /*
      * 405 Method Not Allowed
      * A request method is not supported for the requested resource;
-     * for example, a GET request on a form that requires data to be presented via POST, or a PUT request on a read-only resource.
+     * for example, a GET request on a form that requires data
+     * to be presented via POST, or a PUT request on a read-only resource.
      */
 
     case MethodNotAllowed = 405;
 
     /*
      * 406 Not Acceptable
-     * The requested resource is capable of generating only content not acceptable according to the Accept headers sent in the request.
+     * The requested resource is capable of generating only content
+     * not acceptable according to the Accept headers sent in the request.
      */
 
     case NotAcceptable = 406;
@@ -293,7 +300,8 @@ enum HttpStatus: int
     /*
      * 421 Misdirected Request
      * The request was directed at a server that is not able to produce a response.
-     * This can be sent by a server that is not configured to produce responses for the combination of scheme and authority in the URI.
+     * This can be sent by a server that is not configured to produce responses
+     * for the combination of scheme and authority in the URI.
      */
 
     case MisdirectedRequest = 421;
@@ -369,7 +377,8 @@ enum HttpStatus: int
 
     /*
      * 500 Internal Server Error
-     * A generic error message, given when an unexpected condition was encountered and no more specific message is suitable.
+     * A generic error message, given when an unexpected condition
+     * was encountered and no more specific message is suitable.
      */
 
     case InternalServerError = 500;
@@ -484,7 +493,8 @@ enum HttpStatus: int
 
     /*
      * 525 SSL Handshake Failed
-     * A custom status code used by some providers to indicate when the SSL handshake between the edge server and origin failed.
+     * A custom status code used by some providers to indicate
+     * when the SSL handshake between the edge server and origin failed.
      */
 
     case SSLHandshakeFailed = 525;
@@ -498,7 +508,8 @@ enum HttpStatus: int
 
     /*
      * 527 Railgun Error
-     * A custom status code used by some providers to indicate when a request timed out or failed after the WAN connection was established.
+     * A custom status code used by some providers to indicate when
+     * a request timed out or failed after the WAN connection was established.
      */
 
     case RailgunError = 527;
@@ -582,7 +593,8 @@ enum HttpStatus: int
      * and the values are the corresponding messages.
      * This can be useful for providing human-readable messages
      * for client error HTTP responses in applications or APIs.
-     * This method can help in implementing logic that requires a structured representation of client error status codes,
+     * This method can help in implementing logic that requires
+     * a structured representation of client error status codes,
      * such as in JSON responses or error handling.
      *
      * @return array<int, string>
@@ -608,7 +620,8 @@ enum HttpStatus: int
      * and the values are the corresponding messages.
      * This can be useful for providing human-readable messages
      * for client error HTTP responses in applications or APIs.
-     * This method can help in implementing logic that requires a structured representation of client error status codes,
+     * This method can help in implementing logic that requires
+     * a structured representation of client error status codes,
      * such as in JSON responses or error handling.
      *
      * @return array<int, string>
@@ -655,7 +668,8 @@ enum HttpStatus: int
      * and the values are the corresponding messages.
      * This can be useful for providing human-readable messages
      * for server error HTTP responses in applications or APIs.
-     * This method can help in implementing logic that requires a structured representation of server error status codes,
+     * This method can help in implementing logic that requires
+     * a structured representation of server error status codes,
      * such as in JSON responses or error handling.
      *
      * @return array<int, string>
@@ -700,8 +714,10 @@ enum HttpStatus: int
      * This can be useful for grouping or filtering responses based on their category.
      * This method can help in implementing logic that handles different categories of responses differently,
      * such as logging, user notifications, or retry mechanisms.
-     * This method can be used in conjunction with other methods to provide a comprehensive understanding of the HTTP status code.
-     * This method can be particularly useful in scenarios where the client needs to understand the nature of the response,
+     * This method can be used in conjunction with other methods
+     * to provide a comprehensive understanding of the HTTP status code.
+     * This method can be particularly useful in scenarios
+     * where the client needs to understand the nature of the response,
      * such as in web applications or APIs.
      * This method can be used to provide a more user-friendly representation of the status code,
      * making it easier to understand the response type.
@@ -753,10 +769,12 @@ enum HttpStatus: int
      * This method returns true if the status code is in the range of 500 to 599.
      * This is useful for determining if the server encountered an error while processing the request.
      * This can help in implementing retry logic or error handling strategies.
-     * This method is particularly useful in scenarios where the server might be temporarily unavailable or experiencing issues.
+     * This method is particularly useful in scenarios where
+     * the server might be temporarily unavailable or experiencing issues.
      * It allows developers to differentiate between client-side errors (4xx) and server-side errors (5xx),
      * enabling more precise error handling and user feedback.
-     * This method can be used in conjunction with logging or monitoring systems to track server errors and improve system reliability.
+     * This method can be used in conjunction with logging or
+     * monitoring systems to track server errors and improve system reliability.
      *
      * @return bool
      */
@@ -775,7 +793,8 @@ enum HttpStatus: int
      * such as in web applications or APIs.
      * It allows developers to differentiate between successful responses (2xx) and other types of responses,
      * enabling more precise handling of different response types.
-     * This method can be used in conjunction with logging or monitoring systems to track successful requests and improve system performance.
+     * This method can be used in conjunction with logging or monitoring
+     * systems to track successful requests and improve system performance.
      *
      * @return bool
      */
@@ -795,7 +814,8 @@ enum HttpStatus: int
      * such as in web browsers or HTTP clients.
      * It allows developers to differentiate between redirection responses (3xx) and other types of responses,
      * enabling more precise handling of different response types.
-     * This method can be used in conjunction with logging or monitoring systems to track redirects and improve user experience.
+     * This method can be used in conjunction with logging or monitoring
+     * systems to track redirects and improve user experience.
      *
      * @return bool
      */
@@ -816,7 +836,8 @@ enum HttpStatus: int
      * such as in web applications or APIs.
      * It allows developers to differentiate between informational responses (1xx) and other types of responses,
      * enabling more precise handling of different response types.
-     * This method can be used in conjunction with logging or monitoring systems to track informational responses and improve system performance.
+     * This method can be used in conjunction with logging or monitoring systems
+     * to track informational responses and improve system performance.
      * This method can be used to provide a more user-friendly representation of the status code,
      * making it easier to understand the response type.
      *

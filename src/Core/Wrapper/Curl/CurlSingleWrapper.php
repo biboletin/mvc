@@ -5,6 +5,7 @@ namespace Bibo\Mvc\Core\Wrapper\Curl;
 use Bibo\Mvc\Core\Interfaces\CurlExtendedInterface;
 use CurlHandle;
 use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * CurlSingleWrapper class for handling single cURL requests.
@@ -249,7 +250,7 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
      *
      * @return string The response from the server
      *
-     * @throws \RuntimeException If the cURL request fails (check getError() for details)
+     * @throws RuntimeException If the cURL request fails (check getError() for details)
      */
     public function exec(): string
     {
@@ -395,7 +396,7 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
      * URL, method, headers, and body.
      *
      * @return string The response body as a string
-     * @throws \RuntimeException If the cURL request fails
+     * @throws RuntimeException If the cURL request fails
      */
     public function execute(): string
     {

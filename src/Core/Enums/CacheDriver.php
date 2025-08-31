@@ -56,7 +56,11 @@ enum CacheDriver: string
      */
     public static function isValid(string $value): bool
     {
-        return in_array(strtolower($value), array_map(fn($case) => strtolower($case->value), self::cases()), true);
+        return in_array(
+            strtolower($value),
+            array_map(fn ($case) => strtolower($case->value), self::cases()),
+            true
+        );
     }
 
     /**

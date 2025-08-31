@@ -3,11 +3,12 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Container\Container;
+use Bibo\Mvc\Core\Interfaces\ServiceProviderInterface;
 
 /**
  * Service provider class
  */
-abstract class ServiceProvider
+abstract class ServiceProvider implements ServiceProviderInterface
 {
     /**
      * Container

@@ -71,10 +71,10 @@ enum Environment: string
     public static function fromString(string $value): self
     {
         return match (strtolower($value)) {
-            'development' => self::DEVELOPMENT,
-            'production' => self::PRODUCTION,
-            'testing' => self::TESTING,
-            'staging' => self::STAGING,
+            'development', 'dev' => self::DEVELOPMENT,
+            'production', 'prod' => self::PRODUCTION,
+            'testing', 'test' => self::TESTING,
+            'staging', 'stage' => self::STAGING,
             default => throw new InvalidArgumentException('Invalid environment: ' . $value),
         };
     }
@@ -87,7 +87,7 @@ enum Environment: string
 
     public static function all(): array
     {
-        return array_map(fn($env) => $env->value, self::cases());
+        return array_map(fn ($env) => $env->value, self::cases());
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Bibo\Mvc\Core\Rest\Message;
 
+use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 
@@ -83,7 +84,7 @@ class Stream implements StreamInterface
         }
 
         if (!is_resource($stream)) {
-            throw new \InvalidArgumentException('Invalid stream provided');
+            throw new InvalidArgumentException('Invalid stream provided');
         }
 
         $this->stream = $stream;

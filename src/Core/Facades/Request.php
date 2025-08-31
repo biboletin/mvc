@@ -8,19 +8,23 @@ use Psr\Http\Message\UriInterface;
 
 class Request
 {
-    private static ?BaseRequest $instance = null;
+    /**
+     * Get the singleton instance of BaseRequest
+     *
+     * @return BaseRequest
+     */
+    private static BaseRequest $instance;
 
     /**
      * Creates new instance
      *
-     * @return BaseRequest
+     * @param BaseRequest $request
+     *
+     * @return void
      */
-    protected static function getInstance(): BaseRequest
+    public static function init(BaseRequest $request): void
     {
-        if (self::$instance === null) {
-            self::$instance = new BaseRequest();
-        }
-        return self::$instance;
+        self::$instance = $request;
     }
 
     /**
@@ -30,7 +34,7 @@ class Request
      */
     public static function getMethod(): string
     {
-        return self::getInstance()->getMethod();
+        return self::$instance->getMethod();
     }
 
     /**
@@ -40,7 +44,7 @@ class Request
      */
     public static function getUri(): UriInterface
     {
-        return self::getInstance()->getUri();
+        return self::$instance->getUri();
     }
 
     /**
@@ -50,7 +54,7 @@ class Request
      */
     public static function getHeaders(): array
     {
-        return self::getInstance()->getHeaders();
+        return self::$instance->getHeaders();
     }
 
     /**
@@ -60,7 +64,7 @@ class Request
      */
     public static function getBody(): StreamInterface
     {
-        return self::getInstance()->getBody();
+        return self::$instance->getBody();
     }
 
     /**
@@ -70,7 +74,7 @@ class Request
      */
     public static function getServerParams(): array
     {
-        return self::getInstance()->getServerParams();
+        return self::$instance->getServerParams();
     }
 
     /**
@@ -80,7 +84,7 @@ class Request
      */
     public static function getCookieParams(): array
     {
-        return self::getInstance()->getCookieParams();
+        return self::$instance->getCookieParams();
     }
 
     /**
@@ -90,7 +94,7 @@ class Request
      */
     public static function getQueryParams(): array
     {
-        return self::getInstance()->getQueryParams();
+        return self::$instance->getQueryParams();
     }
 
     /**
@@ -100,7 +104,7 @@ class Request
      */
     public static function getUploadedFiles(): array
     {
-        return self::getInstance()->getUploadedFiles();
+        return self::$instance->getUploadedFiles();
     }
 
     /**
@@ -110,7 +114,7 @@ class Request
      */
     public static function getParsedBody(): array
     {
-        return self::getInstance()->getParsedBody();
+        return self::$instance->getParsedBody();
     }
 
     /**
@@ -120,7 +124,7 @@ class Request
      */
     public static function getAttributes(): array
     {
-        return self::getInstance()->getAttributes();
+        return self::$instance->getAttributes();
     }
 
     /**
@@ -130,7 +134,7 @@ class Request
      */
     public static function getProtocolVersion(): string
     {
-        return self::getInstance()->getProtocolVersion();
+        return self::$instance->getProtocolVersion();
     }
 
     /**
@@ -142,7 +146,7 @@ class Request
      */
     public static function withProtocolVersion(string $version): BaseRequest
     {
-        return self::getInstance()->withProtocolVersion($version);
+        return self::$instance->withProtocolVersion($version);
     }
 
     /**
@@ -154,7 +158,7 @@ class Request
      */
     public static function withMethod(string $method): BaseRequest
     {
-        return self::getInstance()->withMethod($method);
+        return self::$instance->withMethod($method);
     }
 
     /**
@@ -166,7 +170,7 @@ class Request
      */
     public static function withUri(UriInterface $uri): BaseRequest
     {
-        return self::getInstance()->withUri($uri);
+        return self::$instance->withUri($uri);
     }
 
     /**
@@ -179,7 +183,7 @@ class Request
      */
     public static function withHeader(string $name, $value): BaseRequest
     {
-        return self::getInstance()->withHeader($name, $value);
+        return self::$instance->withHeader($name, $value);
     }
 
     /**
@@ -191,7 +195,7 @@ class Request
      */
     public static function withParsedBody($data): BaseRequest
     {
-        return self::getInstance()->withParsedBody($data);
+        return self::$instance->withParsedBody($data);
     }
 
     /**
@@ -203,7 +207,7 @@ class Request
      */
     public static function withCookieParams(array $cookies): BaseRequest
     {
-        return self::getInstance()->withCookieParams($cookies);
+        return self::$instance->withCookieParams($cookies);
     }
 
     /**
@@ -215,7 +219,7 @@ class Request
      */
     public static function withQueryParams(array $query): BaseRequest
     {
-        return self::getInstance()->withQueryParams($query);
+        return self::$instance->withQueryParams($query);
     }
 
     /**
@@ -227,7 +231,7 @@ class Request
      */
     public static function withUploadedFiles(array $uploadedFiles): BaseRequest
     {
-        return self::getInstance()->withUploadedFiles($uploadedFiles);
+        return self::$instance->withUploadedFiles($uploadedFiles);
     }
 
     /**
@@ -240,7 +244,7 @@ class Request
      */
     public static function withAttribute(string $name, $value): BaseRequest
     {
-        return self::getInstance()->withAttribute($name, $value);
+        return self::$instance->withAttribute($name, $value);
     }
 
     /**
@@ -252,6 +256,6 @@ class Request
      */
     public static function withoutAttribute(string $name): BaseRequest
     {
-        return self::getInstance()->withoutAttribute($name);
+        return self::$instance->withoutAttribute($name);
     }
 }

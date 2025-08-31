@@ -1,0 +1,32 @@
+<?php
+
+namespace Bibo\Mvc\Core\Providers;
+
+use Bibo\Mvc\Core\ScriptExecutionTimer\ScriptExecutionTimer;
+
+class ScriptExecutionTimerServiceProvider extends ServiceProvider
+{
+    /**
+     * Register service provider
+     *
+     * @return void
+     */
+    public function register(): void
+    {
+        $scriptExecutionTimer = new ScriptExecutionTimer();
+        $scriptExecutionTimer->start('Total Execution Time');
+
+        $this->container->set(ScriptExecutionTimer::class, function () use ($scriptExecutionTimer) {
+            return $scriptExecutionTimer;
+        });
+    }
+
+    /**
+     * Boot service provider
+     *
+     * @return void
+     */
+    public function boot(): void
+    {
+    }
+}

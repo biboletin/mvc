@@ -3,6 +3,8 @@
 namespace Bibo\Mvc\Core\Logger\Formatter;
 
 use Bibo\Mvc\Core\Interfaces\FormatterInterface;
+use DateTime;
+use Stringable;
 
 /**
  * JSONFormatter formats log entries as JSON.
@@ -63,7 +65,7 @@ class JSONFormatter implements FormatterInterface
      * @param string $dateFormat
      * @param bool   $prettyPrint
      */
-    public function __construct(string $dateFormat = \DateTime::ATOM, bool $prettyPrint = false)
+    public function __construct(string $dateFormat = DateTime::ATOM, bool $prettyPrint = false)
     {
         $this->dateFormat = $dateFormat;
         $this->prettyPrint = $prettyPrint;
@@ -89,13 +91,13 @@ class JSONFormatter implements FormatterInterface
      * }
      * ```
      *
-     * @param string             $level
-     * @param string|\Stringable $message
-     * @param array              $context
+     * @param string            $level
+     * @param string|Stringable $message
+     * @param array             $context
      *
      * @return string
      */
-    public function format(string $level, string|\Stringable $message, array $context = []): string
+    public function format(string $level, string|Stringable $message, array $context = []): string
     {
         $record = [
             'timestamp' => date($this->dateFormat),

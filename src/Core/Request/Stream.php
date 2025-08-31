@@ -4,6 +4,7 @@ namespace Bibo\Mvc\Core\Request;
 
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
+use Throwable;
 
 /**
  * Stream class
@@ -72,7 +73,7 @@ class Stream implements StreamInterface
             }
             $content = stream_get_contents($this->stream);
             return $content !== false ? $content : '';
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return '';
         }
     }

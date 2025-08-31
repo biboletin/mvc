@@ -12,8 +12,8 @@ namespace Bibo\Mvc\Core\Interfaces;
  * Multi-handle cURL operations allow for parallel execution of multiple HTTP requests,
  * which can significantly improve performance when making multiple requests.
  *
- * @see \Bibo\Core\Interfaces\CurlInterface For core cURL functionality
- * @see \Bibo\Core\Wrapper\Curl\CurlMultiWrapper For implementation details
+ * @see CurlInterface For core cURL functionality
+ * @see \Bibo\Mvc\Core\Wrapper\Curl\CurlMultiWrapper For implementation details
  */
 interface CurlMultiInterface extends CurlInterface
 {

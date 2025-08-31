@@ -2,10 +2,11 @@
 
 namespace Bibo\Mvc\Core\Config;
 
-use Bibo\Mvc\Core\Cache\FileCache;
+use Bibo\Mvc\Core\Exception\Custom\Application\ConfigException;
 use Bibo\Mvc\Core\Interfaces\ConfigInterface;
 use Exception;
-use RuntimeException;
+use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * Configuration class for managing application settings and options.
@@ -13,10 +14,8 @@ use RuntimeException;
  * This class provides methods for loading, accessing, and managing configuration
  * values from various sources. It supports loading from PHP files, environment
  * files, and caching for improved performance.
- *
- * @package Bibo\Core\Config
  */
-class Config implements ConfigInterface
+class ConfigHandler implements ConfigInterface
 {
     /**
      * Configuration array that stores all loaded configuration values.
@@ -28,9 +27,9 @@ class Config implements ConfigInterface
     /**
      * Cache handler for configuration.
      *
-     * @var FileCache|null
+     * @var CacheInterface|null
      */
-    private ?FileCache $cache;
+    private ?CacheInterface $cache;
 
     /**
      * The configuration path.
@@ -49,25 +48,43 @@ class Config implements ConfigInterface
     /**
      * Constructor for Config class.
      *
-     * @param FileCache|null $cache      Optional FileCache instance for caching
-     * @param string|null    $configPath Path to configuration files directory
-     * @param string|null    $cachePath  Path to cache directory
+     * @param string|null $cachePath Path to cache directory
      */
-    public function __construct(?FileCache $cache = null, ?string $configPath = null, ?string $cachePath = null)
+    public function __construct(?string $cachePath = null)
+    {
+        $this->cachePath = $cachePath
+            ?? (defined('CACHE_PATH')
+                ? CACHE_PATH
+                : __DIR__ . '/../../cache/');
+    }
+
+    /**
+     * Set the file caching handler.
+     *
+     * @param CacheInterface $cache The file cache instance to use for caching configuration
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function setFileCaching(CacheInterface $cache): void
     {
         $this->cache = $cache;
+        $this->cache->set('config', $this->config);
+    }
+
+    /**
+     * Set the configuration path.
+     *
+     * @param string|null $configPath The path to the configuration directory
+     *
+     * @return void
+     */
+    public function setConfigPath(?string $configPath = null): void
+    {
         $this->configPath = $configPath
             ?? (defined('CONFIG_PATH')
                 ? CONFIG_PATH
                 : __DIR__ . '/../../config/');
-        $this->cachePath = $cachePath ?? (defined('CACHE_PATH')
-            ? CACHE_PATH . 'config/'
-            : __DIR__ . '/../../cache/config/');
-
-        // Ensure the cache directory exists
-        if (!is_null($this->cache) && !file_exists($this->cachePath)) {
-            mkdir($this->cachePath, 0777, true);
-        }
     }
 
     /**
@@ -83,16 +100,8 @@ class Config implements ConfigInterface
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        // Normalize key
-        $key = trim(strtoupper($key));
-
-        // if is UPPER_CASE (ENV style)
-        if (preg_match('/^[A-Z0-9_]+$/', $key)) {
-            $segments = explode('_', strtolower($key));
-        } else {
-            // dot notation
-            $segments = explode('.', strtolower($key));
-        }
+        // normalize key
+        $segments = explode('.', trim($key));
 
         $value = $this->config;
 
@@ -106,8 +115,6 @@ class Config implements ConfigInterface
         return $value;
     }
 
-
-
     /**
      * Check if a configuration key exists.
      *
@@ -119,8 +126,18 @@ class Config implements ConfigInterface
      */
     public function has(string $key): bool
     {
-        $formattedKey = trim(strtoupper($key));
-        return array_key_exists($formattedKey, $this->config);
+        $segments = explode('.', trim($key));
+
+        $value = $this->config;
+
+        foreach ($segments as $segment) {
+            if (!is_array($value) || !array_key_exists($segment, $value)) {
+                return false;
+            }
+            $value = $value[$segment];
+        }
+
+        return true;
     }
 
     /**
@@ -133,16 +150,60 @@ class Config implements ConfigInterface
      */
     public function all(): array
     {
-        if (empty($this->config)) {
-            $this->loadFromCache();
-        }
+        // if (empty($this->config)) {
+        //     $this->loadFromCache();
+        // }
+
         return $this->config;
+    }
+
+    /**
+     * Load configuration files from the config directory.
+     *
+     * Scans the config directory for PHP files and loads them into the configuration array.
+     * Each file should return an array of configuration values. Also caches the configuration.
+     *
+     * @return void
+     * @throws ConfigException
+     */
+    public function load(): void
+    {
+        // Try to load from the cache first
+        // if ($this->loadFromCache()) {
+        //     return;
+        // }
+
+        $configFiles = glob($this->configPath . '*.php') ?? [];
+        if ($configFiles === false) {
+            throw new ConfigException("Failed to read configuration directory: {$this->configPath}");
+        }
+
+        $config = [];
+        foreach ($configFiles as $file) {
+            $name = basename($file, '.php');
+            $this->config = $config;
+            $contents = include $file;
+
+            if (is_array($contents)) {
+                // If the file returns an array with a top-level key that matches the filename
+                if (count($contents) === 1 && isset($contents[$name])) {
+                    $config[$name] = $contents[$name];
+                } else {
+                    $config[$name] = $contents;
+                }
+            }
+            $this->config = $config;
+        }
+
+        $this->format($config);
+        // $this->cacheConfig();
     }
 
     /**
      * Attempt to load configuration from cache.
      *
      * @return bool True if loaded from cache, false otherwise
+     * @throws InvalidArgumentException
      */
     private function loadFromCache(): bool
     {
@@ -169,47 +230,6 @@ class Config implements ConfigInterface
     }
 
     /**
-     * Load configuration files from the config directory.
-     *
-     * Scans the config directory for PHP files and loads them into the configuration array.
-     * Each file should return an array of configuration values. Also caches the configuration.
-     *
-     * @return void
-     */
-    public function load(): void
-    {
-        // Try to load from the cache first
-        // if ($this->loadFromCache()) {
-        //     return;
-        // }
-
-        $configFiles = glob($this->configPath . '*.php');
-        if ($configFiles === false) {
-            throw new RuntimeException("Failed to read configuration directory: {$this->configPath}");
-        }
-
-        $config = [];
-        foreach ($configFiles as $file) {
-            $name = basename($file, '.php');
-            $this->config = $config;
-            $contents = include $file;
-
-            if (is_array($contents)) {
-                // If the file returns an array with a top-level key that matches the filename
-                if (count($contents) === 1 && isset($contents[$name])) {
-                    $config[$name] = $contents[$name];
-                } else {
-                    $config[$name] = $contents;
-                }
-            }
-            $this->config = $config;
-        }
-
-        $this->format($config);
-        $this->cacheConfig();
-    }
-
-    /**
      * Format configuration values and store them in the config array.
      *
      * Processes the configuration array to standardize the format of values
@@ -221,7 +241,6 @@ class Config implements ConfigInterface
      */
     private function format(array $config): void
     {
-        // dd($config);
         foreach ($config as $key => $value) {
             if (!is_array($value)) {
                 continue;
@@ -235,6 +254,7 @@ class Config implements ConfigInterface
      * Cache the current configuration.
      *
      * @return bool True on success, false on failure
+     * @throws InvalidArgumentException
      */
     private function cacheConfig(): bool
     {
@@ -277,17 +297,17 @@ class Config implements ConfigInterface
      * @param string $file The path to the configuration file
      *
      * @return void
-     * @throws RuntimeException If the file does not exist or cannot be read
+     * @throws ConfigException If the file does not exist or cannot be read
      */
     public function loadFromFile(string $file): void
     {
         if (!file_exists($file)) {
-            throw new RuntimeException('Configuration file not found: ' . $file);
+            throw new ConfigException('Configuration file not found: ' . $file);
         }
 
         $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         if ($lines === false) {
-            throw new RuntimeException('Failed to read configuration file: ' . $file);
+            throw new ConfigException('Failed to read configuration file: ' . $file);
         }
 
         foreach ($lines as $line) {
@@ -315,7 +335,7 @@ class Config implements ConfigInterface
             putenv("$key=$value");
         }
 
-        $this->cacheConfig();
+        // $this->cacheConfig();
     }
 
     /**
@@ -352,56 +372,5 @@ class Config implements ConfigInterface
 
             define($name, $value);
         }
-    }
-
-    /**
-     * Set a configuration value.
-     *
-     * @param string $key   The configuration key
-     * @param mixed  $value The configuration value
-     *
-     * @return $this
-     */
-    public function set(string $key, mixed $value): self
-    {
-        $formattedKey = trim(strtoupper($key));
-        $this->config[$formattedKey] = $value;
-
-        // Update cache
-        $this->cacheConfig();
-
-        return $this;
-    }
-
-    /**
-     * Merge configuration arrays.
-     *
-     * @param array $config Configuration to merge with existing config
-     *
-     * @return $this
-     */
-    public function merge(array $config): self
-    {
-        $this->config = array_merge($this->config, $config);
-
-        // Update cache
-        $this->cacheConfig();
-
-        return $this;
-    }
-
-    /**
-     * Clear all configuration values.
-     *
-     * @return $this
-     */
-    public function clear(): self
-    {
-        $this->config = [];
-
-        // Update cache
-        $this->cacheConfig();
-
-        return $this;
     }
 }

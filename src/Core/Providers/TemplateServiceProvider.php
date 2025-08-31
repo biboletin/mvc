@@ -16,10 +16,12 @@ class TemplateServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $config = $this->container->get('config');
         $templateEngine = new TwigTemplateEngine(
             VIEW_PATH,
+            $config->get('cache.enabled'),
             APP_CACHE_PATH,
-            $this->container->get('config')->get('app_debug') ?? false
+            $config->get('app.debug')
         );
         $template = new Template($templateEngine);
 

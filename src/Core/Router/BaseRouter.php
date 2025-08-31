@@ -2,6 +2,7 @@
 
 namespace Bibo\Mvc\Core\Router;
 
+use Bibo\Mvc\Core\Enums\HttpStatus;
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Interfaces\RouteMatchingStrategyInterface;
 use Bibo\Mvc\Core\Interfaces\RouterInterface;
@@ -188,7 +189,7 @@ class BaseRouter implements RouterInterface
             }
         }
 
-        throw new NotFoundException('Route not found', 404);
+        throw new NotFoundException('Route ' . $uri . ' not found!', HttpStatus::NotFound->value);
     }
 
     /**

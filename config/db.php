@@ -44,9 +44,9 @@ return [
 
         'port' => $_ENV['DB_PORT'] ?? 3306,
 
-            /*
-             * Database charset
-             */
+        /*
+         * Database charset
+         */
 
         'charset' => 'utf8mb4',
 

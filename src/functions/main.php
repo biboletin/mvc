@@ -1,7 +1,6 @@
 <?php
 
 use Bibo\Mvc\Core\Base\App;
-use Bibo\Mvc\Core\Config\Config;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -52,17 +51,17 @@ if (!function_exists('get_env')) {
             ?? $_SERVER[$envKey]
             ?? getenv($envKey);
 
-        if ($value !== false && $value !== null) {
-            return match (strtolower((string) $value)) {
-                'true', '(true)'   => true,
-                'false', '(false)' => false,
-                'null', '(null)'   => null,
-                'empty', '(empty)' => '',
-                default            => $value,
-            };
+        if (empty($value)) {
+            return $default;
         }
 
-        return $default;
+        return match (strtolower((string) $value)) {
+            'true', '(true)'   => true,
+            'false', '(false)' => false,
+            'null', '(null)'   => null,
+            'empty', '(empty)' => '',
+            default            => $value,
+        };
     }
 }
 

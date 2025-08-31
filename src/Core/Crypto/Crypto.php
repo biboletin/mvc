@@ -6,7 +6,6 @@ use Bibo\Mvc\Core\Enums\CryptoVersion;
 use Bibo\Mvc\Core\Enums\HashAlgorithm;
 use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
 use Bibo\Mvc\Core\Exception\Custom\Crypto\EncryptException;
-use Bibo\Mvc\Core\Enums\CipherAlgorithm;
 use InvalidArgumentException;
 use Random\RandomException;
 
@@ -28,9 +27,9 @@ class Crypto
     /**
      * The cipher algorithm used for encryption and decryption.
      *
-     * @var CipherAlgorithm
+     * @var string
      */
-    private CipherAlgorithm $cipherAlgorithm;
+    private string $cipherAlgorithm;
 
     /**
      * The length of the initialization vector (IV) in bytes.
@@ -69,27 +68,28 @@ class Crypto
      *
      * Initializes the Crypto instance with a key, optional salt, cipher algorithm, and IV length.
      *
-     * @param string          $key             The encryption key.
-     * @param CipherAlgorithm $cipherAlgorithm The cipher algorithm to use for encryption and decryption.
-     * @param int             $ivLength        The length of the initialization vector (IV) in bytes. Defaults to 16.
+     * @param string $key             The encryption key.
+     * @param string $cipherAlgorithm The cipher algorithm to use for encryption and decryption.
+     * @param int    $ivLength        The length of the initialization vector (IV) in bytes. Defaults to 16.
+     * @param bool   $useHmac
      */
     public function __construct(
         string $key,
-        CipherAlgorithm $cipherAlgorithm = CipherAlgorithm::AES_256_GCM,
+        string $cipherAlgorithm = 'aes-256-cbc',
         int $ivLength = 16,
         bool $useHmac = true
     ) {
         $this->key = $key;
-        $this->cipherAlgorithm = $cipherAlgorithm;
+        $this->cipherAlgorithm = trim(strtolower($cipherAlgorithm));
         $this->ivLength = $ivLength;
 
-        if (!in_array($this->cipherAlgorithm->value, openssl_get_cipher_methods(true))) {
+        if (!in_array($this->cipherAlgorithm, openssl_get_cipher_methods(true))) {
             throw new InvalidArgumentException(
-                'Invalid cipher algorithm provided: ' . $this->cipherAlgorithm->value
+                'Invalid cipher algorithm provided: ' . $this->cipherAlgorithm
             );
         }
 
-        $this->ivLength = openssl_cipher_iv_length($this->cipherAlgorithm->value);
+        $this->ivLength = openssl_cipher_iv_length($this->cipherAlgorithm);
         $this->useHmac = $useHmac;
     }
 
@@ -114,9 +114,9 @@ class Crypto
      * This algorithm defines the method of encryption, such as AES-256-GCM.
      * It is crucial to ensure that the cipher algorithm is supported by the OpenSSL library.
      *
-     * @return CipherAlgorithm The cipher algorithm.
+     * @return string The cipher algorithm.
      */
-    public function getCipherAlgorithm(): CipherAlgorithm
+    public function getCipherAlgorithm(): string
     {
         return $this->cipherAlgorithm;
     }
@@ -168,13 +168,13 @@ class Crypto
      * Sets the cipher algorithm to be used for encryption and decryption.
      * This method validates that the provided cipher algorithm is supported by OpenSSL.
      *
-     * @param  CipherAlgorithm $cipherAlgorithm The cipher algorithm to set.
+     * @param  string $cipherAlgorithm The cipher algorithm to set.
      * @throws InvalidArgumentException If the cipher algorithm is not supported.
      */
-    public function setCipherAlgorithm(CipherAlgorithm $cipherAlgorithm): void
+    public function setCipherAlgorithm(string $cipherAlgorithm): void
     {
-        $this->cipherAlgorithm = $cipherAlgorithm;
-        $this->ivLength = openssl_cipher_iv_length($this->cipherAlgorithm->value);
+        $this->cipherAlgorithm = strtolower($cipherAlgorithm);
+        $this->ivLength = openssl_cipher_iv_length($this->cipherAlgorithm);
     }
 
     /**
@@ -202,6 +202,10 @@ class Crypto
         $this->useHmac = $useHmac;
     }
 
+    public function getUseHmac(): bool
+    {
+        return $this->useHmac;
+    }
     /**
      * Encrypts the provided text using the specified cipher algorithm and returns the encrypted data.
      *
@@ -218,10 +222,17 @@ class Crypto
         $iv = random_bytes($this->ivLength);
         $tag = '';
 
-        $key = hash_pbkdf2(HashAlgorithm::SHA256->value, $this->key, $salt, 100_000, 32, true);
+        $key = hash_pbkdf2(
+            HashAlgorithm::SHA256->value,
+            $this->getKey(),
+            $salt,
+            100_000,
+            32,
+            true
+        );
         $encryptedText = openssl_encrypt(
             $text,
-            $this->cipherAlgorithm->value,
+            strtolower($this->cipherAlgorithm),
             $key,
             OPENSSL_RAW_DATA,
             $iv,
@@ -237,11 +248,11 @@ class Crypto
         // Format: salt|iv|tag|ciphertext
         $payload = $salt . $iv . $tag . $encryptedText;
 
-        if ($this->useHmac) {
+        if ($this->getUseHmac()) {
             // Ensure the HMAC is calculated over the entire formatted string
             $hmacKey = hash_pbkdf2(
                 HashAlgorithm::SHA256->value,
-                $this->key,
+                $this->getKey(),
                 $salt . 'hmac',
                 100_000,
                 self::HMAC_LENGTH,
@@ -276,7 +287,7 @@ class Crypto
 
         $data = base64_decode($payload, true);
         if ($data === false) {
-            throw new DecryptException('Decryption failed: Invalid encoding');
+            throw new DecryptException('Invalid encoding');
         }
 
         $minLength = self::SALT_LENGTH + $this->ivLength + self::TAG_LENGTH;
@@ -285,7 +296,7 @@ class Crypto
         }
 
         if (strlen($data) < $minLength) {
-            throw new DecryptException('Decryption failed: Data too short');
+            throw new DecryptException('Data too short');
         }
 
         // Extract salt, IV, tag
@@ -326,7 +337,7 @@ class Crypto
 
         $decryptedText = openssl_decrypt(
             $encryptedText,
-            $this->cipherAlgorithm->value,
+            strtolower($this->cipherAlgorithm),
             $key,
             OPENSSL_RAW_DATA,
             $iv,

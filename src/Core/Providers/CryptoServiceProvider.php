@@ -3,6 +3,7 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Crypto\Crypto;
+use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
 use Psr\Container\NotFoundExceptionInterface;
 
 class CryptoServiceProvider extends ServiceProvider
@@ -16,13 +17,17 @@ class CryptoServiceProvider extends ServiceProvider
      * @return void
      *
      * @throws NotFoundExceptionInterface
+     * @throws DecryptException
      */
     public function register(): void
     {
         $config = $this->container->get('config');
 
         $crypto = new Crypto(
-            $config->get('encryption.key')
+            $config->get('encryption.key'),
+            $config->get('encryption.cipher'),
+            $config->get('encryption.iv_length'),
+            $config->get('encryption.use_hmac')
         );
 
         $this->container->set('crypto', function () use ($crypto) {

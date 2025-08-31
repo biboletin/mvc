@@ -7,101 +7,62 @@
 return [
 
     /*
-     * Application settings
+     * Application name
      */
 
-    'app' => [
+    'name' => get_env('app.name', 'Example Application'),
 
-        /*
-         * Application name
-         */
+    /*
+     * Application URL
+     */
 
-        'name' => get_env('app.name', 'Example Application'),
+    'url' => get_env('app.url', 'http://localhost'),
 
-        /*
-         * Application URL
-         */
+    /*
+     * Application version
+     */
 
-        'url' => get_env('app.url', 'http://localhost'),
+    'version' => get_env('app.version', '1.0.0'),
 
-        /*
-         * Application version
-         */
+    /*
+     * Application environment
+     */
 
-        'version' => get_env('app.version', '1.0.0'),
+    'env' => get_env('app.env', 'development'),
 
-        /*
-         * Application environment
-         */
+    /*
+     * Application debug mode
+     */
 
-        'env' => get_env('app.env', 'development'),
+    'debug' => get_env('app.debug', false),
 
-        /*
-         * Application debug mode
-         */
+    /*
+     * Application timezone
+     */
 
-        'debug' => get_env('app.debug', false),
+    'timezone' => get_env('app.timezone', 'Europe/Sofia'),
 
-        /*
-         * Application debug level
-         */
+    /*
+     * Application locale
+     */
 
-        'debug_level' => get_env('app.debug_level', 'debug'),
+    'locale' => get_env('app.locale', 'en'),
 
-        /*
-         * Application timezone
-         */
+    /*
+     * Application fallback locale
+     */
 
-        'timezone' => get_env('app.timezone', 'Europe/Sofia'),
+    'fallback_locale' => get_env('app.fallback_locale', 'en'),
 
-        /*
-         * Application locale
-         */
+    /*
+     * Application fallback timezone
+     */
 
-        'locale' => 'en',
+    'fallback_timezone' => get_env('app.fallback_timezone', 'UTC'),
 
-        /*
-         * Application fallback locale
-         */
+    /*
+     * Application key
+     */
 
-        'fallback_locale' => 'en',
-
-        /*
-         * Application fallback timezone
-         */
-
-        'fallback_timezone' => 'UTC',
-
-        /*
-         * Application key
-         */
-
-        'key' => '',
-
-        /*
-         * Application cipher
-         */
-
-        'cipher' => 'AES-256-CBC',
-
-        /*
-         * Application hash
-         */
-
-        'hash' => 'sha256',
-
-        /*
-         * Application hash key
-         */
-
-        'hash_key' => '',
-
-        /*
-         * Application hash options
-         */
-
-        'hash_options' => [
-            'cost' => 12,
-        ],
-    ],
+    'key' => get_env('app.key', ''),
 ];

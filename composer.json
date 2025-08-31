@@ -9,7 +9,7 @@
         "psr-4": {
             "Bibo\\Mvc\\": "src/",
             "Bibo\\App\\": "app/",
-            "Tests\\": "tests/unit/"
+            "Tests\\": "tests/"
         },
         "files":[
             "src/constants/main.php",
@@ -47,6 +47,8 @@
         "ext-dom": "*",
         "ext-json": "*",
         "ext-libxml": "*",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "ext-bz2": "*",
+        "ext-intl": "*"
     }
 }

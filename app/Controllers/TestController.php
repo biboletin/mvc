@@ -2,8 +2,8 @@
 
 namespace Bibo\App\Controllers;
 
-use Bibo\Core\Controller\Controller;
-use Bibo\Core\Response\JsonResponse;
+use Bibo\Mvc\Core\Controller\Controller;
+use Bibo\Mvc\Core\Response\JsonResponse;
 use JsonException;
 
 class TestController extends Controller

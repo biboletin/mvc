@@ -1,5 +1,6 @@
 <?php
 
+use Bibo\Mvc\Core\Providers\EnumServiceProvider;
 use Bibo\Mvc\Core\Providers\AppServiceProvider;
 use Bibo\Mvc\Core\Providers\ConfigServiceProvider;
 use Bibo\Mvc\Core\Providers\ControllerServiceProvider;
@@ -12,6 +13,8 @@ use Bibo\Mvc\Core\Providers\MiddlewareServiceProvider;
 use Bibo\Mvc\Core\Providers\ModelServiceProvider;
 use Bibo\Mvc\Core\Providers\RequestServiceProvider;
 use Bibo\Mvc\Core\Providers\RouteServiceProvider;
+use Bibo\Mvc\Core\Providers\ScriptExecutionTimerServiceProvider;
+use Bibo\Mvc\Core\Providers\StartupConfigServiceProvider;
 use Bibo\Mvc\Core\Providers\TemplateServiceProvider;
 use Bibo\Mvc\Core\Providers\ViewServiceProvider;
 use Bibo\Mvc\Core\Providers\ServiceProvider;
@@ -22,9 +25,12 @@ if (!isset($app)) {
 
 // Core service providers
 $providers = [
+    ScriptExecutionTimerServiceProvider::class,
     ConfigServiceProvider::class,
-    CryptoServiceProvider::class,
+    StartupConfigServiceProvider::class,
+    EnumServiceProvider::class,
     LogServiceProvider::class,
+    CryptoServiceProvider::class,
     TemplateServiceProvider::class,
     ErrorServiceProvider::class,
     MiddlewareDispatcherServiceProvider::class,

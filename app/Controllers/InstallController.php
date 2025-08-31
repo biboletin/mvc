@@ -2,7 +2,7 @@
 
 namespace Bibo\App\Controllers;
 
-use Bibo\Core\Controller\Controller;
+use Bibo\Mvc\Core\Controller\Controller;
 
 class InstallController extends Controller
 {

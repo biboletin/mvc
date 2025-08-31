@@ -125,7 +125,7 @@ if (!defined('APP_CACHE_PATH')) {
      * Application cache directory path
      */
 
-    define('APP_CACHE_PATH', CACHE_PATH . '/app' . DIRECTORY_SEPARATOR);
+    define('APP_CACHE_PATH', CACHE_PATH . 'app' . DIRECTORY_SEPARATOR);
 }
 
 if (!defined('CONFIG_CACHE_PATH')) {
@@ -133,7 +133,7 @@ if (!defined('CONFIG_CACHE_PATH')) {
      * Config cache directory path
      */
 
-    define('CONFIG_CACHE_PATH', CACHE_PATH . '/config' . DIRECTORY_SEPARATOR);
+    define('CONFIG_CACHE_PATH', CACHE_PATH . 'config' . DIRECTORY_SEPARATOR);
 }
 
 if (!defined('ROUTES_CACHE_PATH')) {
@@ -141,5 +141,5 @@ if (!defined('ROUTES_CACHE_PATH')) {
      * Routes cache directory path
      */
 
-    define('ROUTES_CACHE_PATH', CACHE_PATH . '/routes' . DIRECTORY_SEPARATOR);
+    define('ROUTES_CACHE_PATH', CACHE_PATH . 'routes' . DIRECTORY_SEPARATOR);
 }

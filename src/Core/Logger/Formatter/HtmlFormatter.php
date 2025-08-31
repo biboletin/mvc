@@ -3,6 +3,8 @@
 namespace Bibo\Mvc\Core\Logger\Formatter;
 
 use Bibo\Mvc\Core\Interfaces\FormatterInterface;
+use DateTime;
+use Stringable;
 
 /**
  * HtmlFormatter formats log entries as HTML.
@@ -39,12 +41,12 @@ class HtmlFormatter implements FormatterInterface
      *
      * @param string $dateFormat The date format to use for timestamps.
      */
-    public function __construct(string $dateFormat = \DateTime::ATOM)
+    public function __construct(string $dateFormat = DateTime::ATOM)
     {
         $this->dateFormat = $dateFormat;
     }
 
-    public function format(string $level, string|\Stringable $message, array $context = []): string
+    public function format(string $level, string|Stringable $message, array $context = []): string
     {
         $timestamp = date($this->dateFormat);
         $level = strtoupper($level);

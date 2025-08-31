@@ -2,6 +2,8 @@
 
 namespace Bibo\Mvc\Core\Interfaces;
 
+use RuntimeException;
+
 /**
  * Interface CurlInterface
  *
@@ -9,8 +11,8 @@ namespace Bibo\Mvc\Core\Interfaces;
  * It provides methods for configuring, executing, and retrieving information from cURL requests.
  * The interface can be implemented for both single and multi-handle cURL operations.
  *
- * @see \Bibo\Core\Interfaces\CurlExtendedInterface For extended cURL functionality
- * @see \Bibo\Core\Interfaces\CurlMultiInterface For multi-handle cURL operations
+ * @see CurlExtendedInterface For extended cURL functionality
+ * @see CurlMultiInterface For multi-handle cURL operations
  */
 interface CurlInterface
 {
@@ -64,7 +66,7 @@ interface CurlInterface
      * URL, method, headers, and body.
      *
      * @return string The response body as a string
-     * @throws \RuntimeException If the cURL request fails
+     * @throws RuntimeException If the cURL request fails
      */
     public function execute(): string;
 

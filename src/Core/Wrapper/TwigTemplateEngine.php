@@ -14,17 +14,18 @@ class TwigTemplateEngine implements TemplateEngineInterface
 {
     protected Environment $twig;
 
-    public function __construct(string $views, ?string $cachePath = null, bool $debug = false)
-    {
+    public function __construct(
+        string $views,
+        bool $enableCache = false,
+        ?string $cachePath = null,
+        bool $debug = false
+    ) {
         $loader = new FilesystemLoader($views);
         $options = [
             'debug' => $debug,
             'auto_reload' => $debug,
+            'cache' => $enableCache ? $cachePath : false,
         ];
-
-        if ($cachePath) {
-            $options['cache'] = $cachePath;
-        }
 
         $this->twig = new Environment($loader, $options);
 

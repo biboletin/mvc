@@ -2,6 +2,7 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
+use Bibo\Mvc\Core\Facades\Request;
 use Bibo\Mvc\Core\Request\BaseRequest;
 
 class RequestServiceProvider extends ServiceProvider
@@ -13,7 +14,12 @@ class RequestServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->container->set('request', fn () => new BaseRequest());
+        $request = new BaseRequest();
+        Request::init($request);
+
+        $this->container->set('request', function () use ($request) {
+            return $request;
+        });
     }
 
     public function boot(): void

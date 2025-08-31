@@ -1,6 +1,7 @@
 <?php
 
-/** * configuration for hashing in the application.
+/**
+ * * configuration for hashing in the application.
  *
  * This configuration file defines settings for hashing algorithms and options.
  * It allows customization of how passwords and other sensitive data are hashed.

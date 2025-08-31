@@ -3,7 +3,11 @@
 namespace Bibo\Mvc\Core\Cookie;
 
 use Bibo\Mvc\Core\Crypto\Crypto;
-use Bibo\Mvc\Core\Exceptions\Custom\Crypto\EncryptException;
+use Bibo\Mvc\Core\Exception\Custom\Crypto\EncryptException;
+use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
+use Bibo\Mvc\Core\Traits\EncryptedAwareTrait;
+use Bibo\Mvc\Core\Traits\NameAwareTrait;
+use Bibo\Mvc\Core\Traits\PrefixAwareTrait;
 use Random\RandomException;
 
 /**
@@ -16,19 +20,16 @@ use Random\RandomException;
  */
 class CookieHandler
 {
-    /**
-     * Name of the cookie.
-     *
-     * @var string $cookieName
-     */
-    private string $cookieName;
+    use NameAwareTrait;
+    use EncryptedAwareTrait;
+    use PrefixAwareTrait;
 
     /**
      * Value of the cookie.
      *
      * @var string $cookieValue
      */
-    private string $cookieValue;
+    private string $cookieValue = '';
 
     /**
      * Expiration time of the cookie in seconds.
@@ -93,14 +94,12 @@ class CookieHandler
      */
     private bool $cookieSecureOnly;
 
-    private bool $partitioned;
-
     /**
-     * Encrypt the cookie value.
+     * Partitioned cookie flag
      *
      * @var bool
      */
-    private bool $encrypt;
+    private bool $partitioned;
 
     /**
      * Crypto instance for encryption and decryption.
@@ -114,20 +113,11 @@ class CookieHandler
      */
     public function __construct()
     {
-        $this->crypto = new Crypto('cookie');
     }
 
-    /**
-     * Set the name of the cookie.
-     *
-     * @param string $cookieName
-     *
-     * @return $this
-     */
-    public function setName(string $cookieName): self
+    public function setCrypto(Crypto $crypto): void
     {
-        $this->cookieName = $cookieName;
-        return $this;
+        $this->crypto = $crypto;
     }
 
     /**
@@ -135,11 +125,18 @@ class CookieHandler
      *
      * @param string $cookieValue
      *
-     * @return $this
+     * @return CookieHandler
+     *
+     * @throws EncryptException | RandomException
      */
     public function setValue(string $cookieValue): self
     {
-        $this->cookieValue = $cookieValue;
+        $value = $this->isEncrypted()
+            ? $this->crypto->encrypt($cookieValue)
+            : $cookieValue;
+
+        $this->cookieValue = $value;
+
         return $this;
     }
 
@@ -152,7 +149,7 @@ class CookieHandler
      */
     public function setExpire(int $cookieExpire): self
     {
-        $this->cookieExpire = $cookieExpire;
+        $this->cookieExpire = (time() + $cookieExpire);
         return $this;
     }
 
@@ -300,23 +297,16 @@ class CookieHandler
     }
 
     /**
-     * Get the name of the cookie.
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->cookieName;
-    }
-
-    /**
      * Get the value of the cookie.
      *
      * @return string
+     * @throws DecryptException
      */
     public function getValue(): string
     {
-        return $this->cookieValue;
+        return $this->isEncrypted()
+            ? $this->crypto->decrypt($this->cookieValue)
+            : $this->cookieValue;
     }
 
     /**
@@ -443,15 +433,19 @@ class CookieHandler
     {
         return $this->cookieExpire < time();
     }
+
     /**
      * Send the cookie to the browser.
      *
      * @return bool Returns true on success, false on failure.
+     * @throws DecryptException
      */
     public function send(): bool
     {
         $value = $this->getValue();
-        dd($value);
+        $cookieName = $this->getName();
+        $expiresAt = $this->getExpire();
+
         if ($this->isEncrypted()) {
             try {
                 $value = $this->crypto->encrypt($value);
@@ -463,9 +457,9 @@ class CookieHandler
         if ($this->getPartitioned()) {
             $cookie = sprintf(
                 '%s=%s; Expires=%s; Path=%s; Domain=%s; Secure=%s; HttpOnly=%s; SameSite=%s; Partitioned',
-                rawurlencode($this->getName()),
+                rawurlencode($cookieName),
                 rawurlencode($value),
-                gmdate('D, d M Y H:i:s T', $this->getExpire()),
+                $expiresAt,
                 $this->getPath(),
                 $this->getDomain(),
                 $this->getSecure() ? 'true' : 'false',
@@ -478,10 +472,10 @@ class CookieHandler
         }
 
         return setcookie(
-            $this->getName(),
+            $cookieName,
             $value,
             [
-                'expires' => $this->getExpire(),
+                'expires' => $expiresAt,
                 'path' => $this->getPath(),
                 'domain' => $this->getDomain(),
                 'secure' => $this->getSecure(),
@@ -494,15 +488,21 @@ class CookieHandler
     /**
      * Set the cookie with the specified name and value.
      *
-     * @param string $name The name of the cookie.
-     * @param mixed $value The value of the cookie.
+     * @param string $name  The name of the cookie.
+     * @param mixed  $value The value of the cookie.
      *
      * @return bool Returns true on success, false on failure.
+     *
+     * @throws DecryptException
      */
     public function set(string $name, mixed $value): bool
     {
-        $this->cookieName = $name;
-        $this->cookieValue = $value;
+        $this->setName($name);
+        try {
+            $this->setValue($value);
+        } catch (EncryptException | RandomException $e) {
+            return false;
+        }
 
         return $this->send();
     }
@@ -541,11 +541,12 @@ class CookieHandler
     public function get(string $name): mixed
     {
         if (isset($_COOKIE[$name])) {
-            if ($this->encrypt) {
+            if ($this->getEncrypted()) {
                 try {
                     return $this->crypto->decrypt($_COOKIE[$name]);
-                } catch (EncryptException | RandomException $e) {
-                    return null; // Return null if decryption fails
+                } catch (EncryptException | RandomException | DecryptException $e) {
+                    // Return null if decryption fails
+                    return null;
                 }
             }
             return $_COOKIE[$name];
@@ -553,29 +554,14 @@ class CookieHandler
         return null;
     }
 
-    /**
-     * Encrypt the cookie value.
-     * This method can be used to encrypt cookie values before sending them to the browser.
-     * It can be useful for sensitive data that needs to be stored in cookies.
-     *
-     * @param bool $encrypt
-     *
-     * @return $this
-     */
-    public function encrypt(bool $encrypt = true): self
+    public function setPrefix(string $prefix): void
     {
-        $this->encrypt = $encrypt;
-        return $this;
+        $this->prefix = $prefix;
     }
 
-    /**
-     * Check if the cookie value is encrypted.
-     *
-     * @return bool Returns true if the cookie value is encrypted, false otherwise.
-     */
-    public function isEncrypted(): bool
+    public function getPrefix(): string
     {
-        return $this->encrypt;
+        return $this->prefix;
     }
 
     /**
@@ -584,6 +570,8 @@ class CookieHandler
      * @param array<string, mixed> $data An associative array containing cookie properties.
      *
      * @return self Returns a new instance of CookieHandler with the specified properties.
+     *
+     * @throws EncryptException | RandomException
      */
     public function fromArray(array $data): self
     {
@@ -597,7 +585,7 @@ class CookieHandler
             ->setHttpOnly($data['httpOnly'] ?? false)
             ->setSameSite($data['sameSiteValue'] ?? '')
             ->setPartitioned($data['partitioned'] ?? false)
-            ->encrypt($data['encrypted'] ?? false);
+            ->setEncrypted($data['encrypted'] ?? false);
 
         return $cookie;
     }
@@ -606,6 +594,7 @@ class CookieHandler
      * Convert the cookie properties to an associative array.
      *
      * @return array<string, mixed> Returns an associative array containing the cookie properties.
+     * @throws DecryptException
      */
     public function toArray(): array
     {

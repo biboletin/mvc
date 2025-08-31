@@ -42,7 +42,7 @@ class CookieServiceProvider extends ServiceProvider
         $cookie->setEncrypted($config->get('cookie.encrypted'));
         $cookie->setPartitioned($config->get('cookie.partitioned'));
 
-        $this->container->set('cookies', function () use ($cookie) {
+        $this->container->set('cookie', function () use ($cookie) {
             return $cookie;
         });
     }

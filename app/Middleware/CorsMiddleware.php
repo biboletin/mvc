@@ -6,7 +6,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Bibo\Core\Response\HtmlResponse;
+use Bibo\Mvc\Core\Response\HtmlResponse;
 
 class CorsMiddleware implements MiddlewareInterface
 {

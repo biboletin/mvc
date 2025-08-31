@@ -2,8 +2,8 @@
 
 namespace Bibo\App\Middleware;
 
-use Bibo\Core\Response\HtmlResponse;
-use Bibo\Core\Response\JsonResponse;
+use Bibo\Mvc\Core\Response\HtmlResponse;
+use Bibo\Mvc\Core\Response\JsonResponse;
 use JsonException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

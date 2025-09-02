@@ -9,6 +9,7 @@ find . -type f -exec chmod 644 {} \;
 find . -type d -exec chmod 755 {} \;
 
 chown -R www-data:www-data /var/www/html/mvc/storage/cache/
+chown -R www-data:www-data /var/www/html/mvc/storage/cookies/
 chown -R www-data:www-data /var/www/html/mvc/storage/logs/
 chown -R www-data:www-data /var/www/html/mvc/storage/session/
 chown -R www-data:www-data /var/www/html/mvc/storage/tmp/
@@ -18,6 +19,7 @@ composer update --optimize-autoloader
 
 #for development only
 chmod 777 /var/www/html/mvc/storage/cache/
+chmod 777 /var/www/html/mvc/storage/cookies/
 chmod 777 /var/www/html/mvc/storage/logs/
 chmod 777 /var/www/html/mvc/storage/session/
 chmod 777 /var/www/html/mvc/storage/tmp/

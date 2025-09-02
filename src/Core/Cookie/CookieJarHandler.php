@@ -3,27 +3,73 @@
 namespace Bibo\Mvc\Core\Cookie;
 
 use Bibo\Mvc\Core\Crypto\Crypto;
+use Bibo\Mvc\Core\Exception\Custom\Crypto\EncryptException;
+use Bibo\Mvc\Core\Traits\EncryptedAwareTrait;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
+use Random\RandomException;
 
+/**
+ * Cookie Jar Handler
+ */
 class CookieJarHandler
 {
+    use EncryptedAwareTrait;
+
+    /**
+     * Cookies
+     *
+     * @var array
+     */
     protected array $cookies = [];
 
-    protected bool $encrypt = false;
+    protected CookieHandler $cookie;
+
+    /**
+     * Crypto
+     *
+     * @var Crypto
+     */
     protected Crypto $crypto;
 
-    public function __construct(Crypto $crypto)
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+    }
+
+    /**
+     * Crypto
+     *
+     * @param Crypto $crypto
+     *
+     * @return void
+     */
+    public function setCrypto(Crypto $crypto): void
     {
         $this->crypto = $crypto;
     }
 
+    /**
+     * Cookie
+     *
+     * @param CookieHandler $cookie
+     *
+     * @return void
+     */
+    public function setCookie(CookieHandler $cookie): void
+    {
+        $this->cookie = $cookie;
+    }
+
+    public function getCookie(): CookieHandler
+    {
+        return $this->cookie;
+    }
+
     public function add(CookieHandler $cookie): void
     {
-        if ($this->encrypt) {
-            $cookie->encrypt();
-        }
-
         $this->cookies[$cookie->getName()] = $cookie;
     }
 
@@ -37,7 +83,7 @@ class CookieJarHandler
             return null;
         }
 
-        if ($cookie && $this->encrypt) {
+        if ($cookie && $this->isEncrypted()) {
             $cookie->decrypt();
         }
 
@@ -46,20 +92,12 @@ class CookieJarHandler
 
     public function all(): array
     {
-        $validCookies = [];
-
-        foreach ($this->cookies as $name => $cookie) {
-            if (!$cookie->isExpired()) {
-                if ($this->encrypt) {
-                    $cookie->decrypt();
-                }
-                $validCookies[$name] = $cookie;
-            } else {
-                $this->remove($name);
+        return array_map(function ($cookie) {
+            if ($cookie->isExpired()) {
+                $this->remove($cookie->getName());
             }
-        }
-
-        return $validCookies;
+            return $cookie;
+        }, $this->cookies);
     }
 
     public function has(string $name): bool
@@ -75,16 +113,6 @@ class CookieJarHandler
     public function clear(): void
     {
         $this->cookies = [];
-    }
-
-    public function setEncrypt(bool $encrypt): void
-    {
-        $this->encrypt = $encrypt;
-    }
-
-    public function isEncrypt(): bool
-    {
-        return $this->encrypt;
     }
 
     public function toHeader(): string
@@ -111,6 +139,10 @@ class CookieJarHandler
         return implode('; ', $parts);
     }
 
+    /**
+     * @throws RandomException
+     * @throws EncryptException
+     */
     public function parseSetCookieHeader(array $setCookieHeaders, bool $decrypt = false): void
     {
         foreach ($setCookieHeaders as $header) {
@@ -203,11 +235,15 @@ class CookieJarHandler
 
     public function saveToFile(string $path): bool
     {
-        $data = array_map(fn($cookie) => $cookie->toArray(), $this->all());
+        $data = array_map(fn ($cookie) => $cookie->toArray(), $this->all());
 
         return file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) !== false;
     }
 
+    /**
+     * @throws EncryptException
+     * @throws RandomException
+     */
     public function loadFromFile(string $path): bool
     {
         if (!file_exists($path)) {
@@ -222,7 +258,7 @@ class CookieJarHandler
         }
 
         foreach ($data as $cookieData) {
-            $cookie = new CookieHandler();
+            $cookie = $this->getCookie();
             $cookie->fromArray($cookieData);
             $this->add($cookie);
         }
@@ -232,9 +268,13 @@ class CookieJarHandler
 
     public function toArray(): array
     {
-        return array_map(fn($cookie) => $cookie->toArray(), $this->all());
+        return array_map(fn ($cookie) => $cookie->toArray(), $this->all());
     }
 
+    /**
+     * @throws RandomException
+     * @throws EncryptException
+     */
     public function loadFromArray(array $data): void
     {
         foreach ($data as $cookieData) {
@@ -247,11 +287,6 @@ class CookieJarHandler
     public function send(): void
     {
         foreach ($this->all() as $cookie) {
-            // If encryption is enabled and the value is not encrypted
-            if ($this->encrypt && !$cookie->isEncrypted()) {
-                $cookie->encrypt();
-            }
-
             setcookie(
                 $cookie->getName(),
                 $cookie->getValue(),
@@ -259,14 +294,18 @@ class CookieJarHandler
                     'expires' => $cookie->getExpire(),
                     'path' => $cookie->getPath(),
                     'domain' => $cookie->getDomain(),
-                    'secure' => $cookie->isSecure(),
-                    'httponly' => $cookie->isHttpOnly(),
+                    'secure' => $cookie->getSecure(),
+                    'httponly' => $cookie->getHttpOnly(),
                     'samesite' => $cookie->getSameSite() ?? 'Lax',
                 ]
             );
         }
     }
 
+    /**
+     * @throws RandomException
+     * @throws EncryptException
+     */
     public function parseFromGlobals(bool $decrypt = false): void
     {
         foreach ($_COOKIE as $name => $value) {
@@ -285,6 +324,10 @@ class CookieJarHandler
         }
     }
 
+    /**
+     * @throws RandomException
+     * @throws EncryptException
+     */
     public function parseFromRequest(ServerRequestInterface $request, bool $decrypt = false): void
     {
         foreach ($request->getCookieParams() as $name => $value) {

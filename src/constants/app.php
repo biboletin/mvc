@@ -1,11 +1,37 @@
 <?php
 
+if (!defined('RESOURCES_PATH')) {
+    /*
+     * Resources path
+     */
+
+    define(
+        'RESOURCES_PATH',
+        realpath(
+            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'resources'
+        ) . DIRECTORY_SEPARATOR
+    );
+}
+
 if (!defined('VIEW_PATH')) {
     /*
      * Views directory path
      */
 
-    define('VIEW_PATH', realpath(__DIR__ . '/../../resources/views') . DIRECTORY_SEPARATOR);
+    define('VIEW_PATH', realpath(RESOURCES_PATH . 'views') . DIRECTORY_SEPARATOR);
+}
+
+if (!defined('STORAGE_PATH')) {
+    /*
+     * Storage path
+     */
+
+    define(
+        'STORAGE_PATH',
+        realpath(
+            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'storage'
+        ) . DIRECTORY_SEPARATOR
+    );
 }
 
 if (!defined('CACHE_PATH')) {
@@ -13,7 +39,7 @@ if (!defined('CACHE_PATH')) {
      * Cache directory path
      */
 
-    define('CACHE_PATH', realpath(__DIR__ . '/../../storage/cache') . DIRECTORY_SEPARATOR);
+    define('CACHE_PATH', realpath(STORAGE_PATH . '/cache') . DIRECTORY_SEPARATOR);
 }
 
 if (!defined('LOG_PATH')) {
@@ -21,7 +47,7 @@ if (!defined('LOG_PATH')) {
      * Logs directory path
      */
 
-    define('LOG_PATH', realpath(__DIR__ . '/../../storage/logs') . DIRECTORY_SEPARATOR);
+    define('LOG_PATH', realpath(STORAGE_PATH . '/logs') . DIRECTORY_SEPARATOR);
 }
 
 if (!defined('CONFIG_PATH')) {
@@ -54,14 +80,6 @@ if (!defined('PUBLIC_PATH')) {
      */
 
     define('PUBLIC_PATH', realpath(__DIR__ . '/../../public') . DIRECTORY_SEPARATOR);
-}
-
-if (!defined('STORAGE_PATH')) {
-    /*
-     * Storage path
-     */
-
-    define('STORAGE_PATH', realpath(__DIR__ . '/../../storage') . DIRECTORY_SEPARATOR);
 }
 
 if (!defined('SRC_PATH')) {
@@ -142,4 +160,20 @@ if (!defined('ROUTES_CACHE_PATH')) {
      */
 
     define('ROUTES_CACHE_PATH', CACHE_PATH . 'routes' . DIRECTORY_SEPARATOR);
+}
+
+if (!defined('COOKIE_JAR_PATH')) {
+    /*
+     * Cookies path
+     */
+
+    define('COOKIES_PATH', STORAGE_PATH . 'cookies' . DIRECTORY_SEPARATOR);
+}
+
+if (!defined('COOKIE_JAR_PATH')) {
+    /*
+     * CookieJar path
+     */
+
+    define('COOKIE_JAR_PATH', COOKIES_PATH . 'jar' . DIRECTORY_SEPARATOR);
 }

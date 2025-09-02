@@ -1,5 +1,6 @@
 <?php
 
+use Bibo\Mvc\Core\Providers\CookieJarServiceProvider;
 use Bibo\Mvc\Core\Providers\CookieServiceProvider;
 use Bibo\Mvc\Core\Providers\EnumServiceProvider;
 use Bibo\Mvc\Core\Providers\AppServiceProvider;
@@ -30,6 +31,7 @@ $providers = [
     ConfigServiceProvider::class,
     StartupConfigServiceProvider::class,
     CookieServiceProvider::class,
+    CookieJarServiceProvider::class,
     EnumServiceProvider::class,
     LogServiceProvider::class,
     CryptoServiceProvider::class,

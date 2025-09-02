@@ -575,7 +575,7 @@ class CookieHandler
      */
     public function fromArray(array $data): self
     {
-        $cookie = new self();
+        $cookie = clone $this;
         $cookie->setName($data['name'])
             ->setValue($data['value'] ?? '')
             ->setExpire($data['expire'] ?? 0)
@@ -586,7 +586,6 @@ class CookieHandler
             ->setSameSite($data['sameSiteValue'] ?? '')
             ->setPartitioned($data['partitioned'] ?? false)
             ->setEncrypted($data['encrypted'] ?? false);
-
         return $cookie;
     }
 
@@ -607,8 +606,8 @@ class CookieHandler
             'secure' => $this->getSecure(),
             'httponly' => $this->getHttpOnly(),
             'samesite' => $this->getSameSite(),
-            'raw' => $this->getRaw(),
-            'force' => $this->getForce(),
+            // 'raw' => $this->getRaw(),
+            // 'force' => $this->getForce(),
             'secure_only' => $this->getSecure(),
         ];
     }

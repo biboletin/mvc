@@ -50,33 +50,93 @@ interface RouterInterface
     public function delete(string $route, array|callable $callable): self;
 
     /**
+     * Set PATCH routes
+     *
+     * @param string         $route
+     * @param array|callable $callable
+     *
+     * @return RouterInterface
+     */
+    public function patch(string $route, array|callable $callable): self;
+
+    /**
+     * Set HEAD routes
+     *
+     * @param string         $route
+     * @param array|callable $callable
+     *
+     * @return RouterInterface
+     */
+    public function head(string $route, array|callable $callable): self;
+
+    /**
+     * Set OPTIONS routes
+     *
+     * @param string         $route
+     * @param array|callable $callable
+     *
+     * @return RouterInterface
+     */
+    public function options(string $route, array|callable $callable): self;
+
+    /**
+     * Set CONNECT routes
+     *
+     * @param string         $route
+     * @param array|callable $callable
+     *
+     * @return RouterInterface
+     */
+    public function connect(string $route, array|callable $callable): self;
+
+    /**
+     * Set TRACE routes
+     *
+     * @param string         $route
+     * @param array|callable $callable
+     *
+     * @return RouterInterface
+     */
+    public function trace(string $route, array|callable $callable): self;
+
+    /**
+     * Set ANY routes
+     *
+     * @param string         $route
+     * @param array|callable $callable
+     *
+     * @return RouterInterface
+     */
+    public function any(string $route, array|callable $callable): self;
+
+    /**
      * Group routes
      *
      * @param string   $name
      * @param callable $callable
      *
-     * @return void
+     * @return RouterInterface
      */
-    public function group(string $name, callable $callable): void;
+    public function group(string $name, callable $callable): self;
 
     /**
      * Match route
      *
-     * @param string $method
-     * @param string $uri
+     * @param string|array $method
+     * @param string       $uri
      *
      * @return ResponseInterface
      */
-    public function match(string $method, string $uri): ResponseInterface;
+    public function matchRoutes(string|array $method, string $uri): ResponseInterface;
 
     /**
      * Add middleware
      *
-     * @param callable $middleware
+     * @param string|array $middleware
      *
-     * @return void
+     * @return RouterInterface
      */
-    public function middleware(callable $middleware): void;
+    public function middleware(string|array $middleware): self;
 
     /**
      * Find route
@@ -93,9 +153,9 @@ interface RouterInterface
      *
      * @param string $name
      *
-     * @return void
+     * @return RouterInterface
      */
-    public function name(string $name): void;
+    public function name(string $name): self;
 
     /**
      * Dump routes

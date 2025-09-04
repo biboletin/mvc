@@ -42,10 +42,10 @@ $providers = [
     AppServiceProvider::class,
     RouteServiceProvider::class,
     RequestServiceProvider::class,
-    ControllerServiceProvider::class,
     ModelServiceProvider::class,
     FileCacheServiceProvider::class,
     ViewServiceProvider::class,
+    ControllerServiceProvider::class,
 ];
 
 $container = $app->container();

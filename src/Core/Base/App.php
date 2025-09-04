@@ -81,7 +81,7 @@ class App
             $uri = $request->getUri()->getPath(); // Ensure this returns a string
 
             // Match the route using method and path
-            $response = $router->match($method, $uri);
+            $response = $router->matchRoutes($method, $uri);
             // Emit the response
             $responseEmitter->emit($response);
         } catch (ContainerExceptionInterface | JsonException $e) {

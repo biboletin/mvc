@@ -16,11 +16,10 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $container = $this->container;
-        $router = new BaseRouter($container, new CachedRegexMatchStrategy());
+        $router = new BaseRouter($this->container, new CachedRegexMatchStrategy());
         Route::init($router);
 
-        include __DIR__ . '/../../../routes/web.php';
+        include ROUTES_PATH . 'web.php';
 
         $this->container->set('router', fn () => $router);
     }

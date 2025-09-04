@@ -6,7 +6,7 @@ use Bibo\Mvc\Core\Request\BaseRequest;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
-class Request
+final class Request
 {
     /**
      * Get the singleton instance of BaseRequest

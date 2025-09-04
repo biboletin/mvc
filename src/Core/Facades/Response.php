@@ -6,7 +6,7 @@ use Bibo\Mvc\Core\Response\BaseResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class Response
+final class Response
 {
     private static ?ResponseInterface $instance = null;
 

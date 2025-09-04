@@ -2,15 +2,17 @@
 
 namespace Bibo\Mvc\Core\Facades;
 
+use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Router\BaseRouter;
-use Exception;
+use JsonException;
 use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * Facade route class
  */
-class Route
+final class Route
 {
     /**
      * Instance
@@ -18,6 +20,7 @@ class Route
      * @var BaseRouter|null
      */
     private static ?BaseRouter $instance = null;
+    private static array $middleware = [];
 
     public static function init(BaseRouter $router): void
     {
@@ -41,13 +44,12 @@ class Route
      *
      * @param string         $path
      * @param array|callable $handler
-     * @param array|null     $middleware
      *
      * @return BaseRouter
      */
-    public static function get(string $path, array|callable $handler, ?array $middleware = null): BaseRouter
+    public static function get(string $path, array|callable $handler): BaseRouter
     {
-        return self::getInstance()->get($path, $handler, $middleware);
+        return self::getInstance()->get($path, $handler);
     }
 
     /**
@@ -93,42 +95,129 @@ class Route
     }
 
     /**
+     * Set PATCH route
+     *
+     * @param string         $path
+     * @param array|callable $handler
+     * @param array          $middleware
+     *
+     * @return BaseRouter
+     */
+    public static function patch(string $path, array|callable $handler, array $middleware): BaseRouter
+    {
+        return self::getInstance()->patch($path, $handler, $middleware);
+    }
+
+    /**
+     * Set HEAD route
+     *
+     * @param string         $path
+     * @param array|callable $handler
+     * @param array          $middleware
+     *
+     * @return BaseRouter
+     */
+    public static function head(string $path, array|callable $handler, array $middleware): BaseRouter
+    {
+        return self::getInstance()->head($path, $handler, $middleware);
+    }
+
+    /**
+     * Set OPTIONS route
+     *
+     * @param string         $path
+     * @param array|callable $handler
+     * @param array          $middleware
+     *
+     * @return BaseRouter
+     */
+    public static function options(string $path, array|callable $handler, array $middleware): BaseRouter
+    {
+        return self::getInstance()->options($path, $handler, $middleware);
+    }
+
+    /**
+     * Set CONNECT route
+     *
+     * @param string         $path
+     * @param array|callable $handler
+     * @param array          $middleware
+     *
+     * @return BaseRouter
+     */
+    public static function connect(string $path, array|callable $handler, array $middleware): BaseRouter
+    {
+        return self::getInstance()->connect($path, $handler, $middleware);
+    }
+
+    /**
+     * Set TRACE route
+     *
+     * @param string         $path
+     * @param array|callable $handler
+     * @param array          $middleware
+     *
+     * @return BaseRouter
+     */
+    public static function trace(string $path, array|callable $handler, array $middleware): BaseRouter
+    {
+        return self::getInstance()->trace($path, $handler, $middleware);
+    }
+
+    /**
+     * Set ANY route
+     *
+     * @param string         $path
+     * @param array|callable $handler
+     * @param array          $middleware
+     *
+     * @return BaseRouter
+     */
+    public static function any(string $path, array|callable $handler, array $middleware): BaseRouter
+    {
+        return self::getInstance()->any($path, $handler, $middleware);
+    }
+
+    /**
      * Group routes
      *
-     * @param string         $name
-     * @param array|callable $handler
+     * @param string   $name
+     * @param callable $handler
      *
-     * @return void
+     * @return BaseRouter
      */
-    public static function group(string $name, array|callable $handler): void
+    public static function group(string $name, callable $handler): BaseRouter
     {
-        self::getInstance()->group($name, $handler);
+        return self::getInstance()->group($name, $handler);
     }
 
     /**
      * Match route
      *
-     * @param string $method
-     * @param string $uri
+     * @param string|array $method
+     * @param string       $uri
      *
      * @return ResponseInterface
-     * @throws Exception
      * @throws ContainerExceptionInterface
+     * @throws NotFoundException
+     * @throws JsonException
+     * @throws NotFoundExceptionInterface
      */
-    public static function match(string $method, string $uri): ResponseInterface
+    public static function match(string|array $method, string $uri): ResponseInterface
     {
-        return self::getInstance()->match($method, $uri);
+        return self::getInstance()->matchRoutes($method, $uri);
     }
 
     /**
      * Add middleware
      *
-     * @param callable $middleware
+     * @param string|array $middleware
      *
      * @return void
      */
-    public static function middleware(callable $middleware): void
+    public function middleware(string|array $middleware): void
     {
+        // dd(self::$instance);
         self::getInstance()->middleware($middleware);
     }
 
@@ -152,7 +241,7 @@ class Route
      *
      * @return void
      */
-    public static function name(string $name): void
+    public function name(string $name): void
     {
         self::getInstance()->name($name);
     }

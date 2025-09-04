@@ -6,10 +6,12 @@ use Bibo\App\Controllers\TestController;
 use Bibo\Mvc\Core\Facades\Route;
 use Bibo\Mvc\Core\Response\JsonResponse;
 
-Route::get('/', [IndexController::class, 'index'], ['csrf']);
+Route::get('/', [IndexController::class, 'index'])
+    ->middleware(['csrf', 'cors'])
+    ->name('home');
 
 
-Route::get('/api/ping', [TestController::class, 'ping'], ['cors']);
+Route::get('/api/ping', [TestController::class, 'ping'], ['cors'])->name('api.ping');
 
 // Route::get('/api/ping', function () {
 //     return new JsonResponse([
@@ -18,8 +20,21 @@ Route::get('/api/ping', [TestController::class, 'ping'], ['cors']);
 //     ]);
 // }, ['cors']);
 
+Route::group('admin', function () {
+    Route::get('/', [IndexController::class, 'index']);
 
-Route::get('/about', [IndexController::class, 'about']);//->middleware('csrf');
+    Route::get('/api/ping', function () {
+        return new JsonResponse([
+            'status' => 'success',
+            'message' => 'pong',
+        ]);
+    });
+})->middleware(['cors']);
+
+
+Route::get('/about', [IndexController::class, 'about'])
+    ->name('about')
+    ->middleware('cors');
 
 Route::get('/contacts', [IndexController::class, 'contacts']);
 
@@ -34,9 +49,11 @@ Route::get('/user/{name}', function (string $name) {
 });
 
 Route::get('/edit/{id}', function (int $id) {
-    return 'Hello user with id: ' . $id;
+    return 'Edit user with id: ' . $id;
 });
 
 Route::get('/user/{name}/{id}', [IndexController::class, 'user']);
 
 Route::get('/install', [InstallController::class, 'index']);
+
+// Route::dump();

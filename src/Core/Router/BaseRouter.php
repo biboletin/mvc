@@ -2,6 +2,7 @@
 
 namespace Bibo\Mvc\Core\Router;
 
+use Bibo\Mvc\Core\Enums\HttpMethod;
 use Bibo\Mvc\Core\Enums\HttpStatus;
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Interfaces\RouteMatchingStrategyInterface;
@@ -43,6 +44,17 @@ class BaseRouter implements RouterInterface
      */
     private string $currentRouteGroup = '';
 
+    /**
+     * Route name
+     *
+     * @var string|null
+     */
+    private ?string $name = null;
+    /**
+     * Container
+     *
+     * @var ContainerInterface
+     */
     private ContainerInterface $container;
 
     /**
@@ -68,6 +80,7 @@ class BaseRouter implements RouterInterface
      * @param string         $route
      * @param array|callable $handler
      * @param array|null     $middleware
+     * @param string|null    $name
      *
      * @return void
      */
@@ -75,35 +88,43 @@ class BaseRouter implements RouterInterface
         string $method,
         string $route,
         array|callable $handler,
-        ?array $middleware = null
+        ?array $middleware = null,
+        ?string $name = null
     ): void {
-        // $fullRoute = ($this->currentRouteGroup ? '/' . $this->currentRouteGroup : '')
-        // . '/' . trim($route, '/');
-        // $this->routes[] = [
-        //     'method' => $method,
-        //     'route' => $fullRoute,
-        //     'handler' => $callback,
-        // ];
-        $this->routes[] = compact(
-            'method',
-            'route',
-            'handler',
-            'middleware'
-        );
+        // Build full route with group prefix if present
+        $fullRoute = ($this->currentRouteGroup ? '/' . trim($this->currentRouteGroup, '/') : '')
+            . '/' . trim($route, '/');
+
+        // Normalize: replace '//' with '/' so root routes don’t break
+        $fullRoute = preg_replace('#//+#', '/', $fullRoute);
+
+        $this->routes[] = [
+            'method'     => strtoupper($method),
+            'route'      => $fullRoute,
+            'handler'    => $handler,
+            'middleware' => $middleware,
+            'name'       => $name,
+        ];
     }
+
 
     /**
      * Set GET routes
      *
      * @param string         $route
      * @param array|callable $callable
-     * @param array|null     $middleware
      *
      * @return RouterInterface
      */
-    public function get(string $route, callable|array $callable, ?array $middleware = null): RouterInterface
+    public function get(string $route, callable|array $callable): RouterInterface
     {
-        $this->add('GET', $route, $callable, $middleware);
+        $this->add(
+            HttpMethod::fromString('get')->value,
+            $route,
+            $callable,
+            $this->middleware,
+            $this->name
+        );
         return $this;
     }
 
@@ -118,7 +139,7 @@ class BaseRouter implements RouterInterface
      */
     public function post(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
-        $this->add('POST', $route, $callable, $middleware);
+        $this->add(HttpMethod::fromString('post')->value, $route, $callable, $middleware);
         return $this;
     }
 
@@ -133,7 +154,7 @@ class BaseRouter implements RouterInterface
      */
     public function put(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
-        $this->add('PUT', $route, $callable, $middleware);
+        $this->add(HttpMethod::fromString('put')->value, $route, $callable, $middleware);
         return $this;
     }
 
@@ -148,9 +169,100 @@ class BaseRouter implements RouterInterface
      */
     public function delete(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
-        $this->add('DELETE', $route, $callable, $middleware);
+        $this->add(HttpMethod::fromString('delete')->value, $route, $callable, $middleware);
         return $this;
     }
+
+    /**
+     * Set PATCH routes
+     *
+     * @param string         $route
+     * @param array|callable $callable
+     * @param array          $middleware
+     *
+     * @return RouterInterface
+     */
+    public function patch(string $route, callable|array $callable, array $middleware = []): RouterInterface
+    {
+        $this->add(HttpMethod::fromString('patch')->value, $route, $callable, $middleware);
+        return $this;
+    }
+
+    /**
+     * Set HEAD routes
+     *
+     * @param string         $route
+     * @param array|callable $callable
+     * @param array          $middleware
+     *
+     * @return RouterInterface
+     */
+    public function head(string $route, callable|array $callable, array $middleware = []): RouterInterface
+    {
+        $this->add(HttpMethod::fromString('head')->value, $route, $callable, $middleware);
+        return $this;
+    }
+
+    /**
+     * Set OPTIONS routes
+     *
+     * @param string         $route
+     * @param array|callable $callable
+     * @param array          $middleware
+     *
+     * @return RouterInterface
+     */
+    public function options(string $route, callable|array $callable, array $middleware = []): RouterInterface
+    {
+        $this->add(HttpMethod::fromString('options')->value, $route, $callable, $middleware);
+        return $this;
+    }
+
+    /**
+     * Set CONNECT routes
+     *
+     * @param string         $route
+     * @param array|callable $callable
+     * @param array          $middleware
+     *
+     * @return RouterInterface
+     */
+    public function connect(string $route, callable|array $callable, array $middleware = []): RouterInterface
+    {
+        $this->add(HttpMethod::fromString('connect')->value, $route, $callable, $middleware);
+        return $this;
+    }
+
+    /**
+     * Set TRACE routes
+     *
+     * @param string         $route
+     * @param array|callable $callable
+     * @param array          $middleware
+     *
+     * @return RouterInterface
+     */
+    public function trace(string $route, callable|array $callable, array $middleware = []): RouterInterface
+    {
+        $this->add(HttpMethod::fromString('trace')->value, $route, $callable, $middleware);
+        return $this;
+    }
+
+    /**
+     * Set ANY routes
+     *
+     * @param string         $route
+     * @param array|callable $callable
+     * @param array          $middleware
+     *
+     * @return RouterInterface
+     */
+    public function any(string $route, callable|array $callable, array $middleware = []): RouterInterface
+    {
+        $this->add(HttpMethod::fromString('any')->value, $route, $callable, $middleware);
+        return $this;
+    }
+
 
     /**
      * Group routes
@@ -158,26 +270,38 @@ class BaseRouter implements RouterInterface
      * @param string   $name
      * @param callable $callable
      *
-     * @return void
+     * @return BaseRouter
      */
-    public function group(string $name, callable $callable): void
+    public function group(string $name, callable $callable): BaseRouter
     {
         $previousRouteGroup = $this->currentRouteGroup;
+
+        // update prefix for this group
         $this->currentRouteGroup = rtrim($previousRouteGroup . '/' . trim($name, '/'), '/');
-        $callable($this);
+
+        // execute closure
+        $callable();
+
+        // restore prefix after closure finishes
         $this->currentRouteGroup = $previousRouteGroup;
+
+        return $this;
     }
+
 
     /**
      * Match route
      *
-     * @param string $method
-     * @param string $uri
+     * @param string|array $method
+     * @param string       $uri
      *
      * @return ResponseInterface
-     * @throws NotFoundException|JsonException|ContainerExceptionInterface|NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws JsonException
+     * @throws NotFoundException
+     * @throws NotFoundExceptionInterface
      */
-    public function match(string $method, string $uri): ResponseInterface
+    public function matchRoutes(string|array $method, string $uri): ResponseInterface
     {
         $method = strtoupper($method);
 
@@ -305,18 +429,39 @@ class BaseRouter implements RouterInterface
     /**
      * Add middleware
      *
-     * @param callable $middleware
+     * @param string|array $middleware
      *
-     * @return void
+     * @return BaseRouter
      */
-    public function middleware(callable $middleware): void
+    public function middleware(string|array $middleware): BaseRouter
     {
         $lastRouteKey = array_key_last($this->routes);
         if ($lastRouteKey !== null) {
             $this->routes[$lastRouteKey]['middleware'] = $middleware;
         }
+
+        return $this;
     }
 
+    /**
+     * Returns route name
+     *
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Returns middleware
+     *
+     * @return array
+     */
+    public function getMiddleware(): array
+    {
+        return $this->middleware;
+    }
     /**
      * Find route
      *
@@ -338,14 +483,16 @@ class BaseRouter implements RouterInterface
      *
      * @param string $name
      *
-     * @return void
+     * @return BaseRouter
      */
-    public function name(string $name): void
+    public function name(string $name): BaseRouter
     {
         $lastRouteKey = array_key_last($this->routes);
         if ($lastRouteKey !== null) {
             $this->routes[$lastRouteKey]['name'] = $name;
         }
+
+        return $this;
     }
 
     /**
@@ -366,14 +513,25 @@ class BaseRouter implements RouterInterface
     public function dump(): void
     {
         foreach ($this->routes as $route) {
+            $method     = $route['method'];
+            $fullRoute  = $route['route'];
+            $handler    = is_callable($route['handler'])
+                ? 'callable'
+                : (is_array($route['handler']) ? implode('::', $route['handler']) : $route['handler']);
+            $name       = $route['name'] ?? 'No name';
+            $middleware = isset($route['middleware'])
+                ? (is_array($route['middleware'])
+                    ? count($route['middleware']) . ' middleware(s)' : '1 middleware') : 'No middleware';
+
             echo sprintf(
-                "[%s] %s -> %s, Name: %s, Middleware: %s <br>\n",
-                $route['method'],
-                $route['route'],
-                is_callable($route['handler']) ? 'callable' : json_encode($route['handler']),
-                $route['name'] ?? 'No name',
-                isset($route['middleware']) ? count($route['middleware']) . ' middleware(s)' : 'No middleware'
+                "[%s] <b>%s</b> -> %s, Name: %s, Middleware: %s <br>\n",
+                $method,
+                $fullRoute,
+                $handler,
+                $name,
+                $middleware
             );
         }
     }
+
 }

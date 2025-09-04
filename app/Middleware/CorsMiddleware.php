@@ -2,6 +2,8 @@
 
 namespace Bibo\App\Middleware;
 
+use Bibo\Mvc\Core\Enums\HttpMethod;
+use Bibo\Mvc\Core\Enums\HttpStatus;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,10 +19,16 @@ class CorsMiddleware implements MiddlewareInterface
         // Default configuration
         $this->config = array_merge([
             'allow_origin' => '*',
-            'allow_methods' => 'GET, POST, PUT, DELETE, OPTIONS',
+            'allow_methods' => implode(', ', [
+                HttpMethod::GET->value,
+                HttpMethod::POST->value,
+                HttpMethod::PUT->value,
+                HttpMethod::DELETE->value,
+                HttpMethod::OPTIONS->value,
+            ]),
             'allow_headers' => 'Content-Type, Authorization',
             'allow_credentials' => 'true',
-            'max_age' => 86400,
+            'max_age' => 3600,
         ], []);
     }
 
@@ -39,7 +47,7 @@ class CorsMiddleware implements MiddlewareInterface
 
     private function buildPreflightResponse(): ResponseInterface
     {
-        $response = new HtmlResponse('', 204);
+        $response = new HtmlResponse('', HttpStatus::NoContent->value);
         return $this->withCorsHeaders($response);
     }
 
@@ -50,6 +58,6 @@ class CorsMiddleware implements MiddlewareInterface
             ->withHeader('Access-Control-Allow-Methods', $this->config['allow_methods'])
             ->withHeader('Access-Control-Allow-Headers', $this->config['allow_headers'])
             ->withHeader('Access-Control-Allow-Credentials', $this->config['allow_credentials'])
-            ->withHeader('Access-Control-Max-Age', (string)$this->config['max_age']);
+            ->withHeader('Access-Control-Max-Age', (string) $this->config['max_age']);
     }
 }

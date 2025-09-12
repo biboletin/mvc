@@ -70,10 +70,6 @@ class Error
         set_error_handler([$this, 'handleError']);
         set_exception_handler([$this, 'handleException']);
         register_shutdown_function([$this, 'handleShutdown']);
-
-        ini_set('display_errors', $this->isDev() ? '1' : '0');
-        ini_set('log_errors', '1');
-        error_reporting(E_ALL);
     }
 
     /**

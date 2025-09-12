@@ -4,7 +4,7 @@ namespace Bibo\Mvc\Core\Enums;
 
 use InvalidArgumentException;
 
-enum LogLevel: string
+enum LogLevels: string
 {
     case Emergency = 'emergency';
 

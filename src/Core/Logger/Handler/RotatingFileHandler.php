@@ -2,13 +2,15 @@
 
 namespace Bibo\Mvc\Core\Logger\Handler;
 
+use Bibo\Mvc\Core\Interfaces\LogHandlerInterface;
+
 /**
  * RotatingFileHandler handles log writing to files with rotation.
  * It creates a new log file for each day and keeps a limited number of files.
  * When the maximum number of files is reached, the oldest files are deleted.
  * This is useful for managing log file sizes and keeping logs organized by date.
  */
-class RotatingFileHandler
+class RotatingFileHandler implements LogHandlerInterface
 {
     /**
      * The directory where log files will be stored.

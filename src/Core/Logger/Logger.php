@@ -2,11 +2,14 @@
 
 namespace Bibo\Mvc\Core\Logger;
 
+use Bibo\Mvc\Core\Enums\LogLevels;
 use Bibo\Mvc\Core\Interfaces\FormatterInterface;
-use Bibo\Mvc\Core\Logger\Handler\RotatingFileHandler;
+use Bibo\Mvc\Core\Interfaces\LogHandlerInterface;
+// use http\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Stringable;
+use InvalidArgumentException;
 
 /**
  * Logger class that implements PSR-3 LoggerInterface.
@@ -17,24 +20,41 @@ use Stringable;
 class Logger implements LoggerInterface
 {
     /**
+     * Log handlers
+     *
+     * @var array
+     */
+    private array $handlersByLevel = [];
+
+    /**
+     * Log level
+     *
+     * @var int
+     */
+    private int $minLogLevel = 500;
+
+    /**
+     * Log levels
+     *
+     * @var int[]
+     */
+    private const LEVELS = [
+        LogLevels::Debug->value => 100,
+        LogLevels::Info->value => 200,
+        LogLevels::Notice->value => 300,
+        LogLevels::Warning->value => 400,
+        LogLevels::Error->value => 500,
+        LogLevels::Critical->value => 600,
+        LogLevels::Alert->value => 700,
+        LogLevels::Emergency->value => 800,
+    ];
+    /**
      * Formatter instance used to format log messages.
      * This should implement FormatterInterface.
      *
      * @var FormatterInterface
      */
     protected FormatterInterface $formatter;
-
-    /**
-     * RotatingFileHandler instance used to handle log writing.
-     * This should implement LogHandlerInterface.
-     * If null, no handler is set.
-     * If a handler is not provided, an exception will be thrown
-     * when trying to log messages.
-     * If you want to use a handler, you must pass an instance of RotatingFileHandler.
-     *
-     * @var RotatingFileHandler|null
-     */
-    protected ?RotatingFileHandler $handler;
 
     /**
      * Flag to indicate whether to use JSON format for log messages.
@@ -44,13 +64,47 @@ class Logger implements LoggerInterface
      * This flag is not used in this class,
      * but it can be used in subclasses or when extending the functionality.
      *
-     * @param FormatterInterface       $formatter
-     * @param RotatingFileHandler|null $handler
+     * @param FormatterInterface $formatter
      */
-    public function __construct(FormatterInterface $formatter, RotatingFileHandler $handler = null)
+    public function __construct(FormatterInterface $formatter)
     {
         $this->formatter = $formatter;
-        $this->handler = $handler;
+    }
+
+    /**
+     * Set log level
+     *
+     * @param string $level
+     *
+     * @return void
+     */
+    public function setLogLevel(string $level): void
+    {
+        if (isset(self::LEVELS[strtolower($level)])) {
+            $this->minLogLevel = self::LEVELS[strtolower($level)];
+        }
+    }
+
+    /**
+     * Add log handler
+     *
+     * @param LogHandlerInterface $handler
+     * @param string|array        $levels
+     *
+     * @return void
+     */
+    public function addHandler(LogHandlerInterface $handler, string|array $levels): void
+    {
+        $levels = (array) $levels;
+
+        foreach ($levels as $level) {
+            $level = strtolower($level);
+
+            if (!isset(self::LEVELS[$level])) {
+                throw new InvalidArgumentException('Invalid log level: ' . $level);
+            }
+            $this->handlersByLevel[$level][] = $handler;
+        }
     }
 
     /**
@@ -208,7 +262,13 @@ class Logger implements LoggerInterface
         $interpolated = $this->interpolate($message, $context);
         $formattedMessage = $this->formatter->format($level, $interpolated, $context);
 
-        $this->handler->write($formattedMessage);
+        if (self::LEVELS[strtolower($level)] < $this->minLogLevel) {
+            return;
+        }
+
+        foreach ($this->handlersByLevel[strtolower($level)] ?? [] as $handler) {
+            $handler->write($formattedMessage);
+        }
     }
 
     /**

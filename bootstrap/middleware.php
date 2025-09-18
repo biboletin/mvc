@@ -2,22 +2,30 @@
 
 use Bibo\App\Middleware\CorsMiddleware;
 use Bibo\App\Middleware\CsrfMiddleware;
+use Bibo\App\Middleware\ErrorMiddleware;
+use Bibo\App\Middleware\FileInclusionMiddleware;
+use Bibo\App\Middleware\RateLimitMiddleware;
+use Bibo\App\Middleware\SqlInjectionMiddleware;
+use Bibo\App\Middleware\XssMiddleware;
 
 return [
     // Global middleware
+    // Add your global middleware here
     'global' => [
-        // Add your global middleware here
-        'cors' => CorsMiddleware::class,
+        SqlInjectionMiddleware::class,
+        XssMiddleware::class,
+        FileInclusionMiddleware::class,
+        RateLimitMiddleware::class,
+        ErrorMiddleware::class,
     ],
 
     // Middleware groups
     'groups' => [
-        'web' => [
-            // Add your web middleware here
-        ],
-        // 'api' => [
-        //     // Add your API middleware here
-        // ],
+        // Add your web middleware here
+        'web' => [],
+
+        // Add your API middleware here
+        'api' => [],
     ],
 
     // Route middleware

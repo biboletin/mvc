@@ -335,4 +335,8 @@ enum HttpMethod: string
     {
         return strtolower(self::fromServerRequest()->value);
     }
+
+    public static function toString(): string
+    {
+    }
 }

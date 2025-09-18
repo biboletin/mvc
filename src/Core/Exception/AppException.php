@@ -60,4 +60,14 @@ class AppException extends Exception
     {
         return $this->context;
     }
+
+    /**
+     * Get status code
+     *
+     * @return int
+     */
+    public function getStatusCode(): int
+    {
+        return $this->code ?? 500;
+    }
 }

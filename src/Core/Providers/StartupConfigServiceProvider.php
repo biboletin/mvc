@@ -2,6 +2,8 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
+use Bibo\Mvc\Core\Config\ConfigHandler;
+use Bibo\Mvc\Core\Logger\Logger;
 use Locale;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -15,7 +17,7 @@ class StartupConfigServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $config = $this->container->get('config');
+        $config = $this->container->get(ConfigHandler::class);
 
         // Any startup code can go here
         date_default_timezone_set($config->get('app.timezone'));
@@ -25,6 +27,10 @@ class StartupConfigServiceProvider extends ServiceProvider
         if (class_exists(Locale::class)) {
             Locale::setDefault($config->get('app.locale'));
         }
+
+        ini_set('display_errors', $config->get('app.debug') ? '1' : '0');
+        ini_set('log_errors', '1');
+        error_reporting(E_ALL);
     }
 
     /**
@@ -35,6 +41,6 @@ class StartupConfigServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

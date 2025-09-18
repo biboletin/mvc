@@ -2,8 +2,10 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
+use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Crypto\Crypto;
 use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
+use Bibo\Mvc\Core\Logger\Logger;
 use Psr\Container\NotFoundExceptionInterface;
 
 class CryptoServiceProvider extends ServiceProvider
@@ -21,7 +23,7 @@ class CryptoServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $config = $this->container->get('config');
+        $config = $this->container->get(ConfigHandler::class);
 
         $crypto = new Crypto(
             $config->get('encryption.key'),
@@ -30,7 +32,7 @@ class CryptoServiceProvider extends ServiceProvider
             $config->get('encryption.use_hmac')
         );
 
-        $this->container->set('crypto', function () use ($crypto) {
+        $this->container->set(Crypto::class, function () use ($crypto) {
             return $crypto;
         });
     }
@@ -46,6 +48,6 @@ class CryptoServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

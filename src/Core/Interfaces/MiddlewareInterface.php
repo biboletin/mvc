@@ -2,19 +2,24 @@
 
 namespace Bibo\Mvc\Core\Interfaces;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface as PsrMiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+
 /**
  * Interface MiddlewareInterface
  *
  * This interface defines methods for a middleware component in a chain of responsibility pattern.
  */
-interface MiddlewareInterface
+interface MiddlewareInterface extends PsrMiddlewareInterface
 {
     /**
      * Process the middleware logic.
      *
      * This method should contain the logic for the middleware to execute.
      */
-    public function process(): void;
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface;
 
     /**
      * Set the next middleware in the chain.

@@ -3,8 +3,8 @@
 namespace Bibo\Mvc\Core\Cookie;
 
 use Bibo\Mvc\Core\Crypto\Crypto;
-use Bibo\Mvc\Core\Exception\Custom\Crypto\EncryptException;
 use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
+use Bibo\Mvc\Core\Exception\Custom\Crypto\EncryptException;
 use Bibo\Mvc\Core\Traits\EncryptedAwareTrait;
 use Bibo\Mvc\Core\Traits\NameAwareTrait;
 use Bibo\Mvc\Core\Traits\PrefixAwareTrait;

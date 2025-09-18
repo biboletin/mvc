@@ -3,6 +3,8 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Controller\Controller;
+use Bibo\Mvc\Core\Logger\Logger;
+use Psr\Container\NotFoundExceptionInterface;
 
 class ControllerServiceProvider extends ServiceProvider
 {
@@ -15,13 +17,16 @@ class ControllerServiceProvider extends ServiceProvider
     {
         $controller = new Controller($this->container);
 
-        $this->container->set('controller', function () use ($controller) {
+        $this->container->set(Controller::class, function () use ($controller) {
             return $controller;
         });
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

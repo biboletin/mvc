@@ -3,6 +3,8 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Base\App;
+use Bibo\Mvc\Core\Config\ConfigHandler;
+use Bibo\Mvc\Core\Logger\Logger;
 use Psr\Container\NotFoundExceptionInterface;
 
 class AppServiceProvider extends ServiceProvider
@@ -16,11 +18,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $config = $this->container->get('config');
+        $config = $this->container->get(ConfigHandler::class);
         $app = new App($this->container);
         $app->setName($config->get('app.name'));
 
-        $this->container->set('app', function () use ($app) {
+        $this->container->set(App::class, function () use ($app) {
             return $app;
         });
     }
@@ -32,6 +34,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

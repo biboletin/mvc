@@ -2,9 +2,11 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
+use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Enums\Environment;
-use Bibo\Mvc\Core\Enums\LogLevel;
+use Bibo\Mvc\Core\Enums\LogLevels;
 use Bibo\Mvc\Core\Facades\Env;
+use Bibo\Mvc\Core\Logger\Logger;
 use Psr\Container\NotFoundExceptionInterface;
 
 class EnumServiceProvider extends ServiceProvider
@@ -16,14 +18,14 @@ class EnumServiceProvider extends ServiceProvider
 */
     public function register(): void
     {
-        $config = $this->container->get('config');
+        $config = $this->container->get(ConfigHandler::class);
 
         Env::set(
             Environment::fromString($config->get('app.env', 'development'))
         );
 
         $this->container->set('log_level', function () use ($config) {
-            return LogLevel::fromString($config->get('log.level', 'debug'));
+            return LogLevels::fromString($config->get('log.level', 'debug'));
         });
     }
 
@@ -35,6 +37,6 @@ class EnumServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

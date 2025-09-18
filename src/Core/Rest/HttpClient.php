@@ -3,6 +3,7 @@
 namespace Bibo\Mvc\Core\Rest;
 
 use Bibo\Mvc\Core\Enums\CurlStrategyType;
+use Bibo\Mvc\Core\Enums\HttpMethod;
 use Bibo\Mvc\Core\Rest\Message\Request;
 use Bibo\Mvc\Core\Rest\Message\Response;
 use Bibo\Mvc\Core\Rest\Message\Stream;
@@ -129,7 +130,7 @@ class HttpClient
 
         $uri = new Uri($url);
         $body = new Stream(''); // empty body for GET
-        $request = new Request('GET', $uri, $headers, $body);
+        $request = new Request(HttpMethod::GET->value, $uri, $headers, $body);
         $this->client->setOption(CURLOPT_HTTPGET, true);
 
         return $this->send($request);
@@ -150,11 +151,11 @@ class HttpClient
      *
      * @throws RuntimeException If the request fails to execute
      */
-    public function post(string $url, array $headers = [], $data = null): Response
+    public function post(string $url, array $headers = [], mixed $data = null): Response
     {
         $uri = new Uri($url);
         $body = new Stream($data); // body for POST
-        $request = new Request('POST', $uri, $headers, $body);
+        $request = new Request(HttpMethod::POST->value, $uri, $headers, $body);
 
         $this->client->setOption(CURLOPT_POST, true);
         $this->client->setOption(CURLOPT_POSTFIELDS, $data);
@@ -178,11 +179,11 @@ class HttpClient
      *
      * @throws RuntimeException If the request fails to execute
      */
-    public function put(string $url, array $headers = [], $data = null): Response
+    public function put(string $url, array $headers = [], mixed $data = null): Response
     {
         $uri = new Uri($url);
         $body = new Stream($data); // body for PUT
-        $request = new Request('PUT', $uri, $headers, $body);
+        $request = new Request(HttpMethod::PUT->value, $uri, $headers, $body);
 
         $this->client->setOption(CURLOPT_CUSTOMREQUEST, 'PUT');
         $this->client->setOption(CURLOPT_POSTFIELDS, $data);
@@ -209,11 +210,11 @@ class HttpClient
      *
      * @throws RuntimeException If the request fails to execute
      */
-    public function delete(string $url, array $headers = [], $data = null): Response
+    public function delete(string $url, array $headers = [], mixed $data = null): Response
     {
         $uri = new Uri($url);
         $body = new Stream(''); // empty body for DELETE
-        $request = new Request('DELETE', $uri, $headers, $body);
+        $request = new Request(HttpMethod::DELETE->value, $uri, $headers, $body);
 
         $this->client->setOption(CURLOPT_CUSTOMREQUEST, 'DELETE');
         $this->client->setOption(CURLOPT_POSTFIELDS, $data);
@@ -237,11 +238,11 @@ class HttpClient
      *
      * @throws RuntimeException If the request fails to execute
      */
-    public function patch(string $url, array $headers = [], $data = null): Response
+    public function patch(string $url, array $headers = [], mixed $data = null): Response
     {
         $uri = new Uri($url);
         $body = new Stream($data); // body for PATCH
-        $request = new Request('PATCH', $uri, $headers, $body);
+        $request = new Request(HttpMethod::PATCH->value, $uri, $headers, $body);
 
         $this->client->setOption(CURLOPT_CUSTOMREQUEST, 'PATCH');
         $this->client->setOption(CURLOPT_POSTFIELDS, $data);
@@ -270,7 +271,7 @@ class HttpClient
     {
         $uri = new Uri($url);
         $body = new Stream(''); // empty body for HEAD
-        $request = new Request('HEAD', $uri, $headers, $body);
+        $request = new Request(HttpMethod::HEAD->value, $uri, $headers, $body);
 
         $this->client->setOption(CURLOPT_NOBODY, true);
         $this->client->setOption(CURLOPT_CUSTOMREQUEST, 'HEAD');
@@ -300,7 +301,7 @@ class HttpClient
     {
         $uri = new Uri($url);
         $body = new Stream(''); // empty body for OPTIONS
-        $request = new Request('OPTIONS', $uri, $headers, $body);
+        $request = new Request(HttpMethod::OPTIONS->value, $uri, $headers, $body);
 
         $this->client->setOption(CURLOPT_CUSTOMREQUEST, 'OPTIONS');
 
@@ -328,7 +329,7 @@ class HttpClient
     {
         $uri = new Uri($url);
         $body = new Stream(''); // empty body for TRACE
-        $request = new Request('TRACE', $uri, $headers, $body);
+        $request = new Request(HttpMethod::TRACE->value, $uri, $headers, $body);
 
         $this->client->setOption(CURLOPT_CUSTOMREQUEST, 'TRACE');
 
@@ -357,7 +358,7 @@ class HttpClient
     {
         $uri = new Uri($url);
         $body = new Stream(''); // empty body for CONNECT
-        $request = new Request('CONNECT', $uri, $headers, $body);
+        $request = new Request(HttpMethod::CONNECT->value, $uri, $headers, $body);
 
         return $this->send($request);
     }
@@ -377,7 +378,7 @@ class HttpClient
      */
     public function ping(string $url, array $headers = []): Response
     {
-        return $this->send(new Request('GET', new Uri($url), $headers, new Stream('')));
+        return $this->send(new Request(HttpMethod::GET->value, new Uri($url), $headers, new Stream('')));
     }
 
     /**

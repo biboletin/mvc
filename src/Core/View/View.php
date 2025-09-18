@@ -2,11 +2,11 @@
 
 namespace Bibo\Mvc\Core\View;
 
+use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Template\Template;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\SimpleCache\CacheInterface;
 
 /**
  * View
@@ -23,12 +23,7 @@ class View
      * @var Template|mixed
      */
     protected Template $template;
-    /**
-     * Cache instance
-     *
-     * @var CacheInterface|mixed
-     */
-    protected CacheInterface $cache;
+
 
     /**
      * View constructor
@@ -40,9 +35,7 @@ class View
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->cache = $container->get('file_cache');
-        $this->cache->setPath('app/');
-        $this->template = $container->get('template');
+        $this->template = $container->get(Template::class);
     }
 
     /**
@@ -65,6 +58,7 @@ class View
      * @param array  $data
      *
      * @return string
+     * @throws NotFoundException
      */
     public function render(string $templateFile, array $data = []): string
     {

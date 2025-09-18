@@ -3,7 +3,9 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Facades\Request;
+use Bibo\Mvc\Core\Logger\Logger;
 use Bibo\Mvc\Core\Request\BaseRequest;
+use Psr\Container\NotFoundExceptionInterface;
 
 class RequestServiceProvider extends ServiceProvider
 {
@@ -17,13 +19,16 @@ class RequestServiceProvider extends ServiceProvider
         $request = new BaseRequest();
         Request::init($request);
 
-        $this->container->set('request', function () use ($request) {
+        $this->container->set(BaseRequest::class, function () use ($request) {
             return $request;
         });
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

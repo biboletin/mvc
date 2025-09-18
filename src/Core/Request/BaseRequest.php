@@ -2,6 +2,8 @@
 
 namespace Bibo\Mvc\Core\Request;
 
+use Bibo\Mvc\Core\Enums\HttpMethod;
+use Bibo\Mvc\Core\Enums\HttpProtocolVersion;
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
@@ -94,9 +96,13 @@ class BaseRequest implements ServerRequestInterface
      */
     public function __construct()
     {
-        $this->method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $this->protocolVersion = HttpProtocolVersion::V1->value;
+        $this->method = HttpMethod::fromString($_SERVER['REQUEST_METHOD'])->value
+            ?? HttpMethod::fromString('get')->value;
         $this->uri = new Uri($_SERVER['REQUEST_URI'] ?? '/');
-        $this->headers = getallheaders() ?: [];
+        $getAllHeaders = getallheaders();
+        $lowercaseHeaders = array_change_key_case($getAllHeaders, CASE_LOWER);
+        $this->headers = $lowercaseHeaders ?: [];
         $this->body = new Stream(fopen('php://input', 'r+'));
         $this->server = $_SERVER;
         $this->cookie = $_COOKIE;
@@ -360,10 +366,17 @@ class BaseRequest implements ServerRequestInterface
     public function getHeaderLine(string $name): string
     {
         $normalized = strtolower($name);
+
         $values = $this->headers[$normalized] ?? [];
+
+        // Ensure $values is always an array
+        if (!is_array($values)) {
+            $values = [$values];
+        }
 
         return implode(', ', $values);
     }
+
 
     /**
      * Return an instance with the specified header appended with the given value.

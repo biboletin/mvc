@@ -3,6 +3,7 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Facades\Route;
+use Bibo\Mvc\Core\Logger\Logger;
 use Bibo\Mvc\Core\Router\BaseRouter;
 use Bibo\Mvc\Core\Router\CachedRegexMatchStrategy;
 use Psr\Container\NotFoundExceptionInterface;
@@ -21,7 +22,7 @@ class RouteServiceProvider extends ServiceProvider
 
         include ROUTES_PATH . 'web.php';
 
-        $this->container->set('router', fn () => $router);
+        $this->container->set(BaseRouter::class, fn () => $router);
     }
 
     /**
@@ -29,6 +30,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

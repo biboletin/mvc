@@ -2,12 +2,12 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
+use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Cookie\CookieHandler;
 use Bibo\Mvc\Core\Crypto\Crypto;
 use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
-use Bibo\Mvc\Core\Exception\Custom\Crypto\EncryptException;
+use Bibo\Mvc\Core\Logger\Logger;
 use Psr\Container\NotFoundExceptionInterface;
-use Random\RandomException;
 
 class CookieServiceProvider extends ServiceProvider
 {
@@ -21,7 +21,7 @@ class CookieServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $config = $this->container->get('config');
+        $config = $this->container->get(ConfigHandler::class);
 
         $crypto = new Crypto(
             $config->get('encryption.key'),
@@ -42,7 +42,7 @@ class CookieServiceProvider extends ServiceProvider
         $cookie->setEncrypted($config->get('cookie.encrypted'));
         $cookie->setPartitioned($config->get('cookie.partitioned'));
 
-        $this->container->set('cookie', function () use ($cookie) {
+        $this->container->set(CookieHandler::class, function () use ($cookie) {
             return $cookie;
         });
     }
@@ -54,6 +54,6 @@ class CookieServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
+use Bibo\Mvc\Core\Logger\Logger;
+use Bibo\Mvc\Core\Middleware\MiddlewareDispatcher;
 use Psr\Container\NotFoundExceptionInterface;
 
 class MiddlewareServiceProvider extends ServiceProvider
@@ -10,13 +12,37 @@ class MiddlewareServiceProvider extends ServiceProvider
      * Register service provider
      *
      * @return void
-     * @throws NotFoundExceptionInterface
      */
     public function register(): void
     {
-        $dispatcher = $this->container->get('middleware_dispatcher');
+        $dispatcher = new MiddlewareDispatcher($this->container);
 
-        $this->container->set('middleware', function () use ($dispatcher) {
+        $config = require BOOTSTRAP_PATH . 'middleware.php';
+
+
+        // Register global middleware
+        foreach ($config['global'] ?? [] as $class) {
+            $global[] = new $class($this->container);
+            $dispatcher->registerGlobal($global);
+            $this->container->set($class, fn () => new $class($this->container));
+        }
+
+        // Register route middleware
+        foreach ($config['route'] ?? [] as $alias => $class) {
+            $this->container->set($alias, fn () => new $class($this->container));
+
+            $dispatcher->registerRouteMiddleware([
+                $alias => $class,
+            ]);
+        }
+
+        // Register middleware groups
+        foreach ($config['groups'] ?? [] as $name => $group) {
+            $instances = array_map(fn ($class) => new $class($this->container), $group);
+            $dispatcher->defineGroup($name, $instances);
+        }
+
+        $this->container->set(MiddlewareDispatcher::class, function () use ($dispatcher) {
             return $dispatcher;
         });
     }
@@ -29,6 +55,6 @@ class MiddlewareServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

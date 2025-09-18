@@ -2,6 +2,8 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
+use Bibo\Mvc\Core\Config\ConfigHandler;
+use Bibo\Mvc\Core\Logger\Logger;
 use Bibo\Mvc\Core\Template\Template;
 use Bibo\Mvc\Core\Wrapper\TwigTemplateEngine;
 use Psr\Container\NotFoundExceptionInterface;
@@ -16,7 +18,7 @@ class TemplateServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $config = $this->container->get('config');
+        $config = $this->container->get(ConfigHandler::class);
         $templateEngine = new TwigTemplateEngine(
             VIEW_PATH,
             $config->get('cache.enabled'),
@@ -25,7 +27,7 @@ class TemplateServiceProvider extends ServiceProvider
         );
         $template = new Template($templateEngine);
 
-        $this->container->set('template', function () use ($template) {
+        $this->container->set(Template::class, function () use ($template) {
             return $template;
         });
     }
@@ -37,6 +39,6 @@ class TemplateServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

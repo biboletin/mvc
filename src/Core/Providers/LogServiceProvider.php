@@ -2,6 +2,7 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
+use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Logger\Formatter\LineFormatter;
 use Bibo\Mvc\Core\Logger\Handler\RotatingFileHandler;
 use Bibo\Mvc\Core\Logger\Logger;
@@ -24,7 +25,7 @@ class LogServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $config = $this->container->get('config');
+        $config = $this->container->get(ConfigHandler::class);
 
         $formatter = new LineFormatter(
             $config->get('log.date_format'),
@@ -37,12 +38,11 @@ class LogServiceProvider extends ServiceProvider
             $config->get('log.max_files', 5)
         );
 
-        $logger = new Logger(
-            $formatter,
-            $rotatingLogHandler
-        );
+        $logger = new Logger($formatter);
+        $logger->setLogLevel($config->get('log.level'));
+        $logger->addHandler($rotatingLogHandler, $config->get('log.level'));
 
-        $this->container->set('logger', function () use ($logger) {
+        $this->container->set(Logger::class, function () use ($logger) {
             return $logger;
         });
     }
@@ -54,6 +54,6 @@ class LogServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

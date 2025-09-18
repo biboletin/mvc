@@ -5,11 +5,12 @@ namespace Bibo\Mvc\Core\Logger;
 use Bibo\Mvc\Core\Enums\LogLevels;
 use Bibo\Mvc\Core\Interfaces\FormatterInterface;
 use Bibo\Mvc\Core\Interfaces\LogHandlerInterface;
-// use http\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Stringable;
-use InvalidArgumentException;
+
+// use http\Exception\InvalidArgumentException;
 
 /**
  * Logger class that implements PSR-3 LoggerInterface.

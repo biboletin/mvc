@@ -2,6 +2,9 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
+use Bibo\Mvc\Core\Logger\Logger;
+use Psr\Container\NotFoundExceptionInterface;
+
 class DatabaseServiceProvider extends ServiceProvider
 {
     /**
@@ -14,8 +17,13 @@ class DatabaseServiceProvider extends ServiceProvider
         $this->container->set('db', fn () => null);
     }
 
+    /**
+     * Boot Database
+     *
+     * @throws NotFoundExceptionInterface
+     */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

@@ -120,6 +120,27 @@ interface RouterInterface
     public function group(string $name, callable $callable): self;
 
     /**
+     * Redirect route
+     *
+     * @param string $from
+     * @param string $to
+     * @param int    $status
+     *
+     * @return RouterInterface
+     */
+    public function redirect(string $from, string $to, int $status): self;
+
+    /**
+     * Resource route
+     *
+     * @param string $prefix
+     * @param string $controller
+     *
+     * @return RouterInterface
+     */
+    public function resource(string $prefix, string $controller): self;
+
+    /**
      * Match route
      *
      * @param string|array $method

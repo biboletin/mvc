@@ -7,9 +7,12 @@ use Bibo\Mvc\Core\Enums\HttpStatus;
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Interfaces\RouteMatchingStrategyInterface;
 use Bibo\Mvc\Core\Interfaces\RouterInterface;
+use Bibo\Mvc\Core\Middleware\MiddlewareDispatcher;
+use Bibo\Mvc\Core\Request\BaseRequest;
 use Bibo\Mvc\Core\Request\Stream;
 use Bibo\Mvc\Core\Response\HtmlResponse;
 use Bibo\Mvc\Core\Response\JsonResponse;
+use Bibo\Mvc\Core\Response\RedirectResponse;
 use Bibo\Mvc\Core\View\View;
 use Exception;
 use JsonException;
@@ -17,7 +20,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
-
+use Psr\Http\Message\ServerRequestInterface;
 use function array_find;
 
 /**
@@ -64,6 +67,8 @@ class BaseRouter implements RouterInterface
      */
     private RouteMatchingStrategyInterface|CachedRegexMatchStrategy $strategy;
 
+    private MiddlewareDispatcher $dispatcher;
+
     /**
      * Constructor
      */
@@ -71,6 +76,10 @@ class BaseRouter implements RouterInterface
     {
         $this->strategy = $strategy ?? new CachedRegexMatchStrategy();
         $this->container = $container;
+        try {
+            $this->dispatcher = $this->container->get(MiddlewareDispatcher::class);
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+        }
     }
 
     /**
@@ -288,6 +297,42 @@ class BaseRouter implements RouterInterface
         return $this;
     }
 
+    /**
+     * Redirect route
+     *
+     * @param string $from
+     * @param string $to
+     * @param int    $status
+     *
+     * @return BaseRouter
+     */
+    public function redirect(string $from, string $to, int $status = HttpStatus::Found->value): BaseRouter
+    {
+        return $this->get($from, function () use ($to, $status) {
+            return new RedirectResponse($to, $status);
+        });
+    }
+
+    /**
+     * Resource route
+     *
+     * @param string $prefix
+     * @param string $controller
+     *
+     * @return BaseRouter
+     */
+    public function resource(string $prefix, string $controller): BaseRouter
+    {
+        $this->get($prefix, [$controller, 'index']);
+        $this->get("$prefix/create", [$controller, 'create']);
+        $this->post($prefix, [$controller, 'store']);
+        $this->get("$prefix/{id}", [$controller, 'show']);
+        $this->get("$prefix/{id}/edit", [$controller, 'edit']);
+        $this->put("$prefix/{id}", [$controller, 'update']);
+        $this->delete("$prefix/{id}", [$controller, 'destroy']);
+
+        return $this;
+    }
 
     /**
      * Match route
@@ -327,7 +372,7 @@ class BaseRouter implements RouterInterface
     {
         $handler = $route['handler'];
 
-        $coreHandler = function () use ($handler, $params) {
+        $coreHandler = function (ServerRequestInterface $request) use ($handler, $params) {
             if (is_callable($handler)) {
                 return $this->handleCallable($handler, $params);
             }
@@ -340,9 +385,9 @@ class BaseRouter implements RouterInterface
         };
 
         // You must create or inject the current request here
-        $request = $this->container->get('request');
+        $request = $this->container->get(BaseRequest::class);
 
-        return $this->container->get('middleware_dispatcher')->dispatch(
+        return $this->container->get(MiddlewareDispatcher::class)->dispatch(
             $request,
             $coreHandler,
             $route['middleware'] ?? []
@@ -533,5 +578,4 @@ class BaseRouter implements RouterInterface
             );
         }
     }
-
 }

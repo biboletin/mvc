@@ -711,6 +711,7 @@ enum HttpStatus: int
      * - Redirection (3xx)
      * - Client Error (4xx)
      * - Server Error (5xx)
+     *
      * This can be useful for grouping or filtering responses based on their category.
      * This method can help in implementing logic that handles different categories of responses differently,
      * such as logging, user notifications, or retry mechanisms.

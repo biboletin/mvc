@@ -7,6 +7,7 @@ use Bibo\Mvc\Core\Cache\NullCache;
 use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Crypto\Crypto;
 use Bibo\Mvc\Core\Exception\Custom\Application\ConfigException;
+use Bibo\Mvc\Core\Logger\Logger;
 use Exception;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -61,7 +62,7 @@ class ConfigServiceProvider extends ServiceProvider
         $config->setFileCaching($cache);
 
         // Register the config instance in the container
-        $this->container->set('config', function () use ($config) {
+        $this->container->set(ConfigHandler::class, function () use ($config) {
             return $config;
         });
 
@@ -75,6 +76,6 @@ class ConfigServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

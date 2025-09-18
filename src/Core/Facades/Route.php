@@ -2,6 +2,7 @@
 
 namespace Bibo\Mvc\Core\Facades;
 
+use Bibo\Mvc\Core\Enums\HttpStatus;
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Router\BaseRouter;
 use JsonException;
@@ -189,6 +190,33 @@ final class Route
     public static function group(string $name, callable $handler): BaseRouter
     {
         return self::getInstance()->group($name, $handler);
+    }
+
+    /**
+     * Redirect route
+     *
+     * @param string $from
+     * @param string $to
+     * @param int    $status
+     *
+     * @return BaseRouter
+     */
+    public static function redirect(string $from, string $to, int $status = HttpStatus::Found->value): BaseRouter
+    {
+        return self::getInstance()->redirect($from, $to, $status);
+    }
+
+    /**
+     * Resource route
+     *
+     * @param string $prefix
+     * @param string $controller
+     *
+     * @return BaseRouter
+     */
+    public static function resource(string $prefix, string $controller): BaseRouter
+    {
+        return self::getInstance()->resource($prefix, $controller);
     }
 
     /**

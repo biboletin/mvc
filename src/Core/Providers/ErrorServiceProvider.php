@@ -3,7 +3,10 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Error\Error;
+use Bibo\Mvc\Core\Error\ErrorResponseFactory;
 use Bibo\Mvc\Core\Facades\Env;
+use Bibo\Mvc\Core\Logger\Logger;
+use Bibo\Mvc\Core\View\View;
 use Psr\Container\NotFoundExceptionInterface;
 
 class ErrorServiceProvider extends ServiceProvider
@@ -16,16 +19,20 @@ class ErrorServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $error = new Error(
-            $this->container->get('logger'),
-            Env::get()->value
-        );
+        // Register Error service (for normalization and logging)
+        $this->container->set(Error::class, function ($container) {
+            return new Error(
+                $container->get(Logger::class),
+                Env::get()->value
+            );
+        });
 
-        $error->setErrorTemplate($this->container->get('template'));
-        $error->register();
+        // Register ErrorResponseFactory (can inject view and debug flag)
+        $this->container->set(ErrorResponseFactory::class, function ($container) {
+            $view = $container->has(View::class) ? $container->get(View::class) : null;
+            $debug = Env::get()->value === 'development';
 
-        $this->container->set('error', function () use ($error) {
-            return $error;
+            return new ErrorResponseFactory($view, $debug);
         });
     }
 
@@ -36,6 +43,6 @@ class ErrorServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

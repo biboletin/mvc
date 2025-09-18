@@ -2,10 +2,12 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
+use Bibo\Mvc\Core\Config\ConfigHandler;
+use Bibo\Mvc\Core\Cookie\CookieHandler;
 use Bibo\Mvc\Core\Cookie\CookieJarHandler;
 use Bibo\Mvc\Core\Crypto\Crypto;
+use Bibo\Mvc\Core\Logger\Logger;
 use Psr\Container\NotFoundExceptionInterface;
-use Random\RandomException;
 
 class CookieJarServiceProvider extends ServiceProvider
 {
@@ -14,14 +16,14 @@ class CookieJarServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $config = $this->container->get('config');
+        $config = $this->container->get(ConfigHandler::class);
         $crypto = new Crypto(
             $config->get('encryption.key'),
             $config->get('encryption.cipher'),
             $config->get('encryption.iv_length'),
             $config->get('encryption.use_hmac')
         );
-        $cookie = $this->container->get('cookie');
+        $cookie = $this->container->get(CookieHandler::class);
         $cookie->setName('session_id');
         $cookie->setValue('value');
 
@@ -30,7 +32,7 @@ class CookieJarServiceProvider extends ServiceProvider
         $cookieJar->setCrypto($crypto);
         $cookieJar->setEncrypted($config->get('cookie.encrypted'));
 
-        $this->container->set('cookie_jar', function () use ($cookieJar) {
+        $this->container->set(CookieJarHandler::class, function () use ($cookieJar) {
             return $cookieJar;
         });
     }
@@ -40,6 +42,6 @@ class CookieJarServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

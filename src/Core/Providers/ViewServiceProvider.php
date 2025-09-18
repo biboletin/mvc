@@ -2,7 +2,9 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
+use Bibo\Mvc\Core\Logger\Logger;
 use Bibo\Mvc\Core\View\View;
+use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -20,13 +22,14 @@ class ViewServiceProvider extends ServiceProvider
      * Register service provider
      *
      * @return void
+     * @throws Exception
      */
     public function register(): void
     {
         try {
             $view = new View($this->container);
 
-            $this->container->set('views', function () use ($view) {
+            $this->container->set(View::class, function () use ($view) {
                 return $view;
             });
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
@@ -41,6 +44,6 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get('logger')->debug(__CLASS__ . ' booted successfully');
+        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
     }
 }

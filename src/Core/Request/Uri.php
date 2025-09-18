@@ -72,13 +72,13 @@ class Uri implements UriInterface
             throw new InvalidArgumentException('Invalid URI: ' . $uri);
         }
 
-        $this->scheme = isset($parts['scheme']) ? strtolower($parts['scheme']) : '';
-        $this->host = isset($parts['host']) ? strtolower($parts['host']) : '';
-        $this->port = $parts['port'] ?? null;
+        $this->scheme = isset($parts['scheme']) ? strtolower($parts['scheme']) : $_SERVER['REQUEST_SCHEME'];
+        $this->host = isset($parts['host']) ? strtolower($parts['host']) : $_SERVER['HTTP_HOST'];
+        $this->port = $parts['port'] ?? $_SERVER['SERVER_PORT'];
         $this->user = $parts['user'] ?? '';
         $this->password = $parts['pass'] ?? null;
         $this->path = $parts['path'] ?? '';
-        $this->query = $parts['query'] ?? '';
+        $this->query = $parts['query'] ?? $_SERVER['QUERY_STRING'] ?? '';
         $this->fragment = $parts['fragment'] ?? '';
     }
 

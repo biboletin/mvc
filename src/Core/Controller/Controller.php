@@ -2,6 +2,7 @@
 
 namespace Bibo\Mvc\Core\Controller;
 
+use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\View\View;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -12,7 +13,7 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class Controller
 {
-    private View $view;
+    private ?View $view = null;
 
     protected ?ContainerInterface $container = null;
 
@@ -22,7 +23,7 @@ class Controller
     public function __construct(?ContainerInterface $container = null)
     {
         try {
-            $this->view = $container->get('views');
+            $this->view = $container->get(View::class);
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             echo $e->getMessage();
         }
@@ -36,6 +37,7 @@ class Controller
      * @param array  $data
      *
      * @return string
+     * @throws NotFoundException
      */
     protected function render(string $view, array $data = []): string
     {
@@ -52,6 +54,7 @@ class Controller
      */
     public function __destruct()
     {
+        $this->view = null;
         $this->container = null;
     }
 }

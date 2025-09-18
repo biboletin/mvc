@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ status }} - {{ title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 2em; }
+        h1 { color: #c00; }
+        pre { background: #eee; padding: 1em; }
+        a { text-decoration: none; color: #0a53be;}
+    </style>
+</head>
+
+<body>
+    <h1>{{ title }}</h1>
+
+{% if error %}
+    <p>
+        {{ error.message }} in {{ error.file }} on line {{ error.line }}
+    </p>
+
+    {% if error.trace is defined %}
+        <h2>Stack trace:</h2>
+        <pre>{{ error.trace | join("\n") }}</pre>
+    {% endif %}
+
+{% else %}
+    <p>No additional data provided!</p>
+{% endif %}
+    <a href="/">Go back</a>
+</body>
+</html>

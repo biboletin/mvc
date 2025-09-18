@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ status }} - {{ title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 2em; }
+        h1 { color: #c00; }
+        a { text-decoration: none; color: #0a53be;}
+    </style>
+</head>
+<body>
+<h1>{{ title }}</h1>
+
+{% if error %}
+    <p>{{ error.message }}</p>
+{% else %}
+    <p>An unexpected error occurred. Please try again later.</p>
+{% endif %}
+    <a href="/">Go back</a>
+</body>
+</html>

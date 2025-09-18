@@ -10,7 +10,6 @@ use Bibo\Mvc\Core\Providers\CryptoServiceProvider;
 use Bibo\Mvc\Core\Providers\ErrorServiceProvider;
 use Bibo\Mvc\Core\Providers\FileCacheServiceProvider;
 use Bibo\Mvc\Core\Providers\LogServiceProvider;
-use Bibo\Mvc\Core\Providers\MiddlewareDispatcherServiceProvider;
 use Bibo\Mvc\Core\Providers\MiddlewareServiceProvider;
 use Bibo\Mvc\Core\Providers\ModelServiceProvider;
 use Bibo\Mvc\Core\Providers\RequestServiceProvider;
@@ -36,15 +35,14 @@ $providers = [
     LogServiceProvider::class,
     CryptoServiceProvider::class,
     TemplateServiceProvider::class,
+    ViewServiceProvider::class,
     ErrorServiceProvider::class,
-    MiddlewareDispatcherServiceProvider::class,
     MiddlewareServiceProvider::class,
     AppServiceProvider::class,
     RouteServiceProvider::class,
     RequestServiceProvider::class,
     ModelServiceProvider::class,
     FileCacheServiceProvider::class,
-    ViewServiceProvider::class,
     ControllerServiceProvider::class,
 ];
 

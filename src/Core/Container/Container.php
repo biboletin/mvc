@@ -27,7 +27,7 @@ class Container implements ContainerInterface
      * @param string  $id
      * @param Closure $concrete
      *
-     * @return ContainerInterface
+     * @return Container
      */
     public function set(string $id, Closure $concrete): self
     {

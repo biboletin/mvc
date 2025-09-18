@@ -3,11 +3,13 @@
 namespace Bibo\Mvc\Core\Cache;
 
 use Bibo\Mvc\Core\Crypto\Crypto;
-use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
 use Bibo\Mvc\Core\Exception\Custom\Crypto\EncryptException;
 use Bibo\Mvc\Core\Traits\EnabledAwareTrait;
 use DateInterval;
 use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
+use Exception;
 use InvalidArgumentException;
 use Psr\SimpleCache\CacheInterface;
 use Random\RandomException;
@@ -44,16 +46,16 @@ class FileCache implements CacheInterface
     /**
      * Cache creation time
      *
-     * @var DateTime|null
+     * @var DateTimeImmutable|null
      */
-    private ?DateTime $lastModified = null;
+    private ?DateTimeImmutable $lastModified = null;
 
     /**
      * Cache expiration time
      *
-     * @var DateTime|null
+     * @var DateTimeImmutable|null
      */
-    private ?DateTime $expiresAt = null;
+    private ?DateTimeImmutable $expiresAt = null;
 
     /**
      * Indicates if the cache was a hit
@@ -98,6 +100,13 @@ class FileCache implements CacheInterface
     private string $cachePrefix;
 
     /**
+     * DateTime object
+     *
+     * @var DateTime
+     */
+    private DateTime $dateTime;
+
+    /**
      * Constructor
      *
      * @param string $cacheDir
@@ -106,6 +115,8 @@ class FileCache implements CacheInterface
      */
     public function __construct(string $cacheDir = '')
     {
+        $this->setDateTime(new DateTime());
+
         if (trim($cacheDir) === '') {
             throw new InvalidArgumentException('Cache directory must be specified.');
         }
@@ -273,26 +284,43 @@ class FileCache implements CacheInterface
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        $file = $this->getCacheFilePath($key);
+        $filePath = $this->getCacheFilePath($key);
 
-        if (!file_exists($file)) {
+        // No file? → return default
+        if (!file_exists($filePath)) {
             return $default;
         }
 
-        $data = file_get_contents($file);
-        if ($this->getUseCompression()) {
-            $this->uncompress($data);
+        // Expiration check
+        $expiresAt = $this->getExpiresAt();
+        if ($expiresAt instanceof DateTimeInterface && $expiresAt <= new DateTimeImmutable()) {
+            // Cache expired → delete + return default
+            @unlink($filePath);
+            return $default;
         }
-        if ($this->getEncryption()) {
+
+        $data = file_get_contents($filePath);
+        if ($data === false) {
+            return $default;
+        }
+
+        // Decompress if enabled
+        if ($this->getUseCompression()) {
+            $data = $this->uncompress($data);
+        }
+
+        // Decrypt if enabled
+        if ($this->getEncryption() && $this->getCrypto() !== null) {
             try {
                 $data = $this->getCrypto()->decrypt($data);
-            } catch (DecryptException | RandomException $e) {
+            } catch (Exception $e) {
+                // Corrupt / undecryptable → treat as cache miss
                 return $default;
             }
         }
 
-        // Assuming the cache data is serialized
-        return unserialize($data);
+        // Unserialize
+        return unserialize($data, ['allowed_classes' => true]) ?: $default;
     }
 
     /**
@@ -303,13 +331,12 @@ class FileCache implements CacheInterface
      * @param int|DateInterval|null $ttl   Cache TTL (optional)
      *
      * @return bool True on success, false on failure
+     * @throws \DateMalformedStringException
      */
     public function set(string $key, mixed $value, DateInterval|int|null $ttl = null): bool
     {
-
-        // Serialize data before caching
         $data = serialize($value);
-        // Encrypt the serialized data if encryption is enabled
+
         if ($this->getEncryption() && $this->getCrypto() !== null) {
             try {
                 $data = $this->getCrypto()->encrypt($data);
@@ -318,13 +345,26 @@ class FileCache implements CacheInterface
             }
         }
 
-        // Compress the serialized data
         if ($this->getUseCompression()) {
             $data = $this->compress($data);
         }
 
+        $now = new DateTimeImmutable();
+
+        $this->setLastModified($now);
+
+        if ($ttl instanceof DateInterval) {
+            $this->setExpiresAt($now->add($ttl));
+        } elseif (is_int($ttl)) {
+            $this->setExpiresAt($now->modify("+{$ttl} seconds"));
+        } else {
+            // no TTL, could mean "forever" or "until manually cleared"
+            $this->setExpiresAt(null);
+        }
+
         return file_put_contents($this->getCacheFilePath($key), $data) !== false;
     }
+
 
     /**
      * Compress data using the specified compression method.
@@ -492,6 +532,46 @@ class FileCache implements CacheInterface
         }
 
         return $success;
+    }
+
+    public function getLastModified(): ?DateTime
+    {
+        return $this->lastModified;
+    }
+
+    public function setLastModified(?DateTimeImmutable $lastModified): void
+    {
+        $this->lastModified = $lastModified;
+    }
+
+    public function getExpiresAt(): ?DateTime
+    {
+        return $this->expiresAt;
+    }
+
+    public function setExpiresAt(?DateTimeImmutable $expiresAt): void
+    {
+        $this->expiresAt = $expiresAt;
+    }
+
+    public function isHit(): bool
+    {
+        return $this->isHit;
+    }
+
+    public function setIsHit(bool $isHit): void
+    {
+        $this->isHit = $isHit;
+    }
+
+    public function getDateTime(): DateTime
+    {
+        return $this->dateTime;
+    }
+
+    public function setDateTime(DateTime $dateTime): void
+    {
+        $this->dateTime = $dateTime;
     }
 
     /**

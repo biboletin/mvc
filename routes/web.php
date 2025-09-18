@@ -7,18 +7,19 @@ use Bibo\Mvc\Core\Facades\Route;
 use Bibo\Mvc\Core\Response\JsonResponse;
 
 Route::get('/', [IndexController::class, 'index'])
-    ->middleware(['csrf', 'cors'])
     ->name('home');
 
 
 Route::get('/api/ping', [TestController::class, 'ping'], ['cors'])->name('api.ping');
 
-// Route::get('/api/ping', function () {
-//     return new JsonResponse([
-//         'status' => 'success',
-//         'message' => 'pong',
-//     ]);
-// }, ['cors']);
+Route::get('/rest/ping', function () {
+    return new JsonResponse([
+        'status' => 'success',
+        'message' => 'pong',
+    ]);
+});
+
+Route::resource('/rest', IndexController::class);
 
 Route::group('admin', function () {
     Route::get('/', [IndexController::class, 'index']);

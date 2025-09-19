@@ -14,8 +14,8 @@ chown -R www-data:www-data /var/www/html/mvc/storage/logs/
 chown -R www-data:www-data /var/www/html/mvc/storage/session/
 chown -R www-data:www-data /var/www/html/mvc/storage/tmp/
 
-rm -rf vendor/
-composer update --optimize-autoloader
+#rm -rf vendor/
+#composer update --optimize-autoloader
 
 #for development only
 chmod 777 /var/www/html/mvc/storage/cache/

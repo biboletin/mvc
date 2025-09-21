@@ -3,8 +3,10 @@
 namespace Bibo\Mvc\Core\Session;
 
 use Bibo\Mvc\Core\Crypto\Crypto;
+use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
 use Bibo\Mvc\Core\Exception\Custom\Crypto\EncryptException;
-use InvalidArgumentException;
+use Bibo\Mvc\Core\Traits\CompressAwareTrait;
+use Bibo\Mvc\Core\Traits\EncryptedAwareTrait;
 use Random\RandomException;
 use SessionHandlerInterface;
 
@@ -18,6 +20,9 @@ use SessionHandlerInterface;
  */
 class EncryptedSessionHandler implements SessionHandlerInterface
 {
+    use EncryptedAwareTrait;
+    use CompressAwareTrait;
+
     private Crypto $crypto;
     /**
      * The directory path where session files will be stored
@@ -28,15 +33,10 @@ class EncryptedSessionHandler implements SessionHandlerInterface
 
     /**
      * The encryption method used for session data
-     *
-     * @throws RandomException
      */
-    public function __construct()
+    public function __construct(Crypto $crypto)
     {
-        // Generate a random secret key for encryption
-        // 32 bytes = 256 bits
-        $secret = hex2bin(bin2hex(random_bytes(32)));
-        $this->crypto = new Crypto($secret);
+        $this->crypto = $crypto;
     }
 
     /**
@@ -85,6 +85,7 @@ class EncryptedSessionHandler implements SessionHandlerInterface
                 unlink($file);
             }
         }
+
         return true;
     }
 
@@ -118,17 +119,27 @@ class EncryptedSessionHandler implements SessionHandlerInterface
      *
      * @return string|false The decrypted session data or an empty string if the session doesn't exist,
      *                      or false on failure
+     * @throws DecryptException
      */
     public function read(string $id): string|false
     {
-        $file = "$this->savePath/sess_$id";
+        $file = $this->savePath . 'sess_' . $id;
 
         if (!file_exists($file)) {
             return '';
         }
 
         $data = file_get_contents($file);
-        return $this->decrypt($data);
+
+        if ($this->isEncrypted()) {
+            $data = $this->crypto->decrypt($data);
+        }
+
+        if ($this->isCompressed()) {
+            $data = gzuncompress($data);
+        }
+
+        return $data;
     }
 
     /**
@@ -143,44 +154,18 @@ class EncryptedSessionHandler implements SessionHandlerInterface
      */
     public function write(string $id, string $data): bool
     {
-        $file = $this->savePath . "/sess_$id";
-        $encrypted = $this->encrypt($data);
-        return file_put_contents($file, $encrypted) !== false;
-    }
+        $file = $this->savePath . 'sess_' . $id;
 
-    /**
-     * Encrypt data
-     *
-     * Encrypts the given data using the configured encryption method and key.
-     *
-     * @param string $data The data to encrypt
-     *
-     * @return string The encrypted data, base64 encoded
-     */
-    public function encrypt(string $data): string
-    {
-        try {
-            return $this->crypto->encrypt($data);
-        } catch (RandomException | EncryptException $exception) {
-            return $exception->getMessage();
+        if ($this->isCompressed()) {
+            $data = gzcompress($data, 9);
         }
-    }
 
-    /**
-     * Decrypt data
-     *
-     * Decrypts the given data using the configured encryption method and key.
-     *
-     * @param string $data The base64 encoded encrypted data
-     *
-     * @return string|null The decrypted data or false on failure
-     */
-    public function decrypt(string $data): ?string
-    {
         try {
-            return $this->crypto->decrypt($data) ?? null;
-        } catch (InvalidArgumentException $exception) {
-            return $exception->getMessage();
+            $value = $this->isEncrypted() ? $this->crypto->encrypt($data) : $data;
+
+            return file_put_contents($file, $value) !== false;
+        } catch (RandomException | EncryptException $e) {
+            return false;
         }
     }
 }

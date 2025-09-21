@@ -2,8 +2,11 @@
 
 namespace Bibo\Mvc\Core\Session;
 
+use Bibo\Mvc\Core\Crypto\Crypto;
+use Bibo\Mvc\Core\Traits\EncryptedAwareTrait;
+use Bibo\Mvc\Core\Traits\NameAwareTrait;
+use Bibo\Mvc\Core\Traits\PrefixAwareTrait;
 use InvalidArgumentException;
-use Random\RandomException;
 use RuntimeException;
 use SessionHandlerInterface;
 
@@ -14,17 +17,16 @@ use SessionHandlerInterface;
  * offering methods to start, destroy, and manipulate sessions, as well as to configure
  * session parameters like lifetime, path, domain, etc.
  */
-class Session
+class SessionHandler
 {
+    use NameAwareTrait;
+    use EncryptedAwareTrait;
+    use PrefixAwareTrait;
+
     /**
      * Flag indicating whether the session has been started.
      */
     protected bool $started = false;
-
-    /**
-     * The name of the session, used in cookies and URLs.
-     */
-    protected string $name = 'PHPSESSID';
 
     /**
      * Session lifetime in seconds. 0 means "until the browser is closed".
@@ -80,29 +82,66 @@ class Session
 
     /**
      * The session handler instance used for storing and retrieving session data.
+     *
+     * @var SessionHandlerInterface
      */
     protected SessionHandlerInterface $handler;
+
+    /**
+     * Crypto
+     *
+     * @var Crypto
+     */
+    protected Crypto $crypto;
 
     /**
      * Initializes a new Session instance.
      *
      * Reads session configuration from PHP ini settings and sets default values
      * for session parameters.
-     *
-     * @throws RandomException
      */
     public function __construct()
     {
         $this->name = ini_get('session.name') ?: 'PHPSESSID';
-        $this->lifetime = (int)ini_get('session.cookie_lifetime') ?: 0;
+        $this->lifetime = (int) ini_get('session.cookie_lifetime') ?: 0;
         $this->path = ini_get('session.cookie_path') ?: '/';
         $this->domain = ini_get('session.cookie_domain') ?: '';
         $this->secure = ini_get('session.cookie_secure') === '1';
         $this->httpOnly = ini_get('session.cookie_httponly') === '1';
         $this->sameSite = ini_get('session.cookie_samesite') ?: 'Lax';
         $this->savePath = ini_get('session.save_path') ?: sys_get_temp_dir();
+    }
 
-        $this->handler = new EncryptedSessionHandler();
+    /**
+     * Set encryption handler
+     *
+     * @param SessionHandlerInterface $handler
+     *
+     * @return void
+     */
+    public function setEncryptedSessionHandler(SessionHandlerInterface $handler): void
+    {
+        $this->handler = $handler;
+    }
+
+    /**
+     * Get encryption handler
+     *
+     * @return SessionHandlerInterface
+     */
+    public function getEncryptedSessionHandler(): SessionHandlerInterface
+    {
+        return $this->handler;
+    }
+
+    public function setEncryption(Crypto $crypto): void
+    {
+        $this->crypto = $crypto;
+    }
+
+    public function getEncryption(): Crypto
+    {
+        return $this->crypto;
     }
 
     /**
@@ -225,7 +264,7 @@ class Session
      */
     public function setSavePath(string $path): void
     {
-        if (!is_dir($path) && !mkdir($path, 0777, true) && !is_dir($path)) {
+        if (!is_dir($path) && !mkdir($path, 0755, true) && !is_dir($path)) {
             throw new InvalidArgumentException("Unable to create the session save path '" . $path . "'.");
         }
 
@@ -249,41 +288,6 @@ class Session
     public function getSavePath(): string
     {
         return $this->savePath;
-    }
-
-    /**
-     * Sets the session name.
-     *
-     * @param string $name The name of the session.
-     *
-     * @throws RuntimeException If the session is already started.
-     */
-    public function setSessionName(string $name): void
-    {
-        if ($this->started) {
-            throw new RuntimeException('Cannot change session name after it has started.');
-        }
-        $this->name = $name;
-    }
-
-    /**
-     * Gets the session name.
-     *
-     * @return string The name of the session.
-     */
-    public function getSessionName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Gets the session name (alias for getSessionName).
-     *
-     * @return string The name of the session.
-     */
-    public function getName(): string
-    {
-        return $this->name;
     }
 
     /**

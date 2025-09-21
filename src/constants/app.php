@@ -177,3 +177,11 @@ if (!defined('COOKIE_JAR_PATH')) {
 
     define('COOKIE_JAR_PATH', COOKIES_PATH . 'jar' . DIRECTORY_SEPARATOR);
 }
+
+if (!defined('SESSION_SAVE_PATH')) {
+    /*
+     * CookieJar path
+     */
+
+    define('SESSION_SAVE_PATH', STORAGE_PATH . 'session' . DIRECTORY_SEPARATOR);
+}

@@ -1,6 +1,6 @@
 <?php
 
-use Bibo\Mvc\Core\Base\App;
+use Bibo\Mvc\Core\Application\App;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 

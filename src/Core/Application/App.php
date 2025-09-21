@@ -1,6 +1,6 @@
 <?php
 
-namespace Bibo\Mvc\Core\Base;
+namespace Bibo\Mvc\Core\Application;
 
 use Bibo\App\Middleware\ErrorMiddleware;
 use Bibo\Mvc\Core\Error\Error;

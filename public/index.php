@@ -1,7 +1,7 @@
 <?php
 
-use Bibo\Mvc\Core\Base\App;
-use Bibo\Mvc\Core\Base\Kernel;
+use Bibo\Mvc\Core\Application\App;
+use Bibo\Mvc\Core\Application\Kernel;
 use Bibo\Mvc\Core\Container\Container;
 use Bibo\Mvc\Core\Exception\Custom\Http\ResponseExceptionHandler;
 use Bibo\Mvc\Core\ScriptExecutionTimer\ScriptExecutionTimer;

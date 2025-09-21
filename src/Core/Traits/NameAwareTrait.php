@@ -2,7 +2,7 @@
 
 namespace Bibo\Mvc\Core\Traits;
 
-use Bibo\Mvc\Core\Base\App;
+use Bibo\Mvc\Core\Application\App;
 use Bibo\Mvc\Core\Cookie\CookieHandler;
 use Bibo\Mvc\Core\Session\SessionHandler;
 

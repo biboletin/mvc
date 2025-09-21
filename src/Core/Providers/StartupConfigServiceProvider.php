@@ -27,10 +27,6 @@ class StartupConfigServiceProvider extends ServiceProvider
         if (class_exists(Locale::class)) {
             Locale::setDefault($config->get('app.locale'));
         }
-
-        ini_set('display_errors', $config->get('app.debug') ? '1' : '0');
-        ini_set('log_errors', '1');
-        error_reporting(E_ALL);
     }
 
     /**

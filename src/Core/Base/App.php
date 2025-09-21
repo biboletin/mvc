@@ -5,6 +5,7 @@ namespace Bibo\Mvc\Core\Base;
 use Bibo\App\Middleware\ErrorMiddleware;
 use Bibo\Mvc\Core\Error\Error;
 use Bibo\Mvc\Core\Error\ErrorResponseFactory;
+use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Request\BaseRequest;
 use Bibo\Mvc\Core\Response\ResponseEmitter;
 use Bibo\Mvc\Core\Router\BaseRouter;
@@ -73,16 +74,15 @@ class App
      * @return void
      * @throws JsonException
      * @throws NotFoundExceptionInterface
-     * @throws ContainerExceptionInterface
+     * @throws ContainerExceptionInterface|NotFoundException
      */
     public function run(): void
     {
-        $responseEmitter = new ResponseEmitter();
+        $responseEmitter = $this->container->get(ResponseEmitter::class);
 
         try {
             // Get PSR-7 request
             $request = $this->container->get(BaseRequest::class);
-
             // Build the middleware stack
             $router = $this->container->get(BaseRouter::class);
             $errorMiddleware = $this->container->get(ErrorMiddleware::class);

@@ -554,16 +554,6 @@ class CookieHandler
         return null;
     }
 
-    public function setPrefix(string $prefix): void
-    {
-        $this->prefix = $prefix;
-    }
-
-    public function getPrefix(): string
-    {
-        return $this->prefix;
-    }
-
     /**
      * Create a CookieHandler instance from an array of cookie data.
      *

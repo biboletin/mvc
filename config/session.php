@@ -1,195 +1,68 @@
 <?php
 
 /**
- * Session configuration
- */
+* Session configuration
+*/
 
 return [
 
-    'session' => [
+    /*
+     * Session name
+     */
 
-        /*
-         * Session name
-         */
+    'name' => get_env('session.name', 'PHPSESSID'),
 
-        'name' => $_ENV['SESSION_NAME'] ?? 'ExampleSession',
+    /*
+     * Session lifetime
+     */
 
-        /*
-         * Session lifetime
-         */
+    'lifetime' => get_env('session.lifetime', 86400),
 
-        'lifetime' => $_ENV['SESSION_LIFETIME'] ?? 3600,
+    /*
+     * Session path
+     */
 
-        /*
-         * Session path
-         */
+    'path' => get_env('session.path', '/'),
 
-        'path' => $_ENV['SESSION_PATH'] ?? '/',
+    /*
+     * Session domain
+     */
 
-        /*
-         * Session domain
-         */
+    'domain' => get_env('session.domain', 'localhost'),
 
-        'domain' => $_ENV['session_domain'] ?? null,
+    /*
+     * Session secure flag
+     */
 
-        /*
-         * Session secure flag
-         */
+    'secure' => get_env('session.secure', false),
 
-        'secure' => $_ENV['SESSION_SECURE'] ?? false,
+    /*
+     * Session HTTP only flag
+     */
 
-        /*
-         * Session HTTP only flag
-         */
+    'httponly' => get_env('session.httponly', false),
 
-        'httponly' => $_ENV['SESSION_HTTP'] ?? true,
+    /*
+     * Session same site attribute
+     */
 
-        /*
-         * Session same site attribute
-         */
+    'samesite' => get_env('session.samesite', 'lax'),
 
-        'samesite' => $_ENV['SESSION_SAMESITE'] ?? 'Lax',
+    /*
+     * Session name prefix
+     */
 
-        /*
-         * Session encryption
-         */
+    'prefix' => get_env('session.prefix', ''),
 
-        'encryption' => [
-            'enabled' => false,
-            'key' => 'your-encryption-key',
-            'cipher' => 'AES-256-CBC',
-        ],
+    /*
+     * Session encryption
+     */
 
-        /*
-         * Session hashids
-         */
+    'encrypt' => get_env('session.encrypt', false),
 
-        'hashids' => [
-            'enabled' => false,
-            'salt' => 'your-salt',
-            'length' => 10,
-        ],
+    /*
+     * Session compression
+     */
 
-        /*
-         * Session password
-         */
-
-        'password' => [
-            'algorithm' => PASSWORD_DEFAULT,
-            'options' => [
-                'cost' => 12,
-            ],
-        ],
-
-        /*
-         * Session database
-         */
-
-        'database' => [
-            'enabled' => false,
-            'connection' => 'default',
-            'table' => 'sessions',
-        ],
-
-        /*
-         * Session cache
-         */
-
-        'cache' => [
-            'enabled' => false,
-            'store' => 'default',
-            'key' => 'sessions',
-            'ttl' => 3600,
-        ],
-
-        /*
-         * Session CSRF
-         */
-
-        'csrf' => [
-            'key' => 'csrf-token',
-            'expires' => 3600,
-        ],
-
-        /*
-         * Session CORS
-         */
-
-        'cors' => [
-            'enabled' => false,
-            'origin' => '*',
-            'methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-            'headers' => ['Content-Type', 'Authorization'],
-            'exposed' => [],
-            'max_age' => 0,
-        ],
-
-        /*
-         * Session JWT
-         */
-
-        'jwt' => [
-            'enabled' => false,
-        ],
-
-        /*
-         * Session recaptcha
-         */
-
-        'recaptcha' => [
-            'enabled' => false,
-            'site_key' => '',
-        ],
-
-        /*
-         * Session auth
-         */
-
-        'auth' => [
-            'enabled' => false,
-            'model' => 'App\Models\User',
-            'field' => 'email',
-            'password' => 'password',
-            'remember' => 'remember_token',
-            'otp' => 'otp',
-            'jwt' => 'jwt',
-            'hash' => 'hash',
-            'hash_algo' => 'sha256',
-            'hash_options' => [
-                'cost' => 12,
-            ],
-        ],
-
-        /*
-         * Session cookies
-         */
-
-        'cookies' => [],
-
-        /*
-         * Session middleware
-         */
-
-        'middleware' => [
-            'session' => [
-                'class' => 'Biboletin\Middleware\SessionMiddleware',
-                'arguments' => [
-                    'session' => 'session',
-                ]
-            ]
-        ],
-
-        /*
-         * Session redirect
-         */
-
-        'redirect' => [
-            'class' => 'Biboletin\Response\RedirectResponse',
-            'arguments' => [
-                'url' => 'http://example.com',
-                'statusCode' => 200,
-                'headers' => []
-            ]
-        ],
-    ],
+    'compress' => get_env('session.compress', false),
 ];

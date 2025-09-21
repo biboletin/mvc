@@ -4,19 +4,35 @@
     <meta charset="UTF-8">
     <title>{{ status }} - {{ title }}</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 2em; }
-        h1 { color: #c00; }
-        pre { background: #eee; padding: 1em; }
-        a { text-decoration: none; color: #0a53be;}
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            padding: 2em;
+        }
+
+        h1 {
+            color: #c00;
+        }
+
+        pre {
+            background: #eee;
+            padding: 1em;
+        }
+
+        a {
+            text-decoration: none;
+            color: #0a53be;
+        }
     </style>
 </head>
 
 <body>
-    <h1>{{ title }}</h1>
+<h1>{{ title }}</h1>
+<span>Type: {{ error.type }}</span>
 
 {% if error %}
     <p>
-        {{ error.message }} in {{ error.file }} on line {{ error.line }}
+        Message: {{ error.message }} in {{ error.file }} on line {{ error.line }}
     </p>
 
     {% if error.trace is defined %}
@@ -27,6 +43,6 @@
 {% else %}
     <p>No additional data provided!</p>
 {% endif %}
-    <a href="/">Go back</a>
+<a href="/">Go back</a>
 </body>
 </html>

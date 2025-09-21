@@ -24,7 +24,7 @@ trait EncryptedAwareTrait
     }
 
     /**
-     * Check if value is encrypted
+     * Check if the value is encrypted
      *
      * @return bool
      */

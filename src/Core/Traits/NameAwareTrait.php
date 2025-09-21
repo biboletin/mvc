@@ -4,6 +4,7 @@ namespace Bibo\Mvc\Core\Traits;
 
 use Bibo\Mvc\Core\Base\App;
 use Bibo\Mvc\Core\Cookie\CookieHandler;
+use Bibo\Mvc\Core\Session\SessionHandler;
 
 /**
  * Trait NameAwareTrait
@@ -44,7 +45,7 @@ trait NameAwareTrait
      *
      * @param string $name The name to set.
      *
-     * @return CookieHandler|App|NameAwareTrait
+     * @return CookieHandler|App|SessionHandler|NameAwareTrait
      */
     public function setName(string $name): self
     {

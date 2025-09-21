@@ -14,11 +14,11 @@ interface CompressionInterface
     public function compress($data): string;
 
     /**
-     * Uncompress data
+     * Decompress data
      *
      * @param $data
      *
      * @return mixed
      */
-    public function uncompress($data): string;
+    public function decompress($data): string;
 }

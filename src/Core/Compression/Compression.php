@@ -25,7 +25,7 @@ class Compression implements CompressionInterface
      *
      * @return mixed
      */
-    public function uncompress($data): mixed
+    public function decompress($data): mixed
     {
         // TODO: Implement uncompress() method.
     }

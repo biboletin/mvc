@@ -12,11 +12,11 @@ return [
     // Global middleware
     // Add your global middleware here
     'global' => [
+        ErrorMiddleware::class,
         SqlInjectionMiddleware::class,
         XssMiddleware::class,
         FileInclusionMiddleware::class,
         RateLimitMiddleware::class,
-        ErrorMiddleware::class,
     ],
 
     // Middleware groups

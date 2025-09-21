@@ -2,15 +2,31 @@
 
 namespace Bibo\App\Middleware;
 
+use Bibo\Mvc\Core\Abstracts\AbstractMiddleware;
 use Bibo\Mvc\Core\Enums\HttpStatus;
+use Bibo\Mvc\Core\Exception\Custom\Http\BadRequestException;
 use Bibo\Mvc\Core\Interfaces\MiddlewareInterface;
 use Bibo\Mvc\Core\Response\HtmlResponse;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class FileInclusionMiddleware implements MiddlewareInterface
+class FileInclusionMiddleware extends AbstractMiddleware implements MiddlewareInterface
 {
+    /**
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        try {
+            parent::__construct($container);
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+            echo $e->getMessage();
+        }
+    }
+
     /**
      * List of suspicious patterns for LFI/RFI
      *
@@ -36,10 +52,11 @@ class FileInclusionMiddleware implements MiddlewareInterface
     /**
      * Process request to detect LFI/RFI
      *
-     * @param ServerRequestInterface $request
+     * @param ServerRequestInterface  $request
      * @param RequestHandlerInterface $handler
      *
      * @return HtmlResponse
+     * @throws BadRequestException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -50,7 +67,7 @@ class FileInclusionMiddleware implements MiddlewareInterface
 
         foreach ($inputs as $key => $value) {
             if ($this->detectInclusion($value)) {
-                return new HtmlResponse(
+                throw new BadRequestException(
                     'Potential File Inclusion detected in input: ' . htmlspecialchars($key),
                     HttpStatus::BadRequest->value
                 );

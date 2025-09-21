@@ -56,7 +56,7 @@ class MiddlewareDispatcher
     /**
      * Register an array of global middleware applied to all requests.
      *
-     * @param  array<int, string|MiddlewareInterface> $middleware Array of middleware class names or instances
+     * @param array<int, string|MiddlewareInterface> $middleware Array of middleware class names or instances
      *
      * @return void
      */
@@ -69,8 +69,8 @@ class MiddlewareDispatcher
      * Define a middleware group.
      * A group allows combining multiple middlewares under a single alias.
      *
-     * @param  string                                 $group      Name of the middleware group
-     * @param  array<int, string|MiddlewareInterface> $middleware Array of middleware class names or instances
+     * @param string                                 $group      Name of the middleware group
+     * @param array<int, string|MiddlewareInterface> $middleware Array of middleware class names or instances
      *
      * @return void
      */
@@ -83,7 +83,7 @@ class MiddlewareDispatcher
      * Register route-specific middleware.
      * Middleware can be referenced by its alias when defining a route.
      *
-     * @param  array<string, string|MiddlewareInterface> $middleware Key is alias, value is class or instance
+     * @param array<string, string|MiddlewareInterface> $middleware Key is alias, value is class or instance
      *
      * @return void
      */

@@ -2,19 +2,23 @@
 
 namespace Bibo\App\Middleware;
 
+use Bibo\Mvc\Core\Abstracts\AbstractMiddleware;
 use Bibo\Mvc\Core\Enums\HttpStatus;
+use Bibo\Mvc\Core\Exception\Custom\Http\BadRequestException;
 use Bibo\Mvc\Core\Interfaces\MiddlewareInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Bibo\Mvc\Core\Response\HtmlResponse;
 
 /**
  * SqlInjectionMiddleware
  *
  * Detects and blocks SQL injection attempts in query parameters and request body.
  */
-class SqlInjectionMiddleware implements MiddlewareInterface
+class SqlInjectionMiddleware extends AbstractMiddleware implements MiddlewareInterface
 {
     /**
      * List of suspicious SQL patterns to check against
@@ -30,12 +34,24 @@ class SqlInjectionMiddleware implements MiddlewareInterface
     ];
 
     /**
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        try {
+            parent::__construct($container);
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+            echo $e->getMessage();
+        }
+    }
+
+    /**
      * Process request to detect SQL injection
      *
      * @param ServerRequestInterface  $request
      * @param RequestHandlerInterface $handler
      *
      * @return ResponseInterface
+     * @throws BadRequestException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -46,8 +62,7 @@ class SqlInjectionMiddleware implements MiddlewareInterface
 
         foreach ($inputs as $key => $value) {
             if ($this->detectInjection($value)) {
-                // You could log the attempt here
-                return new HtmlResponse(
+                throw new BadRequestException(
                     'Potential SQL Injection detected in input: ' . htmlspecialchars($key),
                     HttpStatus::BadRequest->value
                 );

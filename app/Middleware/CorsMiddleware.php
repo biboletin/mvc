@@ -4,11 +4,11 @@ namespace Bibo\App\Middleware;
 
 use Bibo\Mvc\Core\Enums\HttpMethod;
 use Bibo\Mvc\Core\Enums\HttpStatus;
+use Bibo\Mvc\Core\Response\HtmlResponse;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Bibo\Mvc\Core\Response\HtmlResponse;
 
 class CorsMiddleware implements MiddlewareInterface
 {

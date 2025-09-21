@@ -2,14 +2,18 @@
 
 namespace Bibo\App\Middleware;
 
+use Bibo\Mvc\Core\Abstracts\AbstractMiddleware;
 use Bibo\Mvc\Core\Enums\HttpStatus;
+use Bibo\Mvc\Core\Exception\Custom\Http\BadRequestException;
 use Bibo\Mvc\Core\Interfaces\MiddlewareInterface;
-use Bibo\Mvc\Core\Response\HtmlResponse;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class RateLimitMiddleware implements MiddlewareInterface
+class RateLimitMiddleware extends AbstractMiddleware implements MiddlewareInterface
 {
     /**
      * Limit
@@ -25,11 +29,16 @@ class RateLimitMiddleware implements MiddlewareInterface
      */
     private int $window = 60;
 
-    // public function __construct(int $limit = 100, int $window = 60)
-    // {
-    //     $this->limit = $limit;
-    //     $this->window = $window;
-    // }
+    /**
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        try {
+            parent::__construct($container);
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+            echo $e->getMessage();
+        }
+    }
 
     /**
      * Process middleware
@@ -38,10 +47,10 @@ class RateLimitMiddleware implements MiddlewareInterface
      * @param RequestHandlerInterface $handler
      *
      * @return ResponseInterface
+     * @throws BadRequestException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        session_start();
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         $key = "rate_limit_{$ip}";
 
@@ -52,7 +61,10 @@ class RateLimitMiddleware implements MiddlewareInterface
         $data = &$_SESSION[$key];
         if (time() - $data['time'] < $this->window) {
             if ($data['count'] >= $this->limit) {
-                return new HtmlResponse('Rate limit exceeded', HttpStatus::TooManyRequests->value);
+                throw new BadRequestException(
+                    'Rate limit exceeded',
+                    HttpStatus::TooManyRequests->value
+                );
             }
             $data['count']++;
         } else {

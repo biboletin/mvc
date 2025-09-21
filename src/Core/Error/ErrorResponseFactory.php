@@ -3,11 +3,14 @@
 namespace Bibo\Mvc\Core\Error;
 
 use Bibo\Mvc\Core\Enums\HttpStatus;
+use Bibo\Mvc\Core\Exception\AppException;
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Rest\Message\Response;
 use Bibo\Mvc\Core\View\View;
+use ErrorException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
 
 class ErrorResponseFactory
 {
@@ -41,6 +44,45 @@ class ErrorResponseFactory
         return $this->createTextResponse($errorData, $status);
     }
 
+    /**
+     * @throws NotFoundException
+     */
+    public function createFromException(Throwable $exception, ServerRequestInterface $request): ResponseInterface
+    {
+        if ($exception instanceof AppException) {
+            $status = $exception->getCode() ?: HttpStatus::BadRequest->value;
+            $errorData = [
+                'type' => 'Application',
+                'message' => $exception->getMessage(),
+                'code' => $exception->getCode(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString(),
+            ];
+        } elseif ($exception instanceof ErrorException) {
+            $status = HttpStatus::InternalServerError->value;
+            $errorData = [
+                'type' => 'Core',
+                'message' => $exception->getMessage(),
+                'severity' => $exception->getSeverity(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString(),
+            ];
+        } else {
+            $status = HttpStatus::InternalServerError->value;
+            $errorData = [
+                'type' => 'Unknown',
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString(),
+            ];
+        }
+
+        return $this->createResponse($errorData, $request, $status);
+    }
+
     private function createJsonResponse(array $errorData, int $status): ResponseInterface
     {
         $response = new Response();
@@ -66,7 +108,7 @@ class ErrorResponseFactory
 
         $text = $this->debug
             ? $this->buildPlainText($errorData)
-            : ($errorData['message'] ?? "An internal server error occurred.");
+            : ($errorData['message'] ?? 'An internal server error occurred.');
 
         $response->getBody()->write($text);
 
@@ -109,6 +151,6 @@ class ErrorResponseFactory
             );
         }
 
-        return $data['message'] ?? "An internal server error occurred.";
+        return $data['message'] ?? 'An internal server error occurred.';
     }
 }

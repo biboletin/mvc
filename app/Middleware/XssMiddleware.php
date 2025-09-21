@@ -2,19 +2,20 @@
 
 namespace Bibo\App\Middleware;
 
+use Bibo\Mvc\Core\Abstracts\AbstractMiddleware;
 use Bibo\Mvc\Core\Enums\HttpStatus;
+use Bibo\Mvc\Core\Exception\Custom\Http\BadRequestException;
 use Bibo\Mvc\Core\Interfaces\MiddlewareInterface;
-use Bibo\Mvc\Core\Response\HtmlResponse;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * XssMiddleware
  *
  * Detects and blocks XSS attempts in query parameters and request body.
  */
-class XssMiddleware implements MiddlewareInterface
+class XssMiddleware extends AbstractMiddleware implements MiddlewareInterface
 {
     /**
      * List of suspicious XSS patterns to check against
@@ -33,9 +34,11 @@ class XssMiddleware implements MiddlewareInterface
     /**
      * Process request to detect XSS
      *
-     * @param ServerRequestInterface $request
+     * @param ServerRequestInterface  $request
      * @param RequestHandlerInterface $handler
+     *
      * @return ResponseInterface
+     * @throws BadRequestException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -46,8 +49,7 @@ class XssMiddleware implements MiddlewareInterface
 
         foreach ($inputs as $key => $value) {
             if ($this->detectXss($value)) {
-                // Block request and return HTML error
-                return new HtmlResponse(
+                throw new BadRequestException(
                     'Potential XSS detected in input: ' . htmlspecialchars($key),
                     HttpStatus::BadRequest->value
                 );

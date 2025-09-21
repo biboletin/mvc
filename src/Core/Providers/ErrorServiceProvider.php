@@ -19,20 +19,19 @@ class ErrorServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Register Error service (for normalization and logging)
-        $this->container->set(Error::class, function ($container) {
-            return new Error(
-                $container->get(Logger::class),
-                Env::get()->value
-            );
-        });
-
         // Register ErrorResponseFactory (can inject view and debug flag)
         $this->container->set(ErrorResponseFactory::class, function ($container) {
             $view = $container->has(View::class) ? $container->get(View::class) : null;
             $debug = Env::get()->value === 'development';
 
             return new ErrorResponseFactory($view, $debug);
+        });
+
+        // Register Error service (for normalization and logging)
+        $this->container->set(Error::class, function ($container) {
+            return new Error(
+                $container
+            );
         });
     }
 

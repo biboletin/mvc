@@ -2,9 +2,13 @@
 
 namespace Bibo\App\Middleware;
 
+use Bibo\Mvc\Core\Abstracts\AbstractMiddleware;
 use Bibo\Mvc\Core\Response\HtmlResponse;
 use Bibo\Mvc\Core\Response\JsonResponse;
 use JsonException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -14,8 +18,19 @@ use Random\RandomException;
 /**
  * CSRF Middleware
  */
-class CsrfMiddleware implements MiddlewareInterface
+class CsrfMiddleware extends AbstractMiddleware implements MiddlewareInterface
 {
+    /**
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        try {
+            parent::__construct($container);
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+            echo $e->getMessage();
+        }
+    }
+
     /**
      * Session key for CSRF token
      *

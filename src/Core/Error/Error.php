@@ -2,19 +2,37 @@
 
 namespace Bibo\Mvc\Core\Error;
 
+use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
+use Bibo\Mvc\Core\Logger\Logger;
+use Bibo\Mvc\Core\Request\BaseRequest;
+use Bibo\Mvc\Core\Response\ResponseEmitter;
 use ErrorException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
 class Error
 {
+    /**
+     * @var LoggerInterface|mixed
+     */
     protected LoggerInterface $logger;
-    protected string $environment;
 
-    public function __construct(LoggerInterface $logger, string $environment = 'production')
+    /**
+     * @var ContainerInterface
+     */
+    protected ContainerInterface $container;
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function __construct(ContainerInterface $container)
     {
-        $this->logger = $logger;
-        $this->environment = $environment;
+        $this->logger = $container->get(Logger::class);
+        $this->container = $container;
     }
 
     /**
@@ -42,10 +60,27 @@ class Error
 
     /**
      * Handle uncaught exceptions (log only)
+     *
+     * @throws NotFoundException
      */
     public function handleException(Throwable $exception): void
     {
         $this->logger->error($this->formatThrowable($exception));
+
+        $factory = null;
+        $emitter = null;
+        $request = null;
+
+        try {
+            $factory = $this->container->get(ErrorResponseFactory::class);
+            $emitter = $this->container->get(ResponseEmitter::class);
+            $request = $this->container->get(BaseRequest::class);
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+            $exception = $e;
+        }
+
+        $response = $factory->createFromException($exception, $request);
+        $emitter->emit($response);
     }
 
     /**

@@ -2,44 +2,29 @@
 
 namespace Bibo\App\Middleware;
 
-use Bibo\Mvc\Core\Enums\HttpStatus;
-use Bibo\Mvc\Core\Error\Error;
-use Bibo\Mvc\Core\Error\ErrorResponseFactory;
-use Bibo\Mvc\Core\Exception\AppException;
+use Bibo\Mvc\Core\Abstracts\AbstractMiddleware;
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
+use Bibo\Mvc\Core\Interfaces\MiddlewareInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Bibo\Mvc\Core\Interfaces\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
 
-class ErrorMiddleware implements MiddlewareInterface
+class ErrorMiddleware extends AbstractMiddleware implements MiddlewareInterface
 {
     /**
-     * Error handler
      *
-     * @var Error|mixed
-     */
-    private Error $errorHandler;
-
-    /**
-     * Error response
-     *
-     * @var ErrorResponseFactory|mixed
-     */
-    private ErrorResponseFactory $responseFactory;
-
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->errorHandler = $container->get(Error::class);
-        $this->responseFactory = $container->get(ErrorResponseFactory::class);
+        try {
+            parent::__construct($container);
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+            echo $e->getMessage();
+        }
     }
 
     /**
@@ -54,17 +39,7 @@ class ErrorMiddleware implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (Throwable $e) {
-            // Log exception
-            $this->errorHandler->handleException($e);
-
-            // Normalize exception data
-            $errorData = $this->errorHandler->normalize($e);
-
-            $status = $e instanceof AppException
-                ? $e->getStatusCode()
-                : HttpStatus::InternalServerError->value;
-
-            return $this->responseFactory->createResponse($errorData, $request, $status);
+            return $this->responseFactory->createFromException($e, $request);
         }
     }
 

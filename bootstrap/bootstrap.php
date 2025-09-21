@@ -13,8 +13,10 @@ use Bibo\Mvc\Core\Providers\LogServiceProvider;
 use Bibo\Mvc\Core\Providers\MiddlewareServiceProvider;
 use Bibo\Mvc\Core\Providers\ModelServiceProvider;
 use Bibo\Mvc\Core\Providers\RequestServiceProvider;
+use Bibo\Mvc\Core\Providers\ResponseEmitterServiceProvider;
 use Bibo\Mvc\Core\Providers\RouteServiceProvider;
 use Bibo\Mvc\Core\Providers\ScriptExecutionTimerServiceProvider;
+use Bibo\Mvc\Core\Providers\SessionServiceProvider;
 use Bibo\Mvc\Core\Providers\StartupConfigServiceProvider;
 use Bibo\Mvc\Core\Providers\TemplateServiceProvider;
 use Bibo\Mvc\Core\Providers\ViewServiceProvider;
@@ -27,6 +29,7 @@ if (!isset($app)) {
 // Core service providers
 $providers = [
     ScriptExecutionTimerServiceProvider::class,
+    RequestServiceProvider::class,
     ConfigServiceProvider::class,
     StartupConfigServiceProvider::class,
     CookieServiceProvider::class,
@@ -34,13 +37,14 @@ $providers = [
     EnumServiceProvider::class,
     LogServiceProvider::class,
     CryptoServiceProvider::class,
+    SessionServiceProvider::class,
     TemplateServiceProvider::class,
     ViewServiceProvider::class,
+    ResponseEmitterServiceProvider::class,
     ErrorServiceProvider::class,
     MiddlewareServiceProvider::class,
     AppServiceProvider::class,
     RouteServiceProvider::class,
-    RequestServiceProvider::class,
     ModelServiceProvider::class,
     FileCacheServiceProvider::class,
     ControllerServiceProvider::class,

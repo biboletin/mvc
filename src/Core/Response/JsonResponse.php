@@ -7,18 +7,21 @@ use JsonException;
 use JsonSerializable;
 
 /**
- * Handles JSON responses
+ * HTTP response that serializes payloads to JSON.
+ *
+ * Provides convenience for encoding data to JSON and ensures the appropriate
+ * Content-Type header is set. The body is stored in a temporary stream.
  */
 class JsonResponse extends BaseResponse
 {
     /**
-     * Constructor
+     * Create a new JSON response with the given payload.
      *
-     * @param mixed $data
-     * @param int   $statusCode
-     * @param array $headers
+     * @param mixed $data       The data to encode as JSON. JsonSerializable objects are supported.
+     * @param int   $statusCode HTTP status code (default 200).
+     * @param array $headers    Additional headers to include in the response.
      *
-     * @throws JsonException
+     * @throws JsonException If encoding fails.
      */
     public function __construct($data = null, int $statusCode = 200, array $headers = [])
     {
@@ -30,19 +33,18 @@ class JsonResponse extends BaseResponse
         $body->write(json_encode($data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
         $body->rewind();
 
-
-        $headers['Content-Type'] = 'application/json';
+        $headers['Content-Type'] = ['application/json'];
 
         parent::__construct($statusCode, $headers, $body);
     }
 
     /**
-     * Set the data of the JSON response and re-encode it
+     * Set the response payload and re-encode to JSON.
      *
-     * @param $data
+     * @param mixed $data The data to encode as JSON. JsonSerializable objects are supported.
      *
-     * @return self
-     * @throws JsonException
+     * @return self New instance with an updated body stream.
+     * @throws JsonException If encoding fails.
      */
     public function setData($data): self
     {
@@ -58,20 +60,13 @@ class JsonResponse extends BaseResponse
     }
 
     /**
-     * Send the JSON response
+     * Emit the response to the client using the default ResponseEmitter.
      *
      * @return void
      */
     public function send(): void
     {
-        http_response_code($this->getStatusCode()); // Ensure proper HTTP status
-
-        foreach ($this->getHeaders() as $name => $values) {
-            foreach ($values as $value) {
-                header($name . ': ' . $value, true);
-            }
-        }
-
-        echo $this->getBody()->getContents();
+        $emitter = new ResponseEmitter();
+        $emitter->emit($this);
     }
 }

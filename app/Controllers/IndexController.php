@@ -3,6 +3,8 @@
 namespace Bibo\App\Controllers;
 
 use Bibo\Mvc\Core\Controller\Controller;
+use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
+use Bibo\Mvc\Core\Request\BaseRequest;
 use Bibo\Mvc\Core\Response\JsonResponse;
 use Bibo\Mvc\Core\Rest\HttpClient;
 use JsonException;
@@ -15,27 +17,31 @@ class IndexController extends Controller
     /**
      * Index
      *
+     * @param BaseRequest $request
+     *
      * @return string
+     * @throws NotFoundException
      */
-    public function index(): string
+    public function index(BaseRequest $request): string
     {
         $client = new HttpClient();
         $response = $client->get('https://jsonplaceholder.typicode.com/posts/3');
         $json = json_decode($response->getBody(), true);
-// dd($json);
+// dd($json, $request);
         $data = [];
 
-        return $this->render('home', $data);
+        return $this->view('home', $data);
     }
 
     /**
      * About
      *
      * @return string
+     * @throws NotFoundException
      */
     public function about(): string
     {
-        return $this->render('about', []);
+        return $this->view('about', []);
     }
 
     /**
@@ -53,14 +59,15 @@ class IndexController extends Controller
      *
      * @throws JsonException
      */
-    public function json(): JsonResponse
+    public function api(): JsonResponse
     {
         $client = new HttpClient();
         $response = $client->get('https://jsonplaceholder.typicode.com/posts/3');
 
         $json = json_decode($response->getBody(), JSON_PRETTY_PRINT);
 
-        return new JsonResponse($json);
+        // return new JsonResponse($json);
+        $this->json($json);
     }
 
     /**

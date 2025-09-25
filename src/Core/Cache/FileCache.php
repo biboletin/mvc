@@ -121,7 +121,7 @@ class FileCache implements CacheInterface
             throw new InvalidArgumentException('Cache directory must be specified.');
         }
 
-        // Ensure cache directory exists
+        // Ensure the cache directory exists
         if (!is_dir($cacheDir)) {
             mkdir($cacheDir, 0777, true);
         }
@@ -358,7 +358,7 @@ class FileCache implements CacheInterface
         } elseif (is_int($ttl)) {
             $this->setExpiresAt($now->modify("+{$ttl} seconds"));
         } else {
-            // no TTL, could mean "forever" or "until manually cleared"
+            // no TTL could mean "forever" or "until manually cleared"
             $this->setExpiresAt(null);
         }
 
@@ -622,7 +622,7 @@ class FileCache implements CacheInterface
     }
 
     /**
-     * Get cache path
+     * Get the cache path
      *
      * @return string
      */

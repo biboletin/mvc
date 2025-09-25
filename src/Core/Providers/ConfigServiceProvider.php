@@ -7,7 +7,7 @@ use Bibo\Mvc\Core\Cache\NullCache;
 use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Crypto\Crypto;
 use Bibo\Mvc\Core\Exception\Custom\Application\ConfigException;
-use Bibo\Mvc\Core\Logger\Logger;
+use Bibo\Mvc\Core\Logger\LogManager;
 use Exception;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -76,6 +76,9 @@ class ConfigServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
+        $this->container
+            ->get(LogManager::class)
+            ->get('app')
+            ->debug(__CLASS__ . ' booted successfully');
     }
 }

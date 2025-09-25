@@ -5,7 +5,7 @@ namespace Bibo\Mvc\Core\Providers;
 use Bibo\Mvc\Core\Error\Error;
 use Bibo\Mvc\Core\Error\ErrorResponseFactory;
 use Bibo\Mvc\Core\Facades\Env;
-use Bibo\Mvc\Core\Logger\Logger;
+use Bibo\Mvc\Core\Logger\LogManager;
 use Bibo\Mvc\Core\View\View;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -42,6 +42,9 @@ class ErrorServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
+        $this->container
+            ->get(LogManager::class)
+            ->get('app')
+            ->debug(__CLASS__ . ' booted successfully');
     }
 }

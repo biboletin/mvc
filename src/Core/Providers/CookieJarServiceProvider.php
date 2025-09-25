@@ -6,7 +6,7 @@ use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Cookie\CookieHandler;
 use Bibo\Mvc\Core\Cookie\CookieJarHandler;
 use Bibo\Mvc\Core\Crypto\Crypto;
-use Bibo\Mvc\Core\Logger\Logger;
+use Bibo\Mvc\Core\Logger\LogManager;
 use Psr\Container\NotFoundExceptionInterface;
 
 class CookieJarServiceProvider extends ServiceProvider
@@ -42,6 +42,9 @@ class CookieJarServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
+        $this->container
+            ->get(LogManager::class)
+            ->get('app')
+            ->debug(__CLASS__ . ' booted successfully');
     }
 }

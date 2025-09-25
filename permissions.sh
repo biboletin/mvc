@@ -18,10 +18,10 @@ chown -R www-data:www-data /var/www/html/mvc/storage/tmp/
 #composer update --optimize-autoloader
 
 #for development only
-chmod 777 /var/www/html/mvc/storage/cache/
-chmod 777 /var/www/html/mvc/storage/cookies/
-chmod 777 /var/www/html/mvc/storage/logs/
-chmod 777 /var/www/html/mvc/storage/session/
-chmod 777 /var/www/html/mvc/storage/tmp/
+chmod 775 /var/www/html/mvc/storage/cache/
+chmod 775 /var/www/html/mvc/storage/cookies/
+chmod 775 /var/www/html/mvc/storage/logs/
+chmod 775 /var/www/html/mvc/storage/session/
+chmod 775 /var/www/html/mvc/storage/tmp/
 
 chmod +x permissions.sh

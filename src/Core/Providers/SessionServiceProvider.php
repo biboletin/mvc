@@ -4,7 +4,7 @@ namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Crypto\Crypto;
-use Bibo\Mvc\Core\Logger\Logger;
+use Bibo\Mvc\Core\Logger\LogManager;
 use Bibo\Mvc\Core\Session\EncryptedSessionHandler;
 use Bibo\Mvc\Core\Session\SessionHandler;
 use Psr\Container\NotFoundExceptionInterface;
@@ -42,8 +42,6 @@ class SessionServiceProvider extends ServiceProvider
         $session->setHttpOnly($config->get('session.httponly'));
         $session->setSameSite($config->get('session.samesite'));
         $session->setSavePath(SESSION_SAVE_PATH);
-        $session->start();
-        $session->set('user_id', 5);
 
         $this->container->set(SessionHandler::class, function () use ($session) {
             return $session;
@@ -55,6 +53,9 @@ class SessionServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
+        $this->container
+            ->get(LogManager::class)
+            ->get('app')
+            ->debug(__CLASS__ . ' booted successfully');
     }
 }

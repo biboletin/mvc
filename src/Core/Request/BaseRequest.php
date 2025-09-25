@@ -4,16 +4,36 @@ namespace Bibo\Mvc\Core\Request;
 
 use Bibo\Mvc\Core\Enums\HttpMethod;
 use Bibo\Mvc\Core\Enums\HttpProtocolVersion;
+use Bibo\Mvc\Core\Traits\Http\ClientInfoHelper;
+use Bibo\Mvc\Core\Traits\Http\HttpContentHelper;
+use Bibo\Mvc\Core\Traits\Http\InputHelper;
+use Bibo\Mvc\Core\Traits\Http\RequestHelper;
+use Bibo\Mvc\Core\Traits\Http\SecurityHelper;
+use Bibo\Mvc\Core\Traits\Http\ServerHelper;
+use Bibo\Mvc\Core\Traits\Http\UrlHelper;
 use InvalidArgumentException;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
- * Base request class
+ * PSR-7 ServerRequest implementation used by the framework.
+ *
+ * Wraps superglobals into an immutable request object and exposes helpers via
+ * composed traits (client info, input parsing, security, server, and URL helpers).
+ * Provides fluent with* methods to comply with PSR-7 immutability requirements.
  */
 class BaseRequest implements ServerRequestInterface
 {
+    use ClientInfoHelper;
+    use HttpContentHelper;
+    use InputHelper;
+    use RequestHelper;
+    use SecurityHelper;
+    use ServerHelper;
+    use UrlHelper;
+
     /**
      * Method
      *
@@ -91,11 +111,14 @@ class BaseRequest implements ServerRequestInterface
      */
     private string $protocolVersion = '1.1';
 
+    private ContainerInterface $container;
+
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct(ContainerInterface $container)
     {
+        $this->container = $container;
         $this->protocolVersion = HttpProtocolVersion::V1->value;
         $this->method = HttpMethod::fromString($_SERVER['REQUEST_METHOD'])->value
             ?? HttpMethod::fromString('get')->value;

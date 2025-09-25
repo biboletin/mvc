@@ -1,80 +1,100 @@
-# 📘 Biboletin Framework Roadmap
+# 📘 Bibo MVC Framework Roadmap
 
-This roadmap outlines the features and development milestones for the Biboletin PHP framework.
+This roadmap reflects the current state of the Bibo MVC framework and outlines what is complete, what remains, and recommendations for next steps.
+
+---
+
+## 🔎 Status Summary (Done vs To Do)
+
+Done (highlights):
+- PSR-4 autoloading, DI container (PSR-11), PSR-7/15 HTTP stack, middleware pipeline, response emitter
+- Router matching via composite strategies: Exact, Regex, and Cached Regex (with pattern caching)
+- Advanced router with named routes, parameters, groups, middleware per route/group, resource routes
+- Service provider architecture and boot cycle (see bootstrap/bootstrap.php); providers emit boot logs via LogManager
+- Twig templating, view layer, error handling, CSRF middleware, session provider
+- File cache (PSR-16), logging system with LogManager, rotating file handler and contextual logging
+- Rich HTTP request helper traits (RequestHelper, InputHelper, SecurityHelper, UrlHelper, HttpContentHelper); improved JsonResponse and ResponseEmitter
+- CLI tooling (console kernel + registered commands), configuration files and .env support
+- Illuminate Database package installed; configuration scaffold present
+- Static analysis (PHPStan), code style tooling configured (PHPCS), PHPUnit config present
+
+To Do (highlights):
+- Event dispatcher (PSR-14 or custom), task scheduler/cron integration
+- Authentication (guards), authorization/permissions (RBAC/policies)
+- Migrations/seeds workflow wire-up and developer commands
+- Debug toolbar/profiler, code coverage, CI pipeline
+- Optional modules system and admin panel
 
 ---
 
 ## ✅ Phase 1: Core Foundations
 
-- [x] PSR-16 FileCache with optional encryption
+- [x] PSR-16 FileCache (file-based; optional encryption available via Crypto services)
 - [x] PSR-4 Autoloading via Composer
-- [x] Exception handling (try/catch)
-- [ ] Central configuration system (`config/*.php` or `.env`)
-- [ ] CLI config loader and environment manager
+- [x] Central configuration system (`config/*.php` + `.env` support)
+- [x] Exception and error handling integration
+- [x] CLI tooling entry point (`./console`) and command registration
 
 ---
 
 ## 🧱 Phase 2: HTTP Core
 
-- [x] PSR-7 HTTP Message (Request, Response, URI, Stream)
-- [x] PSR-15 Middleware system
-- [x] Basic router
-- [ ] Named routes and route parameters
-- [ ] Route groups and prefixes
-- [ ] Middleware support per route/group
-- [ ] Response emitter
-- [ ] Error handler (dev/prod support)
+- [x] PSR-7 HTTP Messages (Request, Response, URI, Stream)
+- [x] PSR-15 Middleware system and dispatcher
+- [x] Router with: named routes, parameters, groups/prefixes, per-route/group middleware, resource routes
+- [x] Response emitter service
+- [x] Error handler with environment awareness (dev/prod)
 
 ---
 
 ## 📦 Phase 3: Services & Utilities
 
-- [x] PSR-3 Logger (custom)
-- [x] Log rotation, formatters, contextual logging
+- [x] PSR-3 Logger (custom) with rotating file handler and context
 - [x] PSR-11 Dependency Injection container
-- [ ] Service provider support
+- [x] Service provider support (register + boot lifecycle)
 - [ ] Event dispatcher (PSR-14 or custom)
-- [ ] Task scheduler (optional)
+- [~] Task system (base tasks exist); scheduler/cron integration and CLI UX pending
+
+Legend: [~] = partial/in progress
 
 ---
 
 ## 🧰 Phase 4: Developer Experience
 
 - [x] Twig template engine integration
-- [ ] CLI command tool (e.g., `php biboletin make:controller`)
+- [x] CLI command tool (console kernel + commands in app/Commands and bootstrap/commands.php)
+- [x] `.env` support with config fallbacks
 - [ ] Debug bar / profiler
-- [ ] `.env` support + config fallback
 - [ ] Modular structure (`Modules/User`, `Modules/Admin`, etc.)
 
 ---
 
 ## 🔐 Phase 5: Security & Sessions
 
-- [x] Role-based access control middleware
-- [ ] CSRF protection
-- [ ] Session management
+- [x] CSRF protection (middleware + helpers)
+- [x] Session management (service provider + config)
 - [ ] Authentication (basic / token / JWT)
-- [ ] Permission middleware
+- [ ] Authorization / Permission middleware (roles, policies, gates)
 
 ---
 
 ## 🌐 Phase 6: Database & ORM
 
-- [ ] PDO/DBAL database connection
-- [ ] Query builder
-- [ ] Lightweight ORM or Eloquent-style integration
-- [ ] Migration system
+- [x] Database library available (illuminate/database installed)
+- [ ] Connection bootstrap and service provider wiring for DB
+- [ ] Migrations system and CLI commands
 - [ ] Seeder and data factory support
+- [ ] Optional: lightweight repository/ORM helpers on top of Eloquent
 
 ---
 
 ## 🧪 Phase 7: Testing & CI
 
-- [ ] PHPUnit or Pest setup
-- [x] PHPStan static analysis
-- [ ] PHP-CS-Fixer for code style
-- [ ] Code coverage tools
-- [ ] GitHub Actions for CI
+- [x] PHPUnit scaffold (phpunit.xml) and tests/ directory
+- [x] Static analysis: PHPStan (configured), Psalm config available
+- [ ] Code style: auto-fix (PHP-CS-Fixer) or PHPCBF integration in CI
+- [ ] Code coverage tools (Xdebug/PCOV) and reporting
+- [ ] CI pipeline (GitHub Actions) for tests, static analysis, linting, and build
 
 ---
 
@@ -82,33 +102,44 @@ This roadmap outlines the features and development milestones for the Biboletin 
 
 - [ ] Web admin panel (users, roles, logs)
 - [ ] CMS module (pages, menus)
-- [ ] Web-based config file editor
-- [ ] Cache viewer and log viewer
+- [ ] Web-based config editor
+- [ ] Cache and log viewers
 
 ---
 
 ## 📦 PSR Standards Being Followed
 
-- [x] PSR-1 / PSR-12: Coding standards
-- [x] PSR-3: Logger interface
-- [x] PSR-4: Autoloading standard
-- [x] PSR-7: HTTP message interface
-- [x] PSR-11: Container interface
-- [x] PSR-15: Middleware interface
-- [x] PSR-16: Simple Cache interface
-- [ ] PSR-6: Advanced Caching (optional)
+- [x] PSR-1 / PSR-12: Coding standards (phpcs.xml provided)
+- [x] PSR-3: Logger
+- [x] PSR-4: Autoloading
+- [x] PSR-7: HTTP messages
+- [x] PSR-11: Container
+- [x] PSR-15: HTTP Server Middleware
+- [x] PSR-16: Simple Cache
+- [ ] PSR-6: Caching (optional)
 - [ ] PSR-14: Events (optional)
-- [ ] PSR-17/18: HTTP factories/client (optional)
+- [ ] PSR-17/18: HTTP factories/client compliance (interfaces installed; full compliance TBD)
 
 ---
 
-## 🛠️ Contributing Guidelines (to be added)
+## 💡 Suggestions & Next Steps
 
-- [ ] Code style rules (PHP-CS-Fixer config)
-- [ ] PR review checklist
-- [ ] Issue template
-- [ ] Contributing guide
+Short term:
+- Implement a lightweight event dispatcher (PSR-14) and wire provider/bootstrapping
+- Finalize database wiring: connection manager, migration runner, seeder CLI commands
+- Add Auth middleware + guard abstraction; basic session auth with login/logout routes
+- Introduce a minimal debug toolbar (request timeline, logs, config/env snapshot)
+
+Medium term:
+- CI pipeline (GitHub Actions) running: composer validate, phpstan, psalm, phpcs, phpunit, build assets
+- Add code coverage and quality gates; integrate PHPCBF/PHP-CS-Fixer auto-fixes
+- Provide maker commands: make:controller, make:model, make:migration, make:seeder
+
+Long term / optional:
+- Modules/packages system with service provider auto-discovery
+- Admin panel: users/roles/permissions, logs viewer, cache viewer
+- Publish a starter template and documentation site (docs/) with examples
 
 ---
 
-_Updated: {{TODAY}}_
+_Updated: 2025-09-26 02:45_

@@ -26,4 +26,26 @@ class HtmlResponse extends BaseResponse
 
         parent::__construct($statusCode, $headers, $body);
     }
+
+    /**
+     * Returns a new instance with updated HTML content
+     *
+     * @param string $html
+     *
+     * @return $this
+     */
+    public function withHtml(string $html): static
+    {
+        $body = new Stream(fopen('php://temp', 'r+'));
+        $body->write($html);
+        $body->rewind();
+
+        return $this->withBody($body);
+    }
+
+    public function send(): void
+    {
+        $emitter = new ResponseEmitter();
+        $emitter->emit($this);
+    }
 }

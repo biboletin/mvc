@@ -119,7 +119,7 @@ class Request implements RequestInterface
      */
     public function withProtocolVersion(string $version): MessageInterface
     {
-        // TODO: Implement withProtocolVersion() method.
+        // Return a clone of this message with the HTTP protocol version updated per PSR-7 immutability requirements.
         $clone = clone $this;
         $clone->protocolVersion = $version;
 

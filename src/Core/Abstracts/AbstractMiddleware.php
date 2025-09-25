@@ -4,13 +4,17 @@ namespace Bibo\Mvc\Core\Abstracts;
 
 use Bibo\Mvc\Core\Error\Error;
 use Bibo\Mvc\Core\Error\ErrorResponseFactory;
+use Bibo\Mvc\Core\Logger\LogManager;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 
-class AbstractMiddleware
+abstract class AbstractMiddleware
 {
     protected ContainerInterface $container;
+
+    protected LoggerInterface $logger;
     /**
      * Error handler
      *
@@ -36,6 +40,7 @@ class AbstractMiddleware
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->logger = $container->get(LogManager::class)->get('security');
         $this->errorHandler = $container->get(Error::class);
         $this->responseFactory = $container->get(ErrorResponseFactory::class);
     }

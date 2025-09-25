@@ -80,7 +80,7 @@ class FileInclusionMiddleware extends AbstractMiddleware implements MiddlewareIn
     /**
      * Detect file inclusion patterns in a string or array
      *
-     * @param mixed $value
+     * @param  mixed $value
      * @return bool
      */
     private function detectInclusion(mixed $value): bool

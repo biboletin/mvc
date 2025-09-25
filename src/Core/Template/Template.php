@@ -55,7 +55,7 @@ class Template
 
         // Check if the view file exists
         if (!file_exists(VIEW_PATH . $templateName)) {
-            throw new NotFoundException('View file not found: ' . $view, 404);
+            throw new NotFoundException('View [' . $view . '] not found!', 404);
         }
 
         return $this->engine->render($templateName, $parameters);

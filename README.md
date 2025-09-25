@@ -111,13 +111,16 @@ mvc/
 ## Features
 
 ### Core Framework Features
-- **MVC Architecture**: Clean separation of concerns
-- **Dependency Injection**: PSR-11 compliant container
-- **Service Providers**: Modular service registration
-- **Middleware Pipeline**: Request/response processing
-- **Routing System**: Flexible route matching with parameters
-- **Template Engine**: Twig integration for views
-- **HTTP Client**: Built-in REST client for API consumption
+- MVC Architecture with clean separation of concerns
+- PSR-11 Dependency Injection Container
+- Service Providers (register + boot lifecycle)
+- PSR-15 Middleware pipeline with MiddlewareDispatcher
+- Routing with composite strategies: Exact, Regex, and Cached Regex matching
+- PSR-7 Response emission via ResponseEmitter
+- Controller helpers: view(), json(), redirect()
+- Rich Request helpers: RequestHelper, InputHelper, SecurityHelper, UrlHelper, HttpContentHelper
+- Twig templating engine for views
+- Structured logging via LogManager with named channels (e.g., "app")
 
 ### Database & ORM
 - **Eloquent ORM**: Laravel's database abstraction layer
@@ -317,13 +320,13 @@ Route::get('/hello', [HelloController::class, 'index']);
 <?php
 namespace Bibo\App\Controllers;
 
-use Bibo\Core\Controller\Controller;
+use Bibo\Mvc\Core\Controller\Controller;
 
 class HelloController extends Controller
 {
     public function index(): string
     {
-        return $this->render('hello', ['message' => 'Hello World!']);
+        return $this->view('hello', ['message' => 'Hello World!']);
     }
 }
 ```
@@ -343,7 +346,7 @@ class HelloController extends Controller
 
 ## Routing
 
-The routing system supports various HTTP methods and parameter binding:
+The routing system supports various HTTP methods and parameter binding. Under the hood, routes are matched using a composite strategy that includes Exact path matching, Regex matching, and a Cached Regex matcher for dynamic routes to improve performance:
 
 ### Basic Routes
 ```php
@@ -394,21 +397,21 @@ All controllers extend the base `Controller` class:
 <?php
 namespace Bibo\App\Controllers;
 
-use Bibo\Core\Controller\Controller;
-use Bibo\Core\Response\JsonResponse;
+use Bibo\Mvc\Core\Controller\Controller;
+use Bibo\Mvc\Core\Response\JsonResponse;
 
 class UserController extends Controller
 {
     public function index(): string
     {
         $users = User::all();
-        return $this->render('users/index', ['users' => $users]);
+        return $this->view('users/index', ['users' => $users]);
     }
 
     public function show(int $id): string
     {
         $user = User::find($id);
-        return $this->render('users/show', ['user' => $user]);
+        return $this->view('users/show', ['user' => $user]);
     }
 
     public function api(): JsonResponse
@@ -422,7 +425,7 @@ class UserController extends Controller
 ### Response Types
 Controllers can return various response types:
 
-- **View Response**: `return $this->render('template', $data);`
+- **View Response**: `return $this->view('template', $data);`
 - **JSON Response**: `return new JsonResponse($data);`
 - **Redirect Response**: `return new RedirectResponse('/path');`
 - **HTML Response**: `return new HtmlResponse($html);`
@@ -611,19 +614,20 @@ Cache::tags(['users'])->flush();
 The framework provides comprehensive logging capabilities:
 
 ### Basic Logging
-```php
-use Bibo\Core\Logger\Logger;
+You can log using the LogManager and named channels (e.g., "app"):
 
-// Log levels
-Logger::emergency('System is unusable');
-Logger::alert('Action must be taken immediately');
-Logger::critical('Critical conditions');
-Logger::error('Error conditions');
-Logger::warning('Warning conditions');
-Logger::notice('Normal but significant condition');
-Logger::info('Informational messages');
-Logger::debug('Debug-level messages');
+```php
+use Bibo\Mvc\Core\Logger\LogManager;
+
+// Resolve from the container
+$logger = $container->get(LogManager::class)->get('app');
+
+$logger->info('Application booted', ['service' => 'RouteServiceProvider']);
+$logger->debug('Debug message');
+$logger->error('Something went wrong', ['exception' => $e ?? null]);
 ```
+
+Supported log levels include: emergency, alert, critical, error, warning, notice, info, debug.
 
 ### Log Handlers
 Configure logging in `config/log.php`:

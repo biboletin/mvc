@@ -62,6 +62,10 @@ class SqlInjectionMiddleware extends AbstractMiddleware implements MiddlewareInt
 
         foreach ($inputs as $key => $value) {
             if ($this->detectInjection($value)) {
+                $this->logger->error(
+                    'Potential SQL Injection detected in input: ' . htmlspecialchars($key),
+                    (array) $request->getQueryParams()
+                );
                 throw new BadRequestException(
                     'Potential SQL Injection detected in input: ' . htmlspecialchars($key),
                     HttpStatus::BadRequest->value

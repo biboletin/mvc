@@ -4,13 +4,16 @@ use Bibo\App\Controllers\IndexController;
 use Bibo\App\Controllers\InstallController;
 use Bibo\App\Controllers\TestController;
 use Bibo\Mvc\Core\Facades\Route;
+use Bibo\Mvc\Core\Request\BaseRequest;
 use Bibo\Mvc\Core\Response\JsonResponse;
 
 Route::get('/', [IndexController::class, 'index'])
     ->name('home');
 
 
-Route::get('/api/ping', [TestController::class, 'ping'], ['cors'])->name('api.ping');
+Route::get('/api/ping', [TestController::class, 'ping'])
+    ->middleware('cors')
+    ->name('api.ping');
 
 Route::get('/rest/ping', function () {
     return new JsonResponse([
@@ -40,10 +43,10 @@ Route::get('/about', [IndexController::class, 'about'])
 Route::get('/contacts', [IndexController::class, 'contacts']);
 
 Route::get('/info', function () {
-    echo 'Info func';
-});
+    return "Route::get('/info', function () {";
+})->middleware('rate_limit');
 
-Route::get('/json', [IndexController::class, 'json']);
+Route::get('/api/json', [IndexController::class, 'api']);
 
 Route::get('/user/{name}', function (string $name) {
     return 'Hello ' . $name;
@@ -53,8 +56,10 @@ Route::get('/edit/{id}', function (int $id) {
     return 'Edit user with id: ' . $id;
 });
 
-Route::get('/user/{name}/{id}', [IndexController::class, 'user']);
+Route::get('/user/{name}/{id:\d+}', [IndexController::class, 'user']);
 
 Route::get('/install', [InstallController::class, 'index']);
 
-// Route::dump();
+Route::get('/test', function (BaseRequest $request) {
+    dd($request);
+});

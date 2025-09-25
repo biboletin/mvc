@@ -2,14 +2,20 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Mvc\Core\Logger\Logger;
+use Bibo\Mvc\Core\Logger\LogManager;
 use Bibo\Mvc\Core\Middleware\MiddlewareDispatcher;
 use Psr\Container\NotFoundExceptionInterface;
 
+/**
+ * Service provider for configuring and registering middleware.
+ *
+ * It loads middleware configuration, registers global and route middleware,
+ * defines middleware groups, and exposes a shared MiddlewareDispatcher.
+ */
 class MiddlewareServiceProvider extends ServiceProvider
 {
     /**
-     * Register service provider
+     * Register middleware dispatcher and configure middleware from bootstrap.
      *
      * @return void
      */
@@ -19,8 +25,8 @@ class MiddlewareServiceProvider extends ServiceProvider
 
         $config = require BOOTSTRAP_PATH . 'middleware.php';
 
-
         // Register global middleware
+        $global = [];
         foreach ($config['global'] ?? [] as $class) {
             $global[] = new $class($this->container);
             $dispatcher->registerGlobal($global);
@@ -48,13 +54,16 @@ class MiddlewareServiceProvider extends ServiceProvider
     }
 
     /**
-     * Boot service provider
+     * Boot service provider.
      *
      * @return void
-     * @throws NotFoundExceptionInterface
+     * @throws NotFoundExceptionInterface When the log manager service is not found.
      */
     public function boot(): void
     {
-        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
+        $this->container
+            ->get(LogManager::class)
+            ->get('app')
+            ->debug(__CLASS__ . ' booted successfully');
     }
 }

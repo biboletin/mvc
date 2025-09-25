@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+
+use Bibo\Mvc\Core\Console\ConsoleKernel;
+use Bibo\Mvc\Core\Container\Container;
+
+require __DIR__ . '/vendor/autoload.php';
+
+$container = new Container();
+$kernel = new ConsoleKernel($container);
+
+$registerCommands = require __DIR__ . '/bootstrap/commands.php';
+
+$registerCommands($kernel);
+
+exit($kernel->run($argv));

@@ -49,6 +49,10 @@ class XssMiddleware extends AbstractMiddleware implements MiddlewareInterface
 
         foreach ($inputs as $key => $value) {
             if ($this->detectXss($value)) {
+                $this->logger->error(
+                    'Potential XSS detected in input: ' . htmlspecialchars($key),
+                    (array) $request->getQueryParams()
+                );
                 throw new BadRequestException(
                     'Potential XSS detected in input: ' . htmlspecialchars($key),
                     HttpStatus::BadRequest->value
@@ -62,7 +66,7 @@ class XssMiddleware extends AbstractMiddleware implements MiddlewareInterface
     /**
      * Detect XSS patterns in a string or array
      *
-     * @param mixed $value
+     * @param  mixed $value
      * @return bool
      */
     private function detectXss(mixed $value): bool

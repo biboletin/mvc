@@ -100,7 +100,7 @@ class App
                     public function handle(ServerRequestInterface $request): ResponseInterface
                     {
                         // Router executes controller/action, may throw exceptions
-                        return $this->router->matchRoutes($request->getMethod(), $request->getUri()->getPath());
+                        return $this->router->dispatch($request);
                     }
                 }
             );

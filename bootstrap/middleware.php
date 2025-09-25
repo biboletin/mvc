@@ -13,8 +13,8 @@ return [
     // Add your global middleware here
     'global' => [
         ErrorMiddleware::class,
-        SqlInjectionMiddleware::class,
         XssMiddleware::class,
+        SqlInjectionMiddleware::class,
         FileInclusionMiddleware::class,
         RateLimitMiddleware::class,
     ],
@@ -22,7 +22,10 @@ return [
     // Middleware groups
     'groups' => [
         // Add your web middleware here
-        'web' => [],
+        'web' => [
+            SqlInjectionMiddleware::class,
+            XssMiddleware::class,
+        ],
 
         // Add your API middleware here
         'api' => [],

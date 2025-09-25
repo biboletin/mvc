@@ -3,7 +3,7 @@
 namespace Bibo\Mvc\Core\Error;
 
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
-use Bibo\Mvc\Core\Logger\Logger;
+use Bibo\Mvc\Core\Logger\LogManager;
 use Bibo\Mvc\Core\Request\BaseRequest;
 use Bibo\Mvc\Core\Response\ResponseEmitter;
 use ErrorException;
@@ -31,7 +31,7 @@ class Error
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->logger = $container->get(Logger::class);
+        $this->logger = $container->get(LogManager::class)->get('app');
         $this->container = $container;
     }
 
@@ -75,7 +75,7 @@ class Error
             $factory = $this->container->get(ErrorResponseFactory::class);
             $emitter = $this->container->get(ResponseEmitter::class);
             $request = $this->container->get(BaseRequest::class);
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface | Throwable $e) {
             $exception = $e;
         }
 
@@ -118,11 +118,11 @@ class Error
     }
 
     /**
-     * Format exception for logging (string
+     * Format a Throwable into a single-line string suitable for logs.
      *
-     * @param Throwable $e
+     * @param Throwable $e The exception or error to format
      *
-     * @return string
+     * @return string A formatted string containing type, message, file, line, and stack trace
      */
     public function formatThrowable(Throwable $e): string
     {

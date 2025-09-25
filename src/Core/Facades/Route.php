@@ -3,9 +3,9 @@
 namespace Bibo\Mvc\Core\Facades;
 
 use Bibo\Mvc\Core\Enums\HttpStatus;
+use Bibo\Mvc\Core\Exception\Custom\Http\MethodNotAllowedException;
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Router\BaseRouter;
-use JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -41,7 +41,7 @@ final class Route
     }
 
     /**
-     * Set GET route
+     * Set the GET route
      *
      * @param string         $path
      * @param array|callable $handler
@@ -54,7 +54,7 @@ final class Route
     }
 
     /**
-     * Set POST route
+     * Set the POST route
      *
      * @param string         $path
      * @param array|callable $handler
@@ -68,7 +68,7 @@ final class Route
     }
 
     /**
-     * Set PUT route
+     * Set the PUT route
      *
      * @param string         $path
      * @param array|callable $handler
@@ -110,7 +110,7 @@ final class Route
     }
 
     /**
-     * Set HEAD route
+     * Set the HEAD route
      *
      * @param string         $path
      * @param array|callable $handler
@@ -228,12 +228,11 @@ final class Route
      * @return ResponseInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundException
-     * @throws JsonException
-     * @throws NotFoundExceptionInterface
+     * @throws NotFoundExceptionInterface|MethodNotAllowedException
      */
     public static function match(string|array $method, string $uri): ResponseInterface
     {
-        return self::getInstance()->matchRoutes($method, $uri);
+        return self::getInstance()->dispatch($method, $uri);
     }
 
     /**
@@ -241,12 +240,11 @@ final class Route
      *
      * @param string|array $middleware
      *
-     * @return void
+     * @return BaseRouter
      */
-    public function middleware(string|array $middleware): void
+    public function middleware(string|array $middleware): BaseRouter
     {
-        // dd(self::$instance);
-        self::getInstance()->middleware($middleware);
+        return self::getInstance()->middleware($middleware);
     }
 
     /**
@@ -284,13 +282,8 @@ final class Route
         return self::getInstance()->getRoutes();
     }
 
-    /**
-     * Dump routes as string
-     *
-     * @return void
-     */
-    public static function dump(): void
+    public static function setRoutes(array $routes): void
     {
-        self::getInstance()->dump();
+        self::setRoutes($routes);
     }
 }

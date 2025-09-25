@@ -14,6 +14,7 @@
         "files":[
             "src/constants/main.php",
             "src/constants/app.php",
+            "src/functions/formatters.php",
             "src/functions/main.php"
         ]
     },
@@ -49,6 +50,7 @@
         "ext-libxml": "*",
         "ext-openssl": "*",
         "ext-bz2": "*",
-        "ext-intl": "*"
+        "ext-intl": "*",
+        "ext-http": "*"
     }
 }

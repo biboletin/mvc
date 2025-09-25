@@ -151,7 +151,7 @@ class Stream implements StreamInterface
      */
     public function getSize(): ?int
     {
-        // TODO: Implement getSize() method.
+        // Return the known size in bytes when available; compute or cache it in implementations that track length.
         if ($this->size === null) {
             return null;
         }

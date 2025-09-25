@@ -82,4 +82,18 @@ return [
      * Default is 10485760 bytes (10 MB).
      */
     'max_file_size' => get_env('log.max_size', 10485760),
+
+    'channels' => [
+
+        'app' => [
+            'type' => 'text',
+            'path' => 'app'
+        ],
+
+        'security' => [
+            'type' => 'json',
+            'path' => 'security',
+            'pretty_print' => false,
+        ],
+    ],
 ];

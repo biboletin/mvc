@@ -5,15 +5,15 @@
     <arg name="colors"/>
 	<arg name="parallel" value="75"/>
 	<arg value="np"/>
-    <ini name="memory_limit" value="1024M"/>
+    <ini name="memory_limit" value="2048M"/>
+    <file>app</file>
     <file>src</file>
     <file>config</file>
-    <file>install</file>
-    <file>app/Controllers</file>
-    <file>app/Models</file>
-    <file>public/index.php</file>
+    <file>bootstrap</file>
     <file>routes</file>
+    <file>install</file>
     <file>tests</file>
+    <file>public/index.php</file>
     <exclude-pattern type="relative">*/vendor/**/tmp/**/tests/*</exclude-pattern>
 	<rule ref="Internal.Tokenizer.Exception">
 		<type>error</type>

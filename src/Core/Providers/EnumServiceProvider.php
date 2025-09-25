@@ -6,7 +6,7 @@ use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Enums\Environment;
 use Bibo\Mvc\Core\Enums\LogLevels;
 use Bibo\Mvc\Core\Facades\Env;
-use Bibo\Mvc\Core\Logger\Logger;
+use Bibo\Mvc\Core\Logger\LogManager;
 use Psr\Container\NotFoundExceptionInterface;
 
 class EnumServiceProvider extends ServiceProvider
@@ -37,6 +37,9 @@ class EnumServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
+        $this->container
+            ->get(LogManager::class)
+            ->get('app')
+            ->debug(__CLASS__ . ' booted successfully');
     }
 }

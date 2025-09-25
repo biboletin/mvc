@@ -179,7 +179,7 @@ class NullCache implements CacheInterface
     }
 
     /**
-     * Get cache path
+     * Get a cache path
      *
      * @return void
      */

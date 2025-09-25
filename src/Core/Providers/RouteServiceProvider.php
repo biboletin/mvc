@@ -3,33 +3,58 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Facades\Route;
-use Bibo\Mvc\Core\Logger\Logger;
+use Bibo\Mvc\Core\Logger\LogManager;
 use Bibo\Mvc\Core\Router\BaseRouter;
-use Bibo\Mvc\Core\Router\CachedRegexMatchStrategy;
+use Bibo\Mvc\Core\Strategies\Router\CachedRegexMatchStrategy;
+use Bibo\Mvc\Core\Strategies\Router\CompositeMatchStrategy;
+use Bibo\Mvc\Core\Strategies\Router\ExactMatchStrategy;
+use Bibo\Mvc\Core\Strategies\Router\RegexMatchStrategy;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
+/**
+ * Service provider that bootstraps the routing layer.
+ *
+ * It composes route matching strategies, initializes the router and facade,
+ * loads route definitions, and registers the router instance in the container.
+ */
 class RouteServiceProvider extends ServiceProvider
 {
     /**
-     * Register service provider
+     * Register router and strategies, then load route definitions.
      *
      * @return void
+     * @throws ContainerExceptionInterface If container interaction fails during setup.
      */
     public function register(): void
     {
-        $router = new BaseRouter($this->container, new CachedRegexMatchStrategy());
+        $routeStrategies = [
+            new ExactMatchStrategy(),
+            new RegexMatchStrategy(),
+            new CachedRegexMatchStrategy(),
+        ];
+        $strategy = new CompositeMatchStrategy($routeStrategies);
+        $router = new BaseRouter($this->container, $strategy);
         Route::init($router);
 
+        // Load application routes
         include ROUTES_PATH . 'web.php';
 
+        // Expose the router via the container
         $this->container->set(BaseRouter::class, fn () => $router);
     }
 
     /**
-     * @throws NotFoundExceptionInterface
+     * Boot the provider and log successful initialization.
+     *
+     * @throws NotFoundExceptionInterface When the log manager service is not found.
+     * @return void
      */
     public function boot(): void
     {
-        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
+        $this->container
+            ->get(LogManager::class)
+            ->get('app')
+            ->debug(__CLASS__ . ' booted successfully');
     }
 }

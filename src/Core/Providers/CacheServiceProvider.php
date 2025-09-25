@@ -4,7 +4,7 @@ namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Cache\Cache;
 use Bibo\Mvc\Core\Config\ConfigHandler;
-use Bibo\Mvc\Core\Logger\Logger;
+use Bibo\Mvc\Core\Logger\LogManager;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
@@ -38,6 +38,9 @@ class CacheServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container->get(Logger::class)->debug(__CLASS__ . ' booted successfully');
+        $this->container
+            ->get(LogManager::class)
+            ->get('app')
+            ->debug(__CLASS__ . ' booted successfully');
     }
 }

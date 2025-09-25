@@ -20,7 +20,7 @@ abstract class Model
      */
     public function __construct()
     {
-        // TODO: Implement __construct() method.
+        // Initialize model state here if needed (e.g., set defaults or establish connections).
     }
 
     /**
@@ -31,7 +31,7 @@ abstract class Model
      */
     public static function find(int $id): ?static
     {
-        // TODO: Implement find() method.
+        // Query the underlying data source by primary key and return a populated model instance, or null if not found.
         return null;
     }
 
@@ -42,7 +42,7 @@ abstract class Model
      */
     public static function all(): array
     {
-        // TODO: Implement all() method.
+        // Retrieve all records from the data source and return them as an array of model instances.
         return [];
     }
 
@@ -54,7 +54,7 @@ abstract class Model
      */
     public static function create(array $data): static
     {
-        // TODO: Implement create() method.
+        // Persist the provided attributes to the data source and return the newly created model instance.
         return new static();
     }
 
@@ -66,7 +66,7 @@ abstract class Model
      */
     public static function update(array $data): bool
     {
-        // TODO: Implement update() method.
+        // Apply the given attributes to an existing record and return true on success; false otherwise.
         return false;
     }
 
@@ -78,7 +78,7 @@ abstract class Model
      */
     public static function delete(int $id): bool
     {
-        // TODO: Implement delete() method.
+        // Remove the record identified by the given primary key and return true on success; false otherwise.
         return false;
     }
 
@@ -91,7 +91,7 @@ abstract class Model
      */
     public static function query(string $query, array $params): array|bool
     {
-        // TODO: Implement query() method.
+        // Execute the SQL statement with bound parameters; return result set for SELECT queries or boolean for write operations.
         return [];
     }
 
@@ -102,7 +102,7 @@ abstract class Model
      */
     public static function toArray(): array
     {
-        // TODO: Implement toArray() method.
+        // Return a primitive array representation of the model suitable for APIs, logs, or persistence.
         return [];
     }
 
@@ -113,7 +113,7 @@ abstract class Model
      */
     public static function toJson(): string
     {
-        // TODO: Implement toJson() method.
+        // Convert the model's array representation to JSON; customize encoding options as needed.
         return json_encode(static::toArray()) ?: '{}';
     }
 
@@ -122,6 +122,6 @@ abstract class Model
      */
     public function __destruct()
     {
-        // TODO: Implement __destruct() method.
+        // Perform any necessary cleanup for the model (e.g., freeing resources or closing connections).
     }
 }

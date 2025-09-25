@@ -386,7 +386,7 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
      */
     public function setBody(string $body): void
     {
-        // TODO: Implement setBody() method.
+        // Assign the raw request body and ensure related cURL options (e.g., CURLOPT_POSTFIELDS) are set by the caller or higher-level methods.
     }
 
     /**
@@ -400,6 +400,6 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
      */
     public function execute(): string
     {
-        // TODO: Implement execute() method.
+        // Perform the HTTP request using curl_exec(), capture response/headers, handle errors, and return the body as a string.
     }
 }

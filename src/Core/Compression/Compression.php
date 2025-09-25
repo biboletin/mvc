@@ -15,7 +15,7 @@ class Compression implements CompressionInterface
      */
     public function compress($data): mixed
     {
-        // TODO: Implement compress() method.
+        // Implement a compression strategy here (e.g., gzip, zlib); return the compressed string or throw on failure.
     }
 
     /**
@@ -27,6 +27,6 @@ class Compression implements CompressionInterface
      */
     public function decompress($data): mixed
     {
-        // TODO: Implement uncompress() method.
+        // Implement the corresponding decompression strategy (e.g., gunzip); return the original string or throw on failure.
     }
 }

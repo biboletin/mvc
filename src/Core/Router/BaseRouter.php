@@ -4,16 +4,16 @@ namespace Bibo\Mvc\Core\Router;
 
 use Bibo\Mvc\Core\Enums\HttpMethod;
 use Bibo\Mvc\Core\Enums\HttpStatus;
+use Bibo\Mvc\Core\Exception\Custom\Http\MethodNotAllowedException;
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Interfaces\RouteMatchingStrategyInterface;
 use Bibo\Mvc\Core\Interfaces\RouterInterface;
 use Bibo\Mvc\Core\Middleware\MiddlewareDispatcher;
 use Bibo\Mvc\Core\Request\BaseRequest;
-use Bibo\Mvc\Core\Request\Stream;
+use Bibo\Mvc\Core\Resolver\ArgumentResolver;
 use Bibo\Mvc\Core\Response\HtmlResponse;
 use Bibo\Mvc\Core\Response\JsonResponse;
 use Bibo\Mvc\Core\Response\RedirectResponse;
-use Bibo\Mvc\Core\View\View;
 use Exception;
 use JsonException;
 use Psr\Container\ContainerExceptionInterface;
@@ -21,6 +21,8 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionException;
+use RuntimeException;
 use function array_find;
 
 /**
@@ -67,55 +69,56 @@ class BaseRouter implements RouterInterface
      */
     private RouteMatchingStrategyInterface|CachedRegexMatchStrategy $strategy;
 
-    private MiddlewareDispatcher $dispatcher;
+    /**
+     * Middleware dispatcher
+     *
+     * @var MiddlewareDispatcher|mixed
+     */
+    private MiddlewareDispatcher $middlewareDispatcher;
 
     /**
      * Constructor
+     *
+     * @throws ContainerExceptionInterface
      */
     public function __construct(ContainerInterface $container, ?RouteMatchingStrategyInterface $strategy = null)
     {
-        $this->strategy = $strategy ?? new CachedRegexMatchStrategy();
+        $this->strategy = $strategy;
         $this->container = $container;
-        try {
-            $this->dispatcher = $this->container->get(MiddlewareDispatcher::class);
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
-        }
+        $this->middlewareDispatcher = $container->get(MiddlewareDispatcher::class);
     }
 
+
     /**
-     * Add route to container
+     * Add a route to the router.
      *
-     * @param string         $method
-     * @param string         $route
-     * @param array|callable $handler
-     * @param array|null     $middleware
-     * @param string|null    $name
-     *
-     * @return void
+     * @param string $method HTTP method
+     * @param string $route Route path
+     * @param callable|array $handler Controller or callable
+     * @param array|null $middleware Optional middleware stack
+     * @param string|null $name Optional route name
      */
     private function add(
         string $method,
         string $route,
-        array|callable $handler,
+        callable|array $handler,
         ?array $middleware = null,
         ?string $name = null
     ): void {
-        // Build full route with group prefix if present
-        $fullRoute = ($this->currentRouteGroup ? '/' . trim($this->currentRouteGroup, '/') : '')
-            . '/' . trim($route, '/');
+        $fullRoute = ($this->currentRouteGroup
+                ? '/' . trim($this->currentRouteGroup, '/')
+                : '') . '/' . trim($route, '/');
+        $fullRoute = preg_replace('#//+#', '/', $fullRoute) ?: '/';
 
-        // Normalize: replace '//' with '/' so root routes don’t break
-        $fullRoute = preg_replace('#//+#', '/', $fullRoute);
-
-        $this->routes[] = [
-            'method'     => strtoupper($method),
-            'route'      => $fullRoute,
-            'handler'    => $handler,
-            'middleware' => $middleware,
-            'name'       => $name,
+        $upperMethod = strtoupper(trim($method));
+        $this->routes[$upperMethod][] = [
+            'method' => $upperMethod,
+            'route' => $fullRoute,
+            'handler' => $handler,
+            'middleware' => $middleware ?? [],
+            'name' => $name,
         ];
     }
-
 
     /**
      * Set GET routes
@@ -274,25 +277,22 @@ class BaseRouter implements RouterInterface
 
 
     /**
-     * Group routes
+     * Group routes under a common prefix.
      *
-     * @param string   $name
-     * @param callable $callable
+     * @param string   $prefix
+     * @param callable $callback Receives $this router instance
      *
      * @return BaseRouter
      */
-    public function group(string $name, callable $callable): BaseRouter
+    public function group(string $prefix, callable $callback): BaseRouter
     {
-        $previousRouteGroup = $this->currentRouteGroup;
+        $previousGroup = $this->currentRouteGroup;
 
-        // update prefix for this group
-        $this->currentRouteGroup = rtrim($previousRouteGroup . '/' . trim($name, '/'), '/');
+        $this->currentRouteGroup = rtrim($previousGroup . '/' . trim($prefix, '/'), '/');
 
-        // execute closure
-        $callable();
+        $callback($this);
 
-        // restore prefix after closure finishes
-        $this->currentRouteGroup = $previousRouteGroup;
+        $this->currentRouteGroup = $previousGroup;
 
         return $this;
     }
@@ -335,36 +335,56 @@ class BaseRouter implements RouterInterface
     }
 
     /**
-     * Match route
+     * Dispatch a request to the matching route.
      *
-     * @param string|array $method
-     * @param string       $uri
+     * @param BaseRequest $request
      *
      * @return ResponseInterface
-     * @throws ContainerExceptionInterface
-     * @throws JsonException
-     * @throws NotFoundException
-     * @throws NotFoundExceptionInterface
+     * @throws MethodNotAllowedException
+     * @throws NotFoundException|ContainerExceptionInterface
      */
-    public function matchRoutes(string|array $method, string $uri): ResponseInterface
+    public function dispatch(BaseRequest $request): ResponseInterface
     {
-        $method = strtoupper($method);
+        $method = strtoupper($request->getMethod());
+        $path   = $request->getUri()->getPath();
 
-        foreach ($this->routes as $route) {
-            if ($route['method'] === $method) {
-                if ($this->strategy->matches($route['route'], $uri, $params)) {
-                    return $this->handleRoute($route, $params);
-                }
+        $routesForMethod = $this->routes[$method] ?? [];
+        $routesForAny    = $this->routes['ANY'] ?? [];
+        $allRoutes       = array_merge($routesForMethod, $routesForAny);
+
+        // Try to match with the current strategy
+        $match = $this->strategy->match($method, $path, $allRoutes);
+
+        if ($match !== null) {
+            $middlewareStack = $this->resolveMiddlewareStack($match['middleware'] ?? []);
+            $coreHandler = fn (ServerRequestInterface $request)
+            => $this->handle($match['handler'], $match['params'] ?? []);
+
+            return $this->middlewareDispatcher->dispatch($request, $coreHandler, $middlewareStack);
+        }
+
+        // If no route matched, check if path exists with different method
+        $allowedMethods = [];
+        foreach ($this->routes as $routeMethod => $methodRoutes) {
+            if ($routeMethod === $method) {
+                continue;
+            }
+            $possibleMatch = $this->strategy->match($routeMethod, $path, $methodRoutes);
+            if ($possibleMatch !== null) {
+                $allowedMethods[] = $routeMethod;
             }
         }
 
-        throw new NotFoundException('Route ' . $uri . ' not found!', HttpStatus::NotFound->value);
+        if (!empty($allowedMethods)) {
+            throw new MethodNotAllowedException("Method {$method} not allowed for {$path}");
+        }
+
+        throw new NotFoundException("Route {$path} not found");
     }
 
     /**
      * Handles route
      *
-     * @throws JsonException
      * @throws Exception
      * @throws NotFoundExceptionInterface|ContainerExceptionInterface
      */
@@ -394,96 +414,148 @@ class BaseRouter implements RouterInterface
         );
     }
 
-
-
     /**
      * Handles callables and wraps responses properly
      *
      * @throws JsonException
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
      */
-    private function handleCallable(callable $handler, array $params = []): ResponseInterface
+    protected function handleCallable(callable $handler, array $params = []): ResponseInterface
     {
-        ob_start(); // Capture echoed output
-        $response = call_user_func_array($handler, $params);
-        $output = ob_get_clean(); // Get the output
+        // Resolve arguments
+        $resolver   = $this->container->get(ArgumentResolver::class);
+        $arguments  = $resolver->resolve($handler, $params);
 
-        // If the handler returns a ResponseInterface, return it
-        if ($response instanceof ResponseInterface) {
-            return $response;
-        }
+        $result = $handler(...$arguments);
 
-        if (is_string($response)) {
-            return new HtmlResponse($response);
-        }
-
-        // If handler echoes output, wrap it in a Response
-        if (!empty($output)) {
-            return new HtmlResponse($output); // Ensure you have an HtmlResponse class
-        }
-
-        // Default to an empty JSON response if nothing is returned
-        return new JsonResponse(['message' => 'No content'], 200);
+        return $this->normalizeResponse($result);
     }
-
 
     /**
      * Handle controller action
      *
-     * @throws Exception
+     * @throws Exception|ContainerExceptionInterface
      */
-    private function handleController(array $handler, array $params = []): ResponseInterface
+    protected function handleController(array $handler, array $params = []): ResponseInterface
     {
-        [$controller, $method] = $handler;
+        [$controllerClass, $method] = $handler;
 
-        if (!class_exists($controller)) {
-            throw new NotFoundException('Controller ' . $controller . ' not found');
-        }
+        // Create a controller (container-aware)
+        $controller = new $controllerClass($this->container); // clean, no $this->container injection
 
-        $instance = new $controller($this->container);
+        // Resolve arguments
+        $resolver   = $this->container->get(ArgumentResolver::class);
+        $arguments  = $resolver->resolve($handler, $params);
 
-        if (!method_exists($instance, $method)) {
-            throw new NotFoundException('Method ' . $method . ' not found in ' . $controller);
-        }
+        $result = $controller->$method(...$arguments);
 
-        $response = call_user_func_array([$instance, $method], $params);
-
-        if ($response instanceof JsonResponse) {
-            return $response;
-        }
-
-        if ($response instanceof View) {
-            return new HtmlResponse($response->render());
-        }
-
-        return new HtmlResponse($response);
+        // Normalize return value
+        return $this->normalizeResponse($result);
     }
 
-
     /**
-     * Creates a stream from a string
+     * Flatten middleware aliases and groups into a stack.
+     *
+     * @param array $routeMiddleware
+     *
+     * @return array
      */
-    private function createStream(string $content): Stream
+    private function resolveMiddlewareStack(array $routeMiddleware): array
     {
-        $stream = new Stream(fopen('php://temp', 'r+'));
-        $stream->write($content);
-        $stream->rewind();
-        return $stream;
+        $resolved = [];
+        foreach ($routeMiddleware as $alias) {
+            if (isset($this->middlewareGroups[$alias])) {
+                foreach ($this->middlewareGroups[$alias] as $m) {
+                    $resolved[] = $m;
+                }
+            } elseif (isset($this->routeMiddleware[$alias])) {
+                $resolved[] = $this->routeMiddleware[$alias];
+            } else {
+                // FQCN or instance
+                $resolved[] = $alias;
+            }
+        }
+        return $resolved;
     }
 
+    /**
+     * Handle a route handler (callable or controller).
+     *
+     * @param array|callable $handler
+     * @param array          $params
+     *
+     * @return ResponseInterface
+     * @throws JsonException
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundException
+     * @throws ReflectionException
+     */
+    protected function handle(array|callable $handler, array $params = []): ResponseInterface
+    {
+        $resolver = $this->container->get(ArgumentResolver::class);
+        $arguments = $resolver->resolve($handler, $params);
+
+        if (is_callable($handler)) {
+            $result = $handler(...$arguments);
+
+            return $this->normalizeResponse($result);
+        }
+
+        if (is_array($handler) && count($handler) === 2) {
+            [$controllerClass, $method] = $handler;
+            $controller = new $controllerClass($this->container); // clean, no container
+            $resolver = $this->container->get(ArgumentResolver::class);
+            $arguments = $resolver->resolve($handler, $params);
+            return $this->normalizeResponse($controller->$method(...$arguments));
+        }
+
+        throw new RuntimeException('Invalid route handler');
+    }
 
     /**
-     * Add middleware
+     * @throws JsonException|NotFoundException
+     */
+    protected function normalizeResponse(mixed $result): ResponseInterface
+    {
+        if ($result instanceof ResponseInterface) {
+            return $result;
+        }
+
+        if (is_string($result)) {
+            return new HtmlResponse($result);
+        }
+
+        if (is_array($result)) {
+            return new JsonResponse($result);
+        }
+        throw new NotFoundException(
+            'Controller must return instance of ResponseInterface, string, or array. ' .
+            (is_object($result) ? get_class($result) : gettype($result)) . ' given.',
+            HttpStatus::NotFound->value
+        );
+    }
+
+    /**
+     * Add middleware to the last added route.
      *
-     * @param string|array $middleware
-     *
+     * @param  string|array $middleware
      * @return BaseRouter
      */
     public function middleware(string|array $middleware): BaseRouter
     {
-        $lastRouteKey = array_key_last($this->routes);
-        if ($lastRouteKey !== null) {
-            $this->routes[$lastRouteKey]['middleware'] = $middleware;
+        $lastMethod = array_key_last($this->routes);
+        if ($lastMethod === null) {
+            return $this;
         }
+
+        $lastIndex = array_key_last($this->routes[$lastMethod]);
+        if ($lastIndex === null) {
+            return $this;
+        }
+
+        $this->routes[$lastMethod][$lastIndex]['middleware'] = is_array($middleware) ? $middleware : [$middleware];
 
         return $this;
     }
@@ -524,7 +596,7 @@ class BaseRouter implements RouterInterface
     }
 
     /**
-     * Set route name
+     * Set a route name
      *
      * @param string $name
      *
@@ -532,10 +604,17 @@ class BaseRouter implements RouterInterface
      */
     public function name(string $name): BaseRouter
     {
-        $lastRouteKey = array_key_last($this->routes);
-        if ($lastRouteKey !== null) {
-            $this->routes[$lastRouteKey]['name'] = $name;
+        $lastMethod = array_key_last($this->routes);
+        if ($lastMethod === null) {
+            return $this;
         }
+
+        $lastRouteIndex = array_key_last($this->routes[$lastMethod]);
+        if ($lastRouteIndex === null) {
+            return $this;
+        }
+
+        $this->routes[$lastMethod][$lastRouteIndex]['name'] = $name;
 
         return $this;
     }
@@ -551,31 +630,14 @@ class BaseRouter implements RouterInterface
     }
 
     /**
-     * Dump routes
+     * Set the routes for the application
+     *
+     * @param array $routes The array of routes to be set
      *
      * @return void
      */
-    public function dump(): void
+    public function setRoutes(array $routes): void
     {
-        foreach ($this->routes as $route) {
-            $method     = $route['method'];
-            $fullRoute  = $route['route'];
-            $handler    = is_callable($route['handler'])
-                ? 'callable'
-                : (is_array($route['handler']) ? implode('::', $route['handler']) : $route['handler']);
-            $name       = $route['name'] ?? 'No name';
-            $middleware = isset($route['middleware'])
-                ? (is_array($route['middleware'])
-                    ? count($route['middleware']) . ' middleware(s)' : '1 middleware') : 'No middleware';
-
-            echo sprintf(
-                "[%s] <b>%s</b> -> %s, Name: %s, Middleware: %s <br>\n",
-                $method,
-                $fullRoute,
-                $handler,
-                $name,
-                $middleware
-            );
-        }
+        $this->routes = $routes;
     }
 }

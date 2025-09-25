@@ -2,6 +2,7 @@
 
 namespace Bibo\Mvc\Core\Interfaces;
 
+use Bibo\Mvc\Core\Request\BaseRequest;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -112,12 +113,12 @@ interface RouterInterface
     /**
      * Group routes
      *
-     * @param string   $name
-     * @param callable $callable
+     * @param string   $prefix
+     * @param callable $callback
      *
      * @return RouterInterface
      */
-    public function group(string $name, callable $callable): self;
+    public function group(string $prefix, callable $callback): self;
 
     /**
      * Redirect route
@@ -143,12 +144,11 @@ interface RouterInterface
     /**
      * Match route
      *
-     * @param string|array $method
-     * @param string       $uri
+     * @param BaseRequest $request
      *
      * @return ResponseInterface
      */
-    public function matchRoutes(string|array $method, string $uri): ResponseInterface;
+    public function dispatch(BaseRequest $request): ResponseInterface;
 
     /**
      * Add middleware
@@ -170,18 +170,11 @@ interface RouterInterface
     public function find(string $method, string $route): ?array;
 
     /**
-     * Set route name
+     * Set a route name
      *
      * @param string $name
      *
      * @return RouterInterface
      */
     public function name(string $name): self;
-
-    /**
-     * Dump routes
-     *
-     * @return void
-     */
-    public function dump(): void;
 }

@@ -44,7 +44,6 @@
         "ext-ftp": "*",
         "twig/twig": "4.x-dev",
         "ext-curl": "*",
-        "illuminate/database": "10.x-dev",
         "ext-dom": "*",
         "ext-json": "*",
         "ext-libxml": "*",

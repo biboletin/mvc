@@ -2,6 +2,8 @@
 
 namespace Bibo\Mvc\Core\Interfaces;
 
+use CurlHandle;
+
 /**
  * CurlMultiInterface
  *
@@ -15,7 +17,7 @@ namespace Bibo\Mvc\Core\Interfaces;
  * @see CurlInterface For core cURL functionality
  * @see \Bibo\Mvc\Core\Wrapper\Curl\CurlMultiWrapper For implementation details
  */
-interface CurlMultiInterface extends CurlInterface
+interface CurlMultiInterface
 {
     /**
      * Add a cURL handle to the multi-handle.
@@ -37,11 +39,11 @@ interface CurlMultiInterface extends CurlInterface
      * This method retrieves the underlying cURL multi-handle resource.
      * It can be used for advanced operations or debugging.
      *
-     * @return mixed The cURL multi-handle resource
+     * @return CurlHandle The cURL multi-handle resource
      *
      * @see curl_multi_init() PHP's native function for initializing a multi-handle
      */
-    public function getHandle(): mixed;
+    public function getHandle(): CurlHandle;
 
     /**
      * Remove a cURL handle from the multi-handle.
@@ -67,11 +69,11 @@ interface CurlMultiInterface extends CurlInterface
      * multi-handle implementations typically don't return a response directly.
      * Instead, you should retrieve responses from individual handles after execution.
      *
-     * @return string Empty string for compatibility with CurlInterface
+     * @return array Empty string for compatibility with CurlInterface
      *
      * @see curl_multi_exec() PHP's native function for executing multi-handle requests
      */
-    public function exec(): string;
+    public function execute(): array;
 
     /**
      * Wait for activity on any curl-connection.

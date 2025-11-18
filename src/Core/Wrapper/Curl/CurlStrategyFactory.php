@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bibo\Mvc\Core\Wrapper\Curl;
 
 use Bibo\Mvc\Core\Enums\CurlStrategyType;
@@ -13,18 +15,20 @@ class CurlStrategyFactory
      *
      * @param CurlStrategyType $type Strategy type to create.
      *
-     * @return CurlInterface
-     * @throws InvalidArgumentException
+     * @return AbstractCurlWrapper
      */
-    public static function create(CurlStrategyType $type = CurlStrategyType::SINGLE): CurlInterface
+    public static function create(CurlStrategyType $type = CurlStrategyType::SINGLE): AbstractCurlWrapper
     {
+
         return match ($type) {
             CurlStrategyType::MULTI => (function () {
                 $curl = new CurlMultiWrapper();
                 $curl->init();
+
                 return $curl;
             })(),
             CurlStrategyType::SINGLE => new CurlSingleWrapper(),
+            default => throw new InvalidArgumentException('Invalid cURL strategy type provided.'),
         };
     }
 }

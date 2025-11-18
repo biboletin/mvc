@@ -2,6 +2,7 @@
 
 namespace Bibo\Mvc\Core\Interfaces;
 
+use CurlHandle;
 use RuntimeException;
 
 /**
@@ -54,10 +55,11 @@ interface CurlInterface
      * The body can be a JSON string, form data, or any other format
      * supported by the API being called.
      *
-     * @param  string $body The request body content
-     * @return void
+     * @param string $body The request body content
+     *
+     * @return CurlInterface
      */
-    public function setBody(string $body): void;
+    public function setBody(string $body): self;
 
     /**
      * Executes the cURL request and returns the response body.
@@ -65,10 +67,11 @@ interface CurlInterface
      * This method performs the actual HTTP request using the configured
      * URL, method, headers, and body.
      *
-     * @return string The response body as a string
+     * @return array The response body as a array
+     *
      * @throws RuntimeException If the cURL request fails
      */
-    public function execute(): string;
+    public function execute(): array;
 
     /**
      * Gets the HTTP status code from the last executed request.
@@ -92,7 +95,7 @@ interface CurlInterface
      *
      * @return mixed The cURL handle resource
      */
-    public function getHandle(): mixed;
+    public function getHandle(): CurlHandle;
 
     /**
      * Closes the cURL handle and releases resources.

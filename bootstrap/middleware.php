@@ -5,6 +5,7 @@ use Bibo\App\Middleware\CsrfMiddleware;
 use Bibo\App\Middleware\ErrorMiddleware;
 use Bibo\App\Middleware\FileInclusionMiddleware;
 use Bibo\App\Middleware\RateLimitMiddleware;
+use Bibo\App\Middleware\SessionMiddleware;
 use Bibo\App\Middleware\SqlInjectionMiddleware;
 use Bibo\App\Middleware\XssMiddleware;
 
@@ -12,11 +13,13 @@ return [
     // Global middleware
     // Add your global middleware here
     'global' => [
+        SessionMiddleware::class,
         ErrorMiddleware::class,
         XssMiddleware::class,
         SqlInjectionMiddleware::class,
         FileInclusionMiddleware::class,
-        RateLimitMiddleware::class,
+        // TODO: Fix and Enable Rate Limiting Middleware
+        // RateLimitMiddleware::class,
     ],
 
     // Middleware groups
@@ -28,7 +31,10 @@ return [
         ],
 
         // Add your API middleware here
-        'api' => [],
+        'api' => [
+            RateLimitMiddleware::class,
+            SqlInjectionMiddleware::class,
+        ],
     ],
 
     // Route middleware

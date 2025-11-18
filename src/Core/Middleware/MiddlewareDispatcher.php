@@ -222,7 +222,7 @@ class MiddlewareDispatcher
     /**
      * Resolve middleware by alias, group, class, or instance.
      *
-     * @param string|MiddlewareInterface $middleware
+     * @param  string|MiddlewareInterface $middleware
      * @return MiddlewareInterface
      *
      * @throws Exception|ContainerExceptionInterface
@@ -247,5 +247,20 @@ class MiddlewareDispatcher
 
         // Fallback: assume fully qualified class
         return $this->instantiateMiddleware($middleware);
+    }
+
+    public function getGlobalMiddlewares(): array
+    {
+        return $this->global;
+    }
+
+    public function getGroupMiddlewares(): array
+    {
+        return $this->groups;
+    }
+
+    public function getRouteMiddlewares(): array
+    {
+        return $this->routeMiddleware;
     }
 }

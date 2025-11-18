@@ -56,6 +56,7 @@ class CachedRegexMatchStrategy extends AbstractMatchStrategy
      * Convert route to regex
      *
      * @param string $route
+     *
      * @return string
      */
     private function convertRouteToRegex(string $route): string

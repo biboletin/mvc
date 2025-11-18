@@ -18,7 +18,7 @@ class ResponseEmitter
      * Note: This method uses native header() and echo/flush() calls and should
      * be invoked before any output has been sent.
      *
-     * @param ResponseInterface $response The HTTP response to emit.
+     * @param  ResponseInterface $response The HTTP response to emit.
      * @return void
      */
     public function emit(ResponseInterface $response): void

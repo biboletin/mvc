@@ -1,20 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bibo\Mvc\Core\Wrapper;
 
 use Bibo\Mvc\Core\Interfaces\CurlInterface;
+use Bibo\Mvc\Core\Wrapper\Curl\CurlSingleWrapper;
 use CurlHandle;
 use RuntimeException;
 
 /**
+ * CurlWrapper
  *
+ * A simple cURL wrapper implementing the CurlInterface.
+ * This class provides methods to set up and execute cURL requests,
+ * as well as retrieve response information such as status code and headers.
  */
 class CurlWrapper implements CurlInterface
 {
     /**
-     * @var mixed|CurlHandle|false
+     * @var CurlInterface|null
      */
-    protected mixed $handle;
+    protected ?CurlInterface $handle = null;
 
     /**
      * @var array
@@ -32,103 +39,168 @@ class CurlWrapper implements CurlInterface
     protected array $responseHeaders = [];
 
     /**
+     * Constructor
+     * Initializes the cURL handle.
      *
+     * @param CurlInterface $strategy The cURL strategy to use (single or multi)
      */
-    public function __construct()
+    public function __construct(CurlInterface $strategy)
     {
-        $this->handle = curl_init();
-        if ($this->handle === false) {
-            throw new RuntimeException('Unable to initialize cURL handle');
-        }
-
-        // Setup header capture
-        curl_setopt($this->handle, CURLOPT_HEADERFUNCTION, [$this, 'captureHeaderLine']);
-        curl_setopt($this->handle, CURLOPT_RETURNTRANSFER, true);
+        $this->handle = $strategy;
     }
 
     /**
+     * Sets the URL for the cURL request.
+     *
      * @param string $url
      *
      * @return CurlWrapper
      */
     public function setUrl(string $url): self
     {
-        curl_setopt($this->handle, CURLOPT_URL, $url);
+        $this->handle->setUrl($url);
 
         return $this;
     }
 
     /**
+     * Sets the HTTP method for the cURL request.
+     *
      * @param string $method
      *
      * @return CurlWrapper
      */
     public function setMethod(string $method): self
     {
-        switch (strtoupper($method)) {
-            case 'GET':
-                curl_setopt($this->handle, CURLOPT_HTTPGET, true);
-                break;
-            case 'POST':
-                curl_setopt($this->handle, CURLOPT_POST, true);
-                break;
-            default:
-                curl_setopt($this->handle, CURLOPT_CUSTOMREQUEST, strtoupper($method));
-                break;
-        }
+        $this->handle->setMethod(strtoupper(trim($method)));
     }
 
     /**
+     * Sets the HTTP headers for the cURL request.
+     *
      * @param array $headers
      *
      * @return CurlWrapper
      */
     public function setHeaders(array $headers): self
     {
-        $formatted = [];
-        foreach ($headers as $key => $value) {
-            $formatted[] = "{$key}: {$value}";
-        }
-
-        curl_setopt($this->handle, CURLOPT_HTTPHEADER, $formatted);
+        $this->headers = $headers;
+        $this->handle->setHeaders($headers);
 
         return $this;
     }
 
     /**
+     * Sets the body content for the cURL request.
+     *
      * @param string $body
      *
-     * @return void
+     * @return CurlWrapper
      */
-    public function setBody(string $body): void
+    public function setBody(string $body): self
     {
-        curl_setopt($this->handle, CURLOPT_POSTFIELDS, $body);
+        $this->body = $body;
+        $this->handle->setBody($body);
+
+        return $this;
     }
 
     /**
-     * @return string
+     * Sets a single cURL option.
+     *
+     * @param int   $option
+     * @param mixed $value
+     *
+     * @return $this
      */
-    public function execute(): string
+    public function setOption(int $option, mixed $value): self
     {
-        $this->responseHeaders = []; // Reset headers
-        $this->body = curl_exec($this->handle);
+        $this->handle->setOption($option, $value);
 
-        if ($this->body === false) {
-            throw new RuntimeException('cURL error: ' . curl_error($this->handle));
+        return $this;
+    }
+
+    /**
+     * Sets a progress callback for the cURL request.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function onProgress(callable $callback): self
+    {
+        if (method_exists($this->handle, 'onProgress')) {
+            $this->handle->onProgress($callback);
         }
 
-        return $this->body;
+        return $this;
     }
 
     /**
+     * Sets a chunk callback for the cURL request.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function onChunk(callable $callback): self
+    {
+        if (method_exists($this->handle, 'onChunk')) {
+            $this->handle->onChunk($callback);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Executes the cURL request.
+     *
+     * @return string The response body
+     */
+    public function execute(): array
+    {
+        $this->responseHeaders = []; // Reset headers
+        $response = $this->handle->execute();
+        $this->body = $response['body'] ?? '';
+
+        if ($this->body === false) {
+            throw new RuntimeException('cURL error during execution');
+        }
+
+        return $response;
+    }
+
+    /**
+     * Executes all cURL requests in a multi-handle.
+     *
+     * @return array|null
+     */
+    public function executeAll(): ?array
+    {
+        if (method_exists($this->handle, 'executeAll')) {
+            return $this->handle->executeAll();
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets the response body of the cURL request.
+     *
      * @return int
      */
     public function getStatusCode(): int
     {
-        return curl_getinfo($this->handle, CURLINFO_HTTP_CODE);
+        if ($this->handle instanceof CurlSingleWrapper) {
+            return $this->handle->getInfo(CURLINFO_HTTP_CODE);
+        }
+
+        return 0;
     }
 
     /**
+     * Gets the response headers of the cURL request.
+     *
      * @return array
      */
     public function getResponseHeaders(): array
@@ -137,9 +209,31 @@ class CurlWrapper implements CurlInterface
     }
 
     /**
-     * @return CurlHandle|false|mixed
+     * Gets the response body of the cURL request.
+     *
+     * @return string
      */
-    public function getHandle(): mixed
+    public function getBody(): string
+    {
+        return $this->body;
+    }
+
+    /**
+     * Gets the response headers of the cURL request.
+     *
+     * @return array
+     */
+    public function getHeaders(): array
+    {
+        return $this->responseHeaders;
+    }
+
+    /**
+     * Gets the response body of the cURL request.
+     *
+     * @return CurlHandle
+     */
+    public function getHandle(): CurlHandle
     {
         return $this->handle;
     }
@@ -149,36 +243,8 @@ class CurlWrapper implements CurlInterface
      */
     public function close(): void
     {
-        curl_close($this->handle);
-    }
-
-    /**
-     * @param $curlHandler
-     * @param string $headerLine
-     *
-     * @return int
-     */
-    protected function captureHeaderLine($curlHandler, string $headerLine): int
-    {
-        $trimmed = trim($headerLine);
-
-        if ($trimmed === '') {
-            return strlen($headerLine); // End of headers
+        if (method_exists($this->handle, 'close')) {
+            $this->handle->close();
         }
-
-        if (str_contains($trimmed, ':')) {
-            [$key, $value] = explode(':', $trimmed, 2);
-            $this->responseHeaders[trim($key)] = trim($value);
-        } else {
-            // Handle status line, e.g., "HTTP/1.1 200 OK"
-            $this->responseHeaders[] = $trimmed;
-        }
-
-        return strlen($headerLine);
-    }
-
-    public function setOption(int $option, $value): bool
-    {
-        return curl_setopt($this->handle, $option, $value);
     }
 }

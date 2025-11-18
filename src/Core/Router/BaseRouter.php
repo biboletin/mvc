@@ -14,7 +14,7 @@ use Bibo\Mvc\Core\Resolver\ArgumentResolver;
 use Bibo\Mvc\Core\Response\HtmlResponse;
 use Bibo\Mvc\Core\Response\JsonResponse;
 use Bibo\Mvc\Core\Response\RedirectResponse;
-use Exception;
+use Bibo\Mvc\Core\Strategies\Router\CachedRegexMatchStrategy;
 use JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -23,6 +23,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionException;
 use RuntimeException;
+
 use function array_find;
 
 /**
@@ -92,11 +93,13 @@ class BaseRouter implements RouterInterface
     /**
      * Add a route to the router.
      *
-     * @param string $method HTTP method
-     * @param string $route Route path
-     * @param callable|array $handler Controller or callable
-     * @param array|null $middleware Optional middleware stack
-     * @param string|null $name Optional route name
+     * @param string         $method     HTTP method
+     * @param string         $route      Route path
+     * @param callable|array $handler    Controller or callable
+     * @param array|null     $middleware Optional middleware stack
+     * @param string|null    $name       Optional route name
+     *
+     * @throws ContainerExceptionInterface
      */
     private function add(
         string $method,
@@ -115,7 +118,8 @@ class BaseRouter implements RouterInterface
             'method' => $upperMethod,
             'route' => $fullRoute,
             'handler' => $handler,
-            'middleware' => $middleware ?? [],
+            // 'middleware' => $middleware ?? [],
+            'middleware' => $this->resolveMiddlewareStack($middleware ?? []),
             'name' => $name,
         ];
     }
@@ -127,6 +131,7 @@ class BaseRouter implements RouterInterface
      * @param array|callable $callable
      *
      * @return RouterInterface
+     * @throws ContainerExceptionInterface
      */
     public function get(string $route, callable|array $callable): RouterInterface
     {
@@ -148,6 +153,7 @@ class BaseRouter implements RouterInterface
      * @param array          $middleware
      *
      * @return RouterInterface
+     * @throws ContainerExceptionInterface
      */
     public function post(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
@@ -163,6 +169,7 @@ class BaseRouter implements RouterInterface
      * @param array          $middleware
      *
      * @return RouterInterface
+     * @throws ContainerExceptionInterface
      */
     public function put(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
@@ -178,6 +185,7 @@ class BaseRouter implements RouterInterface
      * @param array          $middleware
      *
      * @return RouterInterface
+     * @throws ContainerExceptionInterface
      */
     public function delete(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
@@ -193,6 +201,7 @@ class BaseRouter implements RouterInterface
      * @param array          $middleware
      *
      * @return RouterInterface
+     * @throws ContainerExceptionInterface
      */
     public function patch(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
@@ -208,6 +217,7 @@ class BaseRouter implements RouterInterface
      * @param array          $middleware
      *
      * @return RouterInterface
+     * @throws ContainerExceptionInterface
      */
     public function head(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
@@ -223,6 +233,7 @@ class BaseRouter implements RouterInterface
      * @param array          $middleware
      *
      * @return RouterInterface
+     * @throws ContainerExceptionInterface
      */
     public function options(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
@@ -238,6 +249,7 @@ class BaseRouter implements RouterInterface
      * @param array          $middleware
      *
      * @return RouterInterface
+     * @throws ContainerExceptionInterface
      */
     public function connect(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
@@ -253,6 +265,7 @@ class BaseRouter implements RouterInterface
      * @param array          $middleware
      *
      * @return RouterInterface
+     * @throws ContainerExceptionInterface
      */
     public function trace(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
@@ -268,6 +281,7 @@ class BaseRouter implements RouterInterface
      * @param array          $middleware
      *
      * @return RouterInterface
+     * @throws ContainerExceptionInterface
      */
     public function any(string $route, callable|array $callable, array $middleware = []): RouterInterface
     {
@@ -305,6 +319,7 @@ class BaseRouter implements RouterInterface
      * @param int    $status
      *
      * @return BaseRouter
+     * @throws ContainerExceptionInterface
      */
     public function redirect(string $from, string $to, int $status = HttpStatus::Found->value): BaseRouter
     {
@@ -320,6 +335,7 @@ class BaseRouter implements RouterInterface
      * @param string $controller
      *
      * @return BaseRouter
+     * @throws ContainerExceptionInterface
      */
     public function resource(string $prefix, string $controller): BaseRouter
     {
@@ -346,24 +362,27 @@ class BaseRouter implements RouterInterface
     public function dispatch(BaseRequest $request): ResponseInterface
     {
         $method = strtoupper($request->getMethod());
-        $path   = $request->getUri()->getPath();
+        $path = $request->getUri()->getPath();
 
         $routesForMethod = $this->routes[$method] ?? [];
-        $routesForAny    = $this->routes['ANY'] ?? [];
-        $allRoutes       = array_merge($routesForMethod, $routesForAny);
+        $routesForAny = $this->routes[HttpMethod::ANY->value] ?? [];
+        $allRoutes = array_merge($routesForMethod, $routesForAny);
 
         // Try to match with the current strategy
         $match = $this->strategy->match($method, $path, $allRoutes);
 
         if ($match !== null) {
             $middlewareStack = $this->resolveMiddlewareStack($match['middleware'] ?? []);
-            $coreHandler = fn (ServerRequestInterface $request)
-            => $this->handle($match['handler'], $match['params'] ?? []);
+
+            $coreHandler = fn (ServerRequestInterface $request) => $this->handle($match['handler'], $match['params'] ?? []);
+            // $coreHandler = function (ServerRequestInterface $request) use ($match) {
+            //     $this->handle($match['handler'], $match['params'] ?? []);
+            // };
 
             return $this->middlewareDispatcher->dispatch($request, $coreHandler, $middlewareStack);
         }
 
-        // If no route matched, check if path exists with different method
+        // If no route matched, check if the path exists with a different method
         $allowedMethods = [];
         foreach ($this->routes as $routeMethod => $methodRoutes) {
             if ($routeMethod === $method) {
@@ -383,99 +402,48 @@ class BaseRouter implements RouterInterface
     }
 
     /**
-     * Handles route
-     *
-     * @throws Exception
-     * @throws NotFoundExceptionInterface|ContainerExceptionInterface
-     */
-    protected function handleRoute(array $route, array $params = []): ResponseInterface
-    {
-        $handler = $route['handler'];
-
-        $coreHandler = function (ServerRequestInterface $request) use ($handler, $params) {
-            if (is_callable($handler)) {
-                return $this->handleCallable($handler, $params);
-            }
-
-            if (is_array($handler) && count($handler) === 2) {
-                return $this->handleController($handler, $params);
-            }
-
-            throw new Exception('Invalid route handler');
-        };
-
-        // You must create or inject the current request here
-        $request = $this->container->get(BaseRequest::class);
-
-        return $this->container->get(MiddlewareDispatcher::class)->dispatch(
-            $request,
-            $coreHandler,
-            $route['middleware'] ?? []
-        );
-    }
-
-    /**
-     * Handles callables and wraps responses properly
-     *
-     * @throws JsonException
-     * @throws ReflectionException
-     * @throws ContainerExceptionInterface
-     */
-    protected function handleCallable(callable $handler, array $params = []): ResponseInterface
-    {
-        // Resolve arguments
-        $resolver   = $this->container->get(ArgumentResolver::class);
-        $arguments  = $resolver->resolve($handler, $params);
-
-        $result = $handler(...$arguments);
-
-        return $this->normalizeResponse($result);
-    }
-
-    /**
-     * Handle controller action
-     *
-     * @throws Exception|ContainerExceptionInterface
-     */
-    protected function handleController(array $handler, array $params = []): ResponseInterface
-    {
-        [$controllerClass, $method] = $handler;
-
-        // Create a controller (container-aware)
-        $controller = new $controllerClass($this->container); // clean, no $this->container injection
-
-        // Resolve arguments
-        $resolver   = $this->container->get(ArgumentResolver::class);
-        $arguments  = $resolver->resolve($handler, $params);
-
-        $result = $controller->$method(...$arguments);
-
-        // Normalize return value
-        return $this->normalizeResponse($result);
-    }
-
-    /**
      * Flatten middleware aliases and groups into a stack.
      *
      * @param array $routeMiddleware
      *
      * @return array
+     *
+     * @throws ContainerExceptionInterface|RuntimeException
      */
     private function resolveMiddlewareStack(array $routeMiddleware): array
     {
+        // Always start with global
+        $middlewareStack = array_merge($this->middlewareDispatcher->getGlobalMiddlewares(), $routeMiddleware);
+
         $resolved = [];
-        foreach ($routeMiddleware as $alias) {
-            if (isset($this->middlewareGroups[$alias])) {
-                foreach ($this->middlewareGroups[$alias] as $m) {
-                    $resolved[] = $m;
-                }
-            } elseif (isset($this->routeMiddleware[$alias])) {
-                $resolved[] = $this->routeMiddleware[$alias];
-            } else {
-                // FQCN or instance
-                $resolved[] = $alias;
+
+        foreach ($middlewareStack as $middleware) {
+            // Already an object (instance of MiddlewareInterface or PSR-15 middleware)
+            if (is_object($middleware)) {
+                $resolved[] = $middleware;
+                continue;
             }
+
+            // If it's a class name (FQCN), resolve it via the container
+            if (is_string($middleware) && class_exists($middleware)) {
+                $resolved[] = $this->container->get($middleware);
+                continue;
+            }
+
+            // If it's a callable, allow it directly
+            if (is_callable($middleware)) {
+                $resolved[] = $middleware;
+                continue;
+            }
+
+            throw new RuntimeException(
+                sprintf(
+                    'Invalid middleware: %s',
+                    is_string($middleware) ? $middleware : gettype($middleware)
+                )
+            );
         }
+
         return $resolved;
     }
 
@@ -540,7 +508,8 @@ class BaseRouter implements RouterInterface
     /**
      * Add middleware to the last added route.
      *
-     * @param  string|array $middleware
+     * @param string|array $middleware
+     *
      * @return BaseRouter
      */
     public function middleware(string|array $middleware): BaseRouter
@@ -579,6 +548,7 @@ class BaseRouter implements RouterInterface
     {
         return $this->middleware;
     }
+
     /**
      * Find route
      *
@@ -639,5 +609,45 @@ class BaseRouter implements RouterInterface
     public function setRoutes(array $routes): void
     {
         $this->routes = $routes;
+    }
+
+    public function dump(): void
+    {
+        $html = <<<HTML
+<table class="table">
+<tr>
+    <td>Method</td>
+    <td>Route</td>
+    <td>Handler</td>
+    <td>Middleware</td>
+    <td>Name</td>
+</tr>
+HTML;
+        // dd($this->routes);
+        foreach ($this->routes as $method => $routes) {
+            foreach ($routes as $route) {
+                $middleware = implode(
+                    ', ',
+                    array_map(
+                        fn ($m) => is_object($m)
+                            ? get_class($m)
+                            : (string)$m,
+                        $route['middleware']
+                    )
+                );
+                $handler = json_encode($route['handler']);
+                $html .= <<<HTML
+<tr>
+    <td>{$method}&nbsp;</td>
+    <td>{$route['route']}&nbsp;</td>
+    <td>{$handler}&nbsp;</td>
+    <td>{$middleware}&nbsp;</td>
+    <td>{$route['name']}&nbsp;</td>
+</tr>
+HTML;
+            }
+        }
+
+        echo $html .= '</table>';
     }
 }

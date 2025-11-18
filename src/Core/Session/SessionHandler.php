@@ -156,15 +156,12 @@ class SessionHandler
             return;
         }
 
-        if ($this->savePath) {
+        if (!$this->savePath) {
             session_save_path($this->savePath);
         }
 
-        if ($this->id) {
-            session_id($this->id);
-        }
-
         session_name($this->name);
+
         session_set_cookie_params([
             'lifetime' => $this->getLifetime(),
             'path' => $this->getPath(),
@@ -174,12 +171,18 @@ class SessionHandler
             'samesite' => $this->getSameSite(),
         ]);
 
-        session_set_save_handler($this->handler, true);
-        $this->setId(session_id());
+        if (isset($this->handler)) {
+            session_set_save_handler($this->handler, true);
+        }
+
         session_start();
 
+        // $this->setId(session_id($this->getPrefix()));
         $this->setData($_SESSION);
         $this->started = true;
+
+        // Register shutdown function to write and close the session automatically
+        register_shutdown_function([$this, 'writeClose']);
     }
 
     /**
@@ -594,6 +597,14 @@ class SessionHandler
             if (is_file($file)) {
                 unlink($file);
             }
+        }
+    }
+
+    public function writeClose(): void
+    {
+        if ($this->started) {
+            session_write_close();
+            $this->started = false;
         }
     }
 }

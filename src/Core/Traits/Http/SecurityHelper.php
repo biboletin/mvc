@@ -53,8 +53,8 @@ trait SecurityHelper
     /**
      * Get a cookie value by name with an optional default.
      *
-     * @param string $name Cookie name.
-     * @param mixed  $default Default value if cookie is not present.
+     * @param  string $name Cookie name.
+     * @param  mixed  $default Default value if cookie is not present.
      * @return mixed The cookie value or default.
      */
     public function getCookie(string $name, $default = null): mixed
@@ -67,7 +67,7 @@ trait SecurityHelper
     /**
      * Determine whether a cookie exists.
      *
-     * @param string $name Cookie name.
+     * @param  string $name Cookie name.
      * @return bool True if present, false otherwise.
      */
     public function hasCookie(string $name): bool
@@ -90,7 +90,7 @@ trait SecurityHelper
     /**
      * Get session ID from a cookie (default 'PHPSESSID').
      *
-     * @param string $cookieName The cookie name that stores the session id.
+     * @param  string $cookieName The cookie name that stores the session id.
      * @return string|null The session id or null if missing.
      */
     public function getSessionId(string $cookieName = 'PHPSESSID'): ?string

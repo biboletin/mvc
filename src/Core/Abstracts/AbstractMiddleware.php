@@ -4,6 +4,7 @@ namespace Bibo\Mvc\Core\Abstracts;
 
 use Bibo\Mvc\Core\Error\Error;
 use Bibo\Mvc\Core\Error\ErrorResponseFactory;
+use Bibo\Mvc\Core\Interfaces\MiddlewareInterface;
 use Bibo\Mvc\Core\Logger\LogManager;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -15,6 +16,7 @@ abstract class AbstractMiddleware
     protected ContainerInterface $container;
 
     protected LoggerInterface $logger;
+
     /**
      * Error handler
      *
@@ -28,6 +30,11 @@ abstract class AbstractMiddleware
      * @var ErrorResponseFactory|mixed
      */
     protected ErrorResponseFactory $responseFactory;
+
+    /**
+     * @var MiddlewareInterface|null
+     */
+    protected ?MiddlewareInterface $next = null;
 
     /**
      * Initialize error handling and error response

@@ -286,4 +286,9 @@ final class Route
     {
         self::setRoutes($routes);
     }
+
+    public static function dump(): void
+    {
+        self::getInstance()->dump();
+    }
 }

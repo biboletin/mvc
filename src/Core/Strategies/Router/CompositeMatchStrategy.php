@@ -39,7 +39,7 @@ class CompositeMatchStrategy extends AbstractMatchStrategy
     /**
      * Add a strategy
      *
-     * @param AbstractMatchStrategy $strategy
+     * @param  AbstractMatchStrategy $strategy
      * @return void
      */
     public function addStrategy(AbstractMatchStrategy $strategy): void

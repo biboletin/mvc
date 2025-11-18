@@ -14,8 +14,8 @@ trait InputHelper
     /**
      * Get a value from the query string.
      *
-     * @param string $key The query parameter name.
-     * @param mixed  $default Default value if not set.
+     * @param  string $key The query parameter name.
+     * @param  mixed  $default Default value if not set.
      * @return mixed The parameter value or default.
      */
     public function getQueryParam(string $key, $default = null): mixed
@@ -38,8 +38,8 @@ trait InputHelper
     /**
      * Get a value from the parsed request body (e.g., application/x-www-form-urlencoded or JSON).
      *
-     * @param string $key The body parameter name.
-     * @param mixed  $default Default value if not set.
+     * @param  string $key The body parameter name.
+     * @param  mixed  $default Default value if not set.
      * @return mixed The parameter value or default.
      */
     public function getParsedBodyParam(string $key, $default = null): mixed
@@ -69,8 +69,8 @@ trait InputHelper
      * Retrieve a value from either the query string or the parsed body.
      * Query string takes precedence.
      *
-     * @param string $key The input key.
-     * @param mixed  $default Default value if not set in either place.
+     * @param  string $key The input key.
+     * @param  mixed  $default Default value if not set in either place.
      * @return mixed
      */
     public function getInput(string $key, $default = null): mixed
@@ -95,7 +95,7 @@ trait InputHelper
     /**
      * Return only the specified keys from combined query+body parameters.
      *
-     * @param string[] $keys Keys to include.
+     * @param  string[] $keys Keys to include.
      * @return array<string, mixed>
      */
     public function only(array $keys): array
@@ -108,7 +108,7 @@ trait InputHelper
     /**
      * Return all combined inputs except the specified keys.
      *
-     * @param string[] $keys Keys to exclude.
+     * @param  string[] $keys Keys to exclude.
      * @return array<string, mixed>
      */
     public function except(array $keys): array

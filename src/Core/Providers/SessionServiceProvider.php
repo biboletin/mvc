@@ -42,6 +42,7 @@ class SessionServiceProvider extends ServiceProvider
         $session->setHttpOnly($config->get('session.httponly'));
         $session->setSameSite($config->get('session.samesite'));
         $session->setSavePath(SESSION_SAVE_PATH);
+        $session->start();
 
         $this->container->set(SessionHandler::class, function () use ($session) {
             return $session;

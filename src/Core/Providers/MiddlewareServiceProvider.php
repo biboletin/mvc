@@ -15,7 +15,7 @@ use Psr\Container\NotFoundExceptionInterface;
 class MiddlewareServiceProvider extends ServiceProvider
 {
     /**
-     * Register middleware dispatcher and configure middleware from bootstrap.
+     * Register a middleware dispatcher and configure middleware from bootstrap.
      *
      * @return void
      */
@@ -30,6 +30,7 @@ class MiddlewareServiceProvider extends ServiceProvider
         foreach ($config['global'] ?? [] as $class) {
             $global[] = new $class($this->container);
             $dispatcher->registerGlobal($global);
+
             $this->container->set($class, fn () => new $class($this->container));
         }
 

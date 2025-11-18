@@ -4,8 +4,9 @@ namespace Bibo\App\Middleware;
 
 use Bibo\Mvc\Core\Abstracts\AbstractMiddleware;
 use Bibo\Mvc\Core\Enums\HttpStatus;
-use Bibo\Mvc\Core\Exception\Custom\Http\BadRequestException;
+use Bibo\Mvc\Core\Exception\Custom\Http\TooManyRequestsException;
 use Bibo\Mvc\Core\Interfaces\MiddlewareInterface;
+use Bibo\Mvc\Core\Session\SessionHandler;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -15,22 +16,10 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class RateLimitMiddleware extends AbstractMiddleware implements MiddlewareInterface
 {
-    /**
-     * Limit
-     *
-     * @var int
-     */
-    private int $limit = 100;
+    private int $limit = 5;   // Max requests per window
+    private int $window = 10; // Window in seconds
+    private SessionHandler $session;
 
-    /**
-     * Window
-     *
-     * @var int
-     */
-    private int $window = 60;
-
-    /**
-     */
     public function __construct(ContainerInterface $container)
     {
         try {
@@ -38,87 +27,109 @@ class RateLimitMiddleware extends AbstractMiddleware implements MiddlewareInterf
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             echo $e->getMessage();
         }
+
+        $this->session = $container->get(SessionHandler::class);
     }
 
     /**
-     * Process middleware
-     *
-     * @param ServerRequestInterface  $request
-     * @param RequestHandlerInterface $handler
-     *
-     * @return ResponseInterface
-     * @throws BadRequestException
+     * @throws TooManyRequestsException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        // Attach session to request if not already
+        if (!$request->getAttribute('session')) {
+            $request = $request->withAttribute('session', $this->session);
+        }
+
+        $ip = $request->getClientIp();
         $key = "rate_limit_{$ip}";
+        $session = $request->getAttribute('session');
 
-        if (!isset($_SESSION[$key])) {
-            $_SESSION[$key] = ['count' => 0, 'time' => time()];
-        }
+        // Read existing rate-limit data
+        $data = $session->get($key);
 
-        $data = &$_SESSION[$key];
-        if (time() - $data['time'] < $this->window) {
-            if ($data['count'] >= $this->limit) {
-                throw new BadRequestException(
-                    'Rate limit exceeded',
-                    HttpStatus::TooManyRequests->value
-                );
-            }
-            $data['count']++;
-        } else {
-            $data = ['count' => 1, 'time' => time()];
-        }
+        // Update data
+        $data = $this->updateRateLimitData($data);
 
-        return $handler->handle($request);
+        // Save back into session
+        $session->set($key, $data);
+
+        // Handle request
+        $response = $handler->handle($request);
+
+        // Add rate-limit headers
+        $response = $this->addRateLimitHeaders($response, $data);
+
+        // Explicitly save session at the end
+        $session->writeClose();
+
+        return $response;
     }
 
     /**
-     * @inheritDoc
+     * @throws TooManyRequestsException
      */
+    private function updateRateLimitData(?array $data): array
+    {
+        $now = time();
+
+        if ($data === null || ($now - $data['start']) >= $this->window) {
+            // start a new window
+            $data = ['count' => 1, 'start' => $now];
+        } else {
+            // increment count in the current window
+            $data['count'] += 1;
+            if ($data['count'] > $this->limit) {
+                throw new TooManyRequestsException('Rate limit exceeded', HttpStatus::TooManyRequests->value);
+            }
+        }
+
+        return $data;
+    }
+
+    private function addRateLimitHeaders(ResponseInterface $response, array $data): ResponseInterface
+    {
+        $remaining = max(0, $this->limit - $data['count']);
+        $reset = ($data['start'] + $this->window) - time();
+
+        return $response
+            ->withHeader('X-RateLimit-Limit', (string) $this->limit)
+            ->withHeader('X-RateLimit-Remaining', (string) $remaining)
+            ->withHeader('X-RateLimit-Reset', (string) max(0, $reset));
+    }
+
     public function setNext(MiddlewareInterface $middleware): MiddlewareInterface
     {
-        // TODO: Implement setNext() method.
+        $this->next = $middleware;
+        return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getNext(): ?MiddlewareInterface
     {
-        // TODO: Implement getNext() method.
+        return $this->next;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function handle(): void
     {
-        // TODO: Implement handle() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function hasNext(): bool
     {
-        // TODO: Implement hasNext() method.
+        return $this->next !== null;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function clearNext(): void
     {
-        // TODO: Implement clearNext() method.
+        $this->next = null;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function toArray(): array
     {
-        // TODO: Implement toArray() method.
+        return [
+            'class'   => static::class,
+            'limit'   => $this->limit,
+            'window'  => $this->window,
+            'hasNext' => $this->hasNext(),
+        ];
     }
 }

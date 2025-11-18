@@ -3,6 +3,7 @@
 use Bibo\App\Controllers\IndexController;
 use Bibo\App\Controllers\InstallController;
 use Bibo\App\Controllers\TestController;
+use Bibo\App\Middleware\RateLimitMiddleware;
 use Bibo\Mvc\Core\Facades\Route;
 use Bibo\Mvc\Core\Request\BaseRequest;
 use Bibo\Mvc\Core\Response\JsonResponse;
@@ -12,7 +13,6 @@ Route::get('/', [IndexController::class, 'index'])
 
 
 Route::get('/api/ping', [TestController::class, 'ping'])
-    ->middleware('cors')
     ->name('api.ping');
 
 Route::get('/rest/ping', function () {
@@ -44,7 +44,7 @@ Route::get('/contacts', [IndexController::class, 'contacts']);
 
 Route::get('/info', function () {
     return "Route::get('/info', function () {";
-})->middleware('rate_limit');
+})->middleware(RateLimitMiddleware::class);
 
 Route::get('/api/json', [IndexController::class, 'api']);
 
@@ -63,3 +63,8 @@ Route::get('/install', [InstallController::class, 'index']);
 Route::get('/test', function (BaseRequest $request) {
     dd($request);
 });
+
+Route::get('/single', [IndexController::class, 'single']);
+
+Route::get('/multi', [IndexController::class, 'multi']);
+// Route::dump();

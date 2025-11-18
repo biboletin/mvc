@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bibo\Mvc\Core\Wrapper\Curl;
 
-use Bibo\Mvc\Core\Interfaces\CurlExtendedInterface;
+use Bibo\Mvc\Core\Interfaces\CurlInterface;
 use CurlHandle;
 use InvalidArgumentException;
 use RuntimeException;
@@ -21,14 +23,14 @@ use RuntimeException;
  * - Retrieving response data, headers, and status codes
  * - Error handling and information retrieval
  */
-class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInterface
+class CurlSingleWrapper extends AbstractCurlWrapper implements CurlInterface
 {
     /**
      * CURL handle
      *
-     * @var CurlHandle
+     * @var CurlHandle|null
      */
-    protected mixed $handle;
+    protected ?CurlHandle $handle = null;
 
     /**
      * CURL options
@@ -52,6 +54,13 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
     protected array $responseHeaders = [];
 
     /**
+     * Callback for processing chunks of data
+     *
+     * @var callable|null
+     */
+    protected $onChunk = null;
+
+    /**
      * CurlSingleWrapper constructor.
      *
      * Initializes a new CurlSingleWrapper instance by creating a new cURL handle.
@@ -63,16 +72,47 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
     }
 
     /**
-     * Initializes the cURL handle.
-     *
-     * Creates a new cURL handle using curl_init() and assigns it to the instance.
-     * This method can be called to reset the wrapper with a fresh cURL handle.
+     * Initialize the cURL handle.
      *
      * @return void
      */
     public function init(): void
     {
         $this->handle = curl_init();
+
+        curl_setopt($this->handle, CURLOPT_HEADERFUNCTION, [$this, 'captureHeaderLine']);
+        curl_setopt($this->handle, CURLOPT_RETURNTRANSFER, true);
+    }
+
+    /**
+     * Sets a callback to be invoked for each chunk of data received.
+     *
+     * This method allows you to specify a callable that will be executed
+     * whenever a chunk of data is received during the cURL request.
+     * The callable should accept two parameters: the cURL handle and the chunk of data.
+     *
+     * @param callable $callback The callback function to handle each chunk of data
+     *
+     * @return $this For method chaining
+     */
+    public function onChunk(callable $callback): self
+    {
+        $this->onChunk = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Gets the current chunk processing callback.
+     *
+     * Returns the callable that has been set to handle chunks of data.
+     * If no callback has been set, this method returns null.
+     *
+     * @return callable|null The chunk processing callback or null if not set
+     */
+    public function getOnChunk(): ?callable
+    {
+        return $this->onChunk;
     }
 
     /**
@@ -101,7 +141,7 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
      *
      * @return mixed The cURL handle resource or CurlHandle object
      */
-    public function getHandle(): mixed
+    public function getHandle(): CurlHandle
     {
         return $this->handle;
     }
@@ -168,7 +208,7 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
      * Sets the HTTP method for the cURL request.
      *
      * Configures the cURL handle to use the specified HTTP method.
-     * Supported methods are: GET, POST, PUT, DELETE, PATCH, and HEAD.
+     * Supported methods are: GET, POST, PUT, DELETE, PATCH, OPTIONS, and HEAD.
      * Each method sets the appropriate cURL options to ensure the request
      * is sent correctly.
      *
@@ -180,28 +220,8 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
      */
     public function setMethod(string $method): static
     {
-        switch (strtolower($method)) {
-            case 'get':
-                $this->setOption(CURLOPT_HTTPGET, true);
-                break;
-            case 'post':
-                $this->setOption(CURLOPT_POST, true);
-                break;
-            case 'put':
-                $this->setOption(CURLOPT_PUT, true);
-                break;
-            case 'delete':
-                $this->setOption(CURLOPT_CUSTOMREQUEST, 'DELETE');
-                break;
-            case 'patch':
-                $this->setOption(CURLOPT_CUSTOMREQUEST, 'PATCH');
-                break;
-            case 'head':
-                $this->setOption(CURLOPT_NOBODY, true);
-                break;
-            default:
-                throw new InvalidArgumentException('Invalid HTTP method: ' . $method);
-        }
+        $formattedMethod = strtoupper(trim($method));
+        $this->setOption(CURLOPT_CUSTOMREQUEST, $formattedMethod);
 
         return $this;
     }
@@ -213,19 +233,42 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
      * as an array of strings in the format "Header-Name: value".
      * Common headers include 'Content-Type', 'Authorization', 'Accept', etc.
      *
-     * @param array $headers Array of header strings (e.g., ['Content-Type: application/json', 'Authorization: Bearer token'])
+     * @param array $headers Array of header strings
+     *                       (e.g., ['Content-Type: application/json', 'Authorization: Bearer token'])
      *
      * @return $this For method chaining
      */
-    public function setHeaders(array $headers): static
+    public function setHeaders(array $headers): self
     {
-        return $this->setOption(CURLOPT_HTTPHEADER, $headers);
+        $formattedHeaders = [];
+        foreach ($headers as $key => $value) {
+            if (is_string($key)) {
+                $formattedHeaders[] = $key . ': ' . $value;
+            } else {
+                $formattedHeaders[] = $value;
+            }
+        }
+
+        return $this->setOption(CURLOPT_HTTPHEADER, $formattedHeaders);
+    }
+
+    /**
+     * Gets the currently set headers for the cURL request.
+     *
+     * Returns the array of headers that have been set on the cURL handle.
+     * If no headers have been set, this method returns null.
+     *
+     * @return array|null The array of header strings or null if none are set
+     */
+    public function getHeaders(): ?array
+    {
+        return $this->getOption(CURLOPT_HTTPHEADER);
     }
 
     /**
      * Sets the POST fields for the cURL request.
      *
-     * Sets the data to be sent in a POST, PUT or PATCH request. This can be either:
+     * Sets the data to be sent in a POST, PUT, or PATCH request. This can be either:
      * - A URL-encoded string (e.g., 'param1=value1&param2=value2')
      * - An associative array (e.g., ['param1' => 'value1', 'param2' => 'value2'])
      * - A JSON string for API requests
@@ -240,24 +283,72 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
         return $this->setOption(CURLOPT_POSTFIELDS, $fields);
     }
 
+    public function getPostFields(): array
+    {
+        $postFields = $this->getOption(CURLOPT_POSTFIELDS);
+        if (is_array($postFields)) {
+            return $postFields;
+        }
+
+        return [];
+    }
+
     /**
      * Executes the cURL request.
      *
-     * Performs the cURL request with all the options that have been set.
-     * This method ensures CURLOPT_RETURNTRANSFER is set to true so that the
-     * response is returned as a string rather than output directly.
-     * The response is stored internally and can be retrieved with getRawResponse().
+     * Performs the HTTP request using the configured cURL handle and options.
+     * This method captures the response body, headers, and status code.
+     * If an onChunk callback is set, it will be invoked for each chunk of data received.
      *
-     * @return string The response from the server
+     * @return array An associative array containing 'status', 'headers', and 'body'
      *
-     * @throws RuntimeException If the cURL request fails (check getError() for details)
+     * @throws RuntimeException If the cURL request fails
      */
-    public function exec(): string
+    public function execute(): array
     {
-        $this->setOption(CURLOPT_RETURNTRANSFER, true);
-        $this->rawResponse = curl_exec($this->handle);
+        $this->setOption(CURLOPT_RETURNTRANSFER, $this->onChunk === null);
+        $this->setOption(CURLOPT_HEADER, false);
 
-        return $this->rawResponse;
+        $this->setOption(CURLOPT_HEADERFUNCTION, function ($handle, string $headerLine) {
+            $length = strlen($headerLine);
+            $line = trim($headerLine);
+
+            if ($line === '') {
+                return $length;
+            }
+
+            if (!str_contains($line, ':')) {
+                $this->responseHeaders['status-line'] = $line;
+
+                return $length;
+            }
+            [$name, $value] = explode(':', $line, 2);
+            $this->responseHeaders[trim($name)][] = trim($value);
+
+            return $length;
+        });
+
+        if ($this->onChunk) {
+            $this->setOption(CURLOPT_WRITEFUNCTION, function ($handle, string $body) {
+                ($this->onChunk)($body);
+
+                return strlen($body);
+            });
+        }
+
+        $response = curl_exec($this->handle);
+
+        if ($response === false) {
+            throw new RuntimeException('cURL error: ' . $this->getError(), $this->getErrorNo());
+        }
+
+        $status = curl_getinfo($this->handle, CURLINFO_HTTP_CODE);
+
+        return [
+            'status' => $status,
+            'headers' => $this->responseHeaders,
+            'body' => $this->onChunk ? null : $response,
+        ];
     }
 
     /**
@@ -335,7 +426,7 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
      */
     public function close(): void
     {
-        if (is_resource($this->handle) || $this->handle instanceof CurlHandle) {
+        if ($this->handle instanceof CurlHandle) {
             curl_close($this->handle);
         }
     }
@@ -382,24 +473,40 @@ class CurlSingleWrapper extends AbstractCurlWrapper implements CurlExtendedInter
      *
      * @param string $body The request body content
      *
-     * @return void
+     * @return CurlInterface
      */
-    public function setBody(string $body): void
+    public function setBody(string $body): CurlInterface
     {
-        // Assign the raw request body and ensure related cURL options (e.g., CURLOPT_POSTFIELDS) are set by the caller or higher-level methods.
+        // Assign the raw request body and ensure related cURL options
+        // (e.g., CURLOPT_POSTFIELDS) are set by the caller or higher-level methods.
     }
 
     /**
-     * Executes the cURL request and returns the response body.
+     * Captures a header line from the cURL response.
+     * This method is used as a callback for CURLOPT_HEADERFUNCTION.
+     * It processes each header line and stores it in the responseHeaders array.
      *
-     * This method performs the actual HTTP request using the configured
-     * URL, method, headers, and body.
+     * @param $curlHandler
+     * @param string $headerLine
      *
-     * @return string The response body as a string
-     * @throws RuntimeException If the cURL request fails
+     * @return int
      */
-    public function execute(): string
+    protected function captureHeaderLine($curlHandler, string $headerLine): int
     {
-        // Perform the HTTP request using curl_exec(), capture response/headers, handle errors, and return the body as a string.
+        $trimmed = trim($headerLine);
+
+        if ($trimmed === '') {
+            return strlen($headerLine); // End of headers
+        }
+
+        if (str_contains($trimmed, ':')) {
+            [$key, $value] = explode(':', $trimmed, 2);
+            $this->responseHeaders[trim($key)] = trim($value);
+        } else {
+            // Handle status line, e.g., "HTTP/1.1 200 OK"
+            $this->responseHeaders[] = $trimmed;
+        }
+
+        return strlen($headerLine);
     }
 }

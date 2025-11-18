@@ -1,6 +1,7 @@
 <?php
 
 use Bibo\Mvc\Core\Application\App;
+use Bibo\Mvc\Core\Config\ConfigHandler;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -22,8 +23,10 @@ if (!function_exists('config')) {
             return $envValue;
         }
 
+
         try {
-            $config = $app->get('config');
+            $config = $app->get(ConfigHandler::class);
+
             return $config->get($key, $default);
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             return $default;
@@ -46,7 +49,7 @@ if (!function_exists('get_env')) {
         $segments = explode('.', $key);
         $envKey = strtoupper(implode('_', $segments));
 
-        // First, look in the environment variables
+        // First, look at the environment variables
         $value = $_ENV[$envKey]
             ?? $_SERVER[$envKey]
             ?? getenv($envKey);

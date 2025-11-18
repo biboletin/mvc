@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bibo\Mvc\Core\Rest;
 
 use Bibo\Mvc\Core\Enums\CurlStrategyType;
@@ -8,8 +10,10 @@ use Bibo\Mvc\Core\Rest\Message\Request;
 use Bibo\Mvc\Core\Rest\Message\Response;
 use Bibo\Mvc\Core\Rest\Message\Stream;
 use Bibo\Mvc\Core\Rest\Message\Uri;
+use Bibo\Mvc\Core\Wrapper\Curl\CurlSingleWrapper;
 use Bibo\Mvc\Core\Wrapper\Curl\CurlStrategyFactory;
 use Bibo\Mvc\Core\Wrapper\CurlWrapper;
+use Closure;
 use RuntimeException;
 
 /**
@@ -35,18 +39,163 @@ class HttpClient
      */
     protected string $baseUrl = '';
 
+    protected int $timeout = 30;
+    protected int $retries = 0;
+
+    protected array $headers = [];
+    protected ?Closure $tapCallback = null;
+    protected ?Closure $progressCallback = null;
+    protected ?Closure $mockResponse = null;
+    protected ?Closure $logger = null;
+    protected ?int $cacheTtl = null;
+    protected array $cacheStore = [];
+
+    /**
+     * Last request and response details for debugging/logging.
+     *
+     * @var string|null
+     */
+    protected ?string $lastRequestId = null;
+
+    /**
+     * Last response ID for tracking.
+     *
+     * @var string|null
+     */
+    protected ?string $lastResponseId = null;
+
+    /**
+     * Last response content for debugging/logging.
+     *
+     * @var string|null
+     */
+    protected ?string $lastResponse = null;
+
     /**
      * Initialize a new HttpClient instance.
      *
      * Creates a new CurlWrapper instance with a 'single' mode for making individual HTTP requests.
+     * If a different CurlStrategyType is provided, it will be used instead.
+     * The client is configured to handle request/response conversion between PSR-7 compatible objects
+     * and the underlying cURL implementation.
+     *
+     * @param CurlStrategyType|null $strategy The cURL strategy to use (single or multi). Defaults to SINGLE.
      */
-    public function __construct()
+    public function __construct(?CurlStrategyType $strategy = null)
     {
-        // $strategy = new CurlStrategyFactory();
-        // $strategy->create(CurlStrategyType::SINGLE);
+        if ($strategy === null) {
+            $strategy = CurlStrategyType::SINGLE;
+        }
 
-        // $this->client = new CurlWrapper();
-        $this->client = new CurlWrapper(CurlStrategyFactory::create(CurlStrategyType::SINGLE));
+        $this->client = new CurlWrapper(CurlStrategyFactory::create($strategy));
+    }
+
+    public function setTimeout(int $seconds): self
+    {
+        $this->timeout = $seconds;
+
+        return $this;
+    }
+
+    public function setRetries(int $retries): self
+    {
+        $this->retries = $retries;
+
+        return $this;
+    }
+
+    public function setHeaders(array $headers): self
+    {
+        $this->headers = $headers;
+
+        return $this;
+    }
+
+    public function setTapCallback(?callable $callback): self
+    {
+        $this->tapCallback = $callback;
+
+        return $this;
+    }
+
+    public function setProgressCallback(?callable $callback): self
+    {
+        $this->progressCallback = $callback;
+
+        return $this;
+    }
+
+    public function setMockResponse(?callable $callback): self
+    {
+        $this->mockResponse = $callback;
+
+        return $this;
+    }
+
+    public function setLogger(?callable $logger): self
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
+    public function setCache(?int $ttl = null): self
+    {
+        $this->cacheTtl = $ttl;
+
+        return $this;
+    }
+
+    public function setCacheStore(array $store): self
+    {
+        $this->cacheStore = $store;
+
+        return $this;
+    }
+
+    public function getTimeout(): int
+    {
+        return $this->timeout;
+    }
+
+    public function getRetries(): int
+    {
+        return $this->retries;
+    }
+
+    public function getHeaders(): array
+    {
+        return $this->headers;
+    }
+
+    public function getTapCallback(): ?callable
+    {
+        return $this->tapCallback;
+    }
+
+    public function getProgressCallback(): ?callable
+    {
+        return $this->progressCallback;
+    }
+
+    public function getMockResponse(): ?callable
+    {
+        return $this->mockResponse;
+    }
+
+    public function getLogger(): ?callable
+    {
+        return $this->logger;
+    }
+
+    public function getCacheTtl(): ?int
+    {
+        return $this->cacheTtl;
+    }
+
+    public function getCacheStore(): array
+    {
+        return $this->cacheStore;
     }
 
     /**
@@ -107,7 +256,7 @@ class HttpClient
         $response = $this->client->execute();
 
         // Create and return the Response object
-        return new Response($this->client->getStatusCode(), [], $response, null);
+        return new Response($this->client->getStatusCode(), $response['headers'], $response['body'] ?? '');
     }
 
     /**
@@ -403,9 +552,14 @@ class HttpClient
      *
      * @param string $baseUrl The base URL to set
      */
-    public function setBaseUrl(string $baseUrl): void
+    public function setBaseUrl(string $baseUrl): self
     {
-        $this->baseUrl = rtrim($baseUrl, '/'); // Ensure no trailing slash
+        // Ensure no trailing slash
+        $this->baseUrl = rtrim($baseUrl, '/');
+
+        // Optionally, you could validate the URL format here
+
+        return $this;
     }
 
     /**
@@ -420,6 +574,11 @@ class HttpClient
     {
         return $this->client;
     }
+
+    // public function ()
+    // {
+    //
+    // }
 
     /**
      * Clean up resources when the HttpClient is destroyed.

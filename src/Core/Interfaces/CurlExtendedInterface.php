@@ -2,6 +2,8 @@
 
 namespace Bibo\Mvc\Core\Interfaces;
 
+use CurlHandle;
+
 /**
  * CurlExtendedInterface
  * Extends the CurlInterface to provide additional functionality for handling cURL operations.
@@ -27,9 +29,9 @@ interface CurlExtendedInterface extends CurlInterface
     /**
      * Set the cURL handle.
      *
-     * @return mixed
+     * @return CurlHandle
      */
-    public function getHandle(): mixed;
+    public function getHandle(): CurlHandle;
 
     /**
      * Set the cURL handle.

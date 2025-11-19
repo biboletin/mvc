@@ -47,15 +47,9 @@ class ConfigHandler implements ConfigInterface
 
     /**
      * Constructor for Config class.
-     *
-     * @param string|null $cachePath Path to cache directory
      */
-    public function __construct(?string $cachePath = null)
+    public function __construct()
     {
-        $this->cachePath = $cachePath
-            ?? (defined('CACHE_PATH')
-                ? CACHE_PATH
-                : __DIR__ . '/../../cache/');
     }
 
     /**

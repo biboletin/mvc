@@ -15,7 +15,8 @@ define('APP_START', microtime(true));
 $timer = new ScriptExecutionTimer();
 $timer->start('total_execution_time');
 
-$app = new App(new Container());
+$container = new Container();
+$app = new App($container);
 
 
 include __DIR__ . '/../bootstrap/bootstrap.php';

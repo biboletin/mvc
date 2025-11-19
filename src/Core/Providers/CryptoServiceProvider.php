@@ -6,7 +6,9 @@ use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Crypto\Crypto;
 use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
 use Bibo\Mvc\Core\Logger\LogManager;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 
 class CryptoServiceProvider extends ServiceProvider
 {
@@ -23,18 +25,20 @@ class CryptoServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $config = $this->container->get(ConfigHandler::class);
+        try {
+            $config = $this->container->get(ConfigHandler::class);
+            $crypto = new Crypto(
+                $config->get('encryption.key'),
+                $config->get('encryption.cipher'),
+                $config->get('encryption.iv_length'),
+                $config->get('encryption.use_hmac')
+            );
 
-        $crypto = new Crypto(
-            $config->get('encryption.key'),
-            $config->get('encryption.cipher'),
-            $config->get('encryption.iv_length'),
-            $config->get('encryption.use_hmac')
-        );
-
-        $this->container->set(Crypto::class, function () use ($crypto) {
-            return $crypto;
-        });
+            $this->container->set(Crypto::class, function () use ($crypto) {
+                return $crypto;
+            });
+        } catch (NotFoundExceptionInterface|ReflectionException|ContainerExceptionInterface $e) {
+        }
     }
 
     /**

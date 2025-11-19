@@ -9,8 +9,10 @@ use Bibo\Mvc\Core\Crypto\Crypto;
 use Bibo\Mvc\Core\Exception\Custom\Application\ConfigException;
 use Bibo\Mvc\Core\Logger\LogManager;
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use ReflectionException;
 
 class ConfigServiceProvider extends ServiceProvider
 {
@@ -76,9 +78,12 @@ class ConfigServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container
-            ->get(LogManager::class)
-            ->get('app')
-            ->debug(__CLASS__ . ' booted successfully');
+        try {
+            $this->container
+                ->get(LogManager::class)
+                ->get('app')
+                ->debug(__CLASS__ . ' booted successfully');
+        } catch (NotFoundExceptionInterface|ReflectionException|ContainerExceptionInterface $e) {
+        }
     }
 }

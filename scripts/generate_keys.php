@@ -44,7 +44,7 @@ if (file_exists($envFile)) {
 // Write back to .env
 if (file_put_contents($envFile, $envContent) !== false) {
     echo "✅ New keys generated and stored in .env\n";
-    echo "Keys: " . implode(', ', array_keys($keys)) . "\n";
+    echo "Keys:\r\n" . implode("\r\n", array_keys($keys)) . "\n";
 } else {
     echo "❌ Failed to write to .env file.\n";
     exit(1);

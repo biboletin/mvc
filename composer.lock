@@ -1136,12 +1136,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "96939c7a3dbd1ae0a5c40dcc16f15289869f4b99"
+                "reference": "59e6ffa3d6b3dd6590aff6d13496e582dd2e8163"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/96939c7a3dbd1ae0a5c40dcc16f15289869f4b99",
-                "reference": "96939c7a3dbd1ae0a5c40dcc16f15289869f4b99",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/59e6ffa3d6b3dd6590aff6d13496e582dd2e8163",
+                "reference": "59e6ffa3d6b3dd6590aff6d13496e582dd2e8163",
                 "shasum": ""
             },
             "require": {
@@ -1218,7 +1218,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-11-08T12:23:47+00:00"
+            "time": "2025-11-16T10:16:47+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -1519,12 +1519,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "eb659b1ff719245c731a76ecf9fd9bb24cc6fce4"
+                "reference": "96e762fc0650a1f9ec0ca382558febbf98ba53d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/eb659b1ff719245c731a76ecf9fd9bb24cc6fce4",
-                "reference": "eb659b1ff719245c731a76ecf9fd9bb24cc6fce4",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/96e762fc0650a1f9ec0ca382558febbf98ba53d0",
+                "reference": "96e762fc0650a1f9ec0ca382558febbf98ba53d0",
                 "shasum": ""
             },
             "require": {
@@ -1620,7 +1620,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-11-14T06:00:36+00:00"
+            "time": "2025-11-16T10:18:42+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -2872,16 +2872,16 @@
         },
         {
             "name": "theseer/tokenizer",
-            "version": "1.3.0",
+            "version": "1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theseer/tokenizer.git",
-                "reference": "d74205c497bfbca49f34d4bc4c19c17e22db4ebb"
+                "reference": "b7489ce515e168639d17feec34b8847c326b0b3c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/d74205c497bfbca49f34d4bc4c19c17e22db4ebb",
-                "reference": "d74205c497bfbca49f34d4bc4c19c17e22db4ebb",
+                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/b7489ce515e168639d17feec34b8847c326b0b3c",
+                "reference": "b7489ce515e168639d17feec34b8847c326b0b3c",
                 "shasum": ""
             },
             "require": {
@@ -2910,7 +2910,7 @@
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
             "support": {
                 "issues": "https://github.com/theseer/tokenizer/issues",
-                "source": "https://github.com/theseer/tokenizer/tree/1.3.0"
+                "source": "https://github.com/theseer/tokenizer/tree/1.3.1"
             },
             "funding": [
                 {
@@ -2918,7 +2918,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-11-13T13:44:09+00:00"
+            "time": "2025-11-17T20:03:58+00:00"
         }
     ],
     "aliases": [],
@@ -2951,5 +2951,5 @@
         "ext-http": "*"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

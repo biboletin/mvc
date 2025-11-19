@@ -64,5 +64,5 @@ return [
      * Application key
      */
 
-    'key' => get_env('app.key', ''),
+    'key' => get_env('app.key', null),
 ];

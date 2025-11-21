@@ -32,6 +32,8 @@ abstract class AbstractMiddleware
     protected ErrorResponseFactory $responseFactory;
 
     /**
+     * Next middleware
+     *
      * @var MiddlewareInterface|null
      */
     protected ?MiddlewareInterface $next = null;

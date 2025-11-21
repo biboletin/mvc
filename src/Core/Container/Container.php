@@ -2,6 +2,7 @@
 
 namespace Bibo\Mvc\Core\Container;
 
+use AllowDynamicProperties;
 use Bibo\Mvc\Core\Exception\Custom\Container\ContainerException;
 use Bibo\Mvc\Core\Exception\Custom\Container\ContainerItemNotFoundException;
 use Closure;
@@ -38,6 +39,7 @@ use Throwable;
  * dependency resolution, providing the convenience of autowiring without
  * sacrificing control and explicit configurability.
  */
+#[AllowDynamicProperties]
 final class Container implements ContainerInterface
 {
     /**
@@ -78,7 +80,7 @@ final class Container implements ContainerInterface
      * the container throws a descriptive exception.
      *
      * Example:
-     *     A → B → A   (circular dependency)
+     *     A → B → A (circular dependency)
      *
      * @var SplStack<string>
      */
@@ -91,12 +93,23 @@ final class Container implements ContainerInterface
      */
     private array $reflections = [];
 
+    private array $nonShared = [];
+
     /**
      * Constructor
+     *
+     * @param array<string, Closure> $bindings
+     * @param array<string, string>  $aliases
      */
-    public function __construct()
+    public function __construct(array $bindings = [], array $aliases = [])
     {
         $this->resolving = new SplStack();
+        $this->bindings = $bindings;
+        $this->aliases = $aliases;
+
+        // ✔ Container should resolve itself
+        $this->aliases[ContainerInterface::class] = self::class;
+        $this->bindings[self::class] = fn () => $this;
     }
 
     /**
@@ -112,38 +125,40 @@ final class Container implements ContainerInterface
      */
     public function get(string $id): mixed
     {
-        if (isset($this->instances[$id])) {
+        // instance cached
+        if (array_key_exists($id, $this->instances)) {
             return $this->instances[$id];
         }
 
-        if (!isset($this->bindings[$id])) {
-            throw new ContainerItemNotFoundException('Item ' . $id . ' not found!');
+        // alias lookup (before binding)
+        if (isset($this->aliases[$id])) {
+            $id = $this->aliases[$id];
         }
 
-        try {
-            $this->instances[$id] = ($this->bindings[$id])($this);
-        } catch (Throwable $exception) {
-            throw new ContainerItemNotFoundException(
-                'Failed to resolve service ' . $id . ': ' . $exception->getMessage(),
-                0,
-                $exception
-            );
-        }
-
-        // If it's bound, use the bound instance
+        // explicit binding
         if (isset($this->bindings[$id])) {
-            $this->instances[$id] = ($this->bindings[$id])($this);
-            return $this->instances[$id];
+            try {
+                $object = ($this->bindings[$id])($this);
+
+                // singleton unless registered with factory()
+                if (!isset($this->nonShared[$id])) {
+                    $this->instances[$id] = $object;
+                }
+
+                return $object;
+            } catch (Throwable $e) {
+                throw new ContainerException("Failed to resolve binding '" . $id . "'");
+            }
         }
 
-        // If not bound but class exists, autowire it
+        // autowire fallback
         if (class_exists($id)) {
             return $this->instances[$id] = $this->resolve($id);
         }
 
-
-        throw new ContainerItemNotFoundException("No entry found for '{" . $id . "}'.");
+        throw new ContainerItemNotFoundException("No entry found for '" . $id . "'");
     }
+
 
     /**
      * Define a service in the container.
@@ -230,9 +245,8 @@ final class Container implements ContainerInterface
      */
     public function factory(string $id, Closure $factory): self
     {
-        $this->bindings[$id] = function (Container $c) use ($factory) {
-            return $factory($c); // call fresh every time
-        };
+        $this->bindings[$id] = $factory;
+        $this->nonShared[$id] = true;
 
         return $this;
     }
@@ -251,7 +265,6 @@ final class Container implements ContainerInterface
      */
     public function autowire(string $class): mixed
     {
-        dd($class);
         return $this->get($class);
     }
 
@@ -371,52 +384,61 @@ final class Container implements ContainerInterface
      */
     public function call(callable $callable, array $parameters = []): mixed
     {
-        $key = is_array($callable) ? $callable[0] . '::' . $callable[1] : (is_string($callable) ? $callable : '');
-
-        if (!isset($this->reflections[$key])) {
-            if (is_array($callable)) {
-                $reflection = new ReflectionMethod($callable[0], $callable[1]);
-            } elseif (is_string($callable) && str_contains($callable, '::')) {
-                $reflection = new ReflectionMethod(...explode('::', $callable));
-            } elseif ($callable instanceof Closure || is_string($callable)) {
-                $reflection = new ReflectionFunction($callable);
-            } else {
-                throw new ContainerException('Invalid callable type');
-            }
-        } else {
-            // If cached, just use it
-            $reflection = $this->reflections[$key];
-        }
-
+        $reflection = $this->getCallableReflection($callable);
         $args = [];
 
         foreach ($reflection->getParameters() as $param) {
             $name = $param->getName();
             $type = $param->getType();
 
-            // Class type → autowire
-            if ($type instanceof ReflectionNamedType && !$type->isBuiltin()) {
-                $args[] = $this->get($type->getName());
-                continue;
-            }
-
-            // Manual parameter?
+            // 1. manual parameter
             if (array_key_exists($name, $parameters)) {
                 $args[] = $parameters[$name];
                 continue;
             }
 
-            // Use default value
+            // 2. autowiring for class types
+            if ($type instanceof ReflectionNamedType && !$type->isBuiltin()) {
+                $args[] = $this->get($type->getName());
+                continue;
+            }
+
+            // 3. default parameter
             if ($param->isDefaultValueAvailable()) {
                 $args[] = $param->getDefaultValue();
                 continue;
             }
 
-            // No resolution possible
-            throw new ContainerException("Missing parameter '{" . $name . "}'");
+            throw new ContainerException("Missing required parameter '{$name}'");
         }
 
         return $callable(...$args);
+    }
+
+    /**
+     * Get the ReflectionFunction or ReflectionMethod for a callable.
+     * This is used internally by the `call()` method to inspect the callable's parameters.
+     *
+     * @param callable $callable
+     *
+     * @return ReflectionFunction|ReflectionMethod
+     * @throws ReflectionException
+     */
+    private function getCallableReflection(callable $callable): ReflectionFunction|ReflectionMethod
+    {
+        // array callable: [Class, 'method']
+        if (is_array($callable)) {
+            return new ReflectionMethod($callable[0], $callable[1]);
+        }
+
+        // "Class::method" static string
+        if (is_string($callable) && str_contains($callable, '::')) {
+            [$class, $method] = explode('::', $callable);
+            return new ReflectionMethod($class, $method);
+        }
+
+        // Closure or named function
+        return new ReflectionFunction($callable);
     }
 
     /**
@@ -496,6 +518,7 @@ final class Container implements ContainerInterface
      * If the method does not exist, it throws a ContainerException.
      * This method is useful for accessing container methods dynamically,
      * such as when you want to call a method that is not explicitly defined in the container class.
+     *
      * @param string $method
      *                      The name of the method to call.
      *                      This method should be a valid method name that exists in the container class.

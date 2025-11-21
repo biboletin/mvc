@@ -3,6 +3,7 @@
 namespace Bibo\Mvc\Core\View;
 
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
+use Bibo\Mvc\Core\Logger\LogManager;
 use Bibo\Mvc\Core\Template\Template;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -24,6 +25,13 @@ class View
      */
     protected Template $template;
 
+    /**
+     * Container instance
+     *
+     * @var ContainerInterface|null
+     */
+    protected ?ContainerInterface $container = null;
+
 
     /**
      * View constructor
@@ -35,7 +43,8 @@ class View
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->template = $container->get(Template::class);
+        $this->container = $container;
+        $this->template = $this->container->get(Template::class);
     }
 
     /**

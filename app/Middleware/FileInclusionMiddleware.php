@@ -17,34 +17,29 @@ use Psr\Http\Server\RequestHandlerInterface;
 class FileInclusionMiddleware extends AbstractMiddleware implements MiddlewareInterface
 {
     /**
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        try {
-            parent::__construct($container);
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
-            echo $e->getMessage();
-        }
-    }
-
-    /**
      * List of suspicious patterns for LFI/RFI
      *
      * @var string[]
      */
     private array $patterns = [
         // Directory traversal
-        // ../
         '/\.\.\//',
-        // ..\ for Windows
         '/\.\.\\\\/',
+
+        // Sensitive directories
+        '/vendor\//i',
+        '/node_modules\//i',
+        '/\.git\//i',
+
         // Sensitive files
         '/\/etc\/passwd/i',
         '/boot\.ini/i',
         '/win\.ini/i',
+
         // PHP file extensions
         '/\.php[0-9]?/i',
         '/\.phtml/i',
+
         // Remote inclusion attempts
         '/(http|https|ftp|php|data|file):\/\//i',
     ];
@@ -80,7 +75,8 @@ class FileInclusionMiddleware extends AbstractMiddleware implements MiddlewareIn
     /**
      * Detect file inclusion patterns in a string or array
      *
-     * @param  mixed $value
+     * @param mixed $value
+     *
      * @return bool
      */
     private function detectInclusion(mixed $value): bool

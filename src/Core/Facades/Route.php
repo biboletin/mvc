@@ -43,7 +43,7 @@ final class Route
     /**
      * Set the GET route
      *
-     * @param string         $path
+     * @param string $path
      * @param array|callable $handler
      *
      * @return BaseRouter
@@ -56,140 +56,132 @@ final class Route
     /**
      * Set the POST route
      *
-     * @param string         $path
+     * @param string $path
      * @param array|callable $handler
-     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function post(string $path, array|callable $handler, array $middleware): BaseRouter
+    public static function post(string $path, array|callable $handler): BaseRouter
     {
-        return self::getInstance()->post($path, $handler, $middleware);
+        return self::getInstance()->post($path, $handler);
     }
 
     /**
      * Set the PUT route
      *
-     * @param string         $path
+     * @param string $path
      * @param array|callable $handler
-     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function put(string $path, array|callable $handler, array $middleware): BaseRouter
+    public static function put(string $path, array|callable $handler): BaseRouter
     {
-        return self::getInstance()->put($path, $handler, $middleware);
+        return self::getInstance()->put($path, $handler);
     }
 
     /**
      * Set DELETE route
      *
-     * @param string         $path
+     * @param string $path
      * @param array|callable $handler
-     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function delete(string $path, array|callable $handler, array $middleware): BaseRouter
+    public static function delete(string $path, array|callable $handler): BaseRouter
     {
-        return self::getInstance()->delete($path, $handler, $middleware);
+        return self::getInstance()->delete($path, $handler);
     }
 
     /**
      * Set PATCH route
      *
-     * @param string         $path
+     * @param string $path
      * @param array|callable $handler
-     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function patch(string $path, array|callable $handler, array $middleware): BaseRouter
+    public static function patch(string $path, array|callable $handler): BaseRouter
     {
-        return self::getInstance()->patch($path, $handler, $middleware);
+        return self::getInstance()->patch($path, $handler);
     }
 
     /**
      * Set the HEAD route
      *
-     * @param string         $path
+     * @param string $path
      * @param array|callable $handler
-     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function head(string $path, array|callable $handler, array $middleware): BaseRouter
+    public static function head(string $path, array|callable $handler): BaseRouter
     {
-        return self::getInstance()->head($path, $handler, $middleware);
+        return self::getInstance()->head($path, $handler);
     }
 
     /**
      * Set OPTIONS route
      *
-     * @param string         $path
+     * @param string $path
      * @param array|callable $handler
-     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function options(string $path, array|callable $handler, array $middleware): BaseRouter
+    public static function options(string $path, array|callable $handler): BaseRouter
     {
-        return self::getInstance()->options($path, $handler, $middleware);
+        return self::getInstance()->options($path, $handler);
     }
 
     /**
      * Set CONNECT route
      *
-     * @param string         $path
+     * @param string $path
      * @param array|callable $handler
-     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function connect(string $path, array|callable $handler, array $middleware): BaseRouter
+    public static function connect(string $path, array|callable $handler): BaseRouter
     {
-        return self::getInstance()->connect($path, $handler, $middleware);
+        return self::getInstance()->connect($path, $handler);
     }
 
     /**
      * Set TRACE route
      *
-     * @param string         $path
+     * @param string $path
      * @param array|callable $handler
-     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function trace(string $path, array|callable $handler, array $middleware): BaseRouter
+    public static function trace(string $path, array|callable $handler): BaseRouter
     {
-        return self::getInstance()->trace($path, $handler, $middleware);
+        return self::getInstance()->trace($path, $handler);
     }
 
     /**
      * Set ANY route
      *
-     * @param string         $path
+     * @param string $path
      * @param array|callable $handler
-     * @param array          $middleware
      *
      * @return BaseRouter
      */
-    public static function any(string $path, array|callable $handler, array $middleware): BaseRouter
+    public static function any(string $path, array|callable $handler): BaseRouter
     {
-        return self::getInstance()->any($path, $handler, $middleware);
+        return self::getInstance()->any($path, $handler);
     }
 
     /**
      * Group routes
      *
-     * @param string   $name
+     * @param string $name
      * @param callable $handler
+     * @param string|array $groupMiddleware
      *
      * @return BaseRouter
      */
-    public static function group(string $name, callable $handler): BaseRouter
+    public static function group(string $name, callable $handler, string|array $groupMiddleware): BaseRouter
     {
-        return self::getInstance()->group($name, $handler);
+        return self::getInstance()->group($name, $handler, $groupMiddleware);
     }
 
     /**
@@ -197,7 +189,7 @@ final class Route
      *
      * @param string $from
      * @param string $to
-     * @param int    $status
+     * @param int $status
      *
      * @return BaseRouter
      */
@@ -223,16 +215,14 @@ final class Route
      * Match route
      *
      * @param string|array $method
-     * @param string       $uri
+     * @param string $uri
+     * @param array|callable $handler
      *
-     * @return ResponseInterface
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundException
-     * @throws NotFoundExceptionInterface|MethodNotAllowedException
+     * @return BaseRouter
      */
-    public static function match(string|array $method, string $uri): ResponseInterface
+    public static function match(string|array $method, string $uri, array|callable $handler): BaseRouter
     {
-        return self::getInstance()->dispatch($method, $uri);
+        return self::getInstance()->match($method, $uri, $handler);
     }
 
     /**
@@ -280,11 +270,6 @@ final class Route
     public static function getRoutes(): array
     {
         return self::getInstance()->getRoutes();
-    }
-
-    public static function setRoutes(array $routes): void
-    {
-        self::setRoutes($routes);
     }
 
     public static function dump(): void

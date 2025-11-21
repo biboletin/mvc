@@ -27,7 +27,8 @@
     "minimum-stability": "dev",
     "require-dev": {
         "symfony/var-dumper": "7.3.x-dev",
-        "phpunit/phpunit": "^11"
+        "phpunit/phpunit": "^11",
+        "phpcompatibility/php-compatibility": "^10.0@dev"
     },
     "require": {
         "psr/log": "^3.0@dev",
@@ -51,5 +52,10 @@
         "ext-bz2": "*",
         "ext-intl": "*",
         "ext-http": "*"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

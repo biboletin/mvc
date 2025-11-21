@@ -66,7 +66,7 @@ class IndexController extends Controller
         $client = new HttpClient();
         $response = $client->get('https://jsonplaceholder.typicode.com/posts/3');
 
-        $json = json_decode($response->getBody(), JSON_PRETTY_PRINT);
+        $json = json_decode((string) $response->getBody(), true, 512, JSON_PRETTY_PRINT);
 
         // return new JsonResponse($json);
         $this->json($json);
@@ -97,10 +97,10 @@ class IndexController extends Controller
 
         $json = json_decode($response->getBody(), true);
 
-dd(
-    $response,
-    $json
-);
+        dd(
+            $response,
+            $json
+        );
         $data = [];
 
         return $this->view('home', $data);

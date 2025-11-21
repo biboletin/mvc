@@ -46,7 +46,7 @@ class JsonResponse extends BaseResponse
      * @return self New instance with an updated body stream.
      * @throws JsonException If encoding fails.
      */
-    public function setData($data): self
+    public function setData(mixed $data): self
     {
         if ($data instanceof JsonSerializable) {
             $data = $data->jsonSerialize(); // Serialize if it's a JsonSerializable object

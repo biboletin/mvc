@@ -37,7 +37,7 @@ class CryptoServiceProvider extends ServiceProvider
             $this->container->set(Crypto::class, function () use ($crypto) {
                 return $crypto;
             });
-        } catch (NotFoundExceptionInterface|ReflectionException|ContainerExceptionInterface $e) {
+        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
         }
     }
 

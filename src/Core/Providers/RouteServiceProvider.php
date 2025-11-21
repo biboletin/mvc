@@ -4,6 +4,7 @@ namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Facades\Route;
 use Bibo\Mvc\Core\Logger\LogManager;
+use Bibo\Mvc\Core\Middleware\MiddlewareDispatcher;
 use Bibo\Mvc\Core\Router\BaseRouter;
 use Bibo\Mvc\Core\Strategies\Router\CachedRegexMatchStrategy;
 use Bibo\Mvc\Core\Strategies\Router\CompositeMatchStrategy;
@@ -11,6 +12,7 @@ use Bibo\Mvc\Core\Strategies\Router\ExactMatchStrategy;
 use Bibo\Mvc\Core\Strategies\Router\RegexMatchStrategy;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 
 /**
  * Service provider that bootstraps the routing layer.
@@ -25,6 +27,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      * @throws ContainerExceptionInterface If container interaction fails during setup.
+     * @throws ReflectionException
      */
     public function register(): void
     {
@@ -34,7 +37,12 @@ class RouteServiceProvider extends ServiceProvider
             new CachedRegexMatchStrategy(),
         ];
         $strategy = new CompositeMatchStrategy($routeStrategies);
-        $router = new BaseRouter($this->container, $strategy);
+        $router = new BaseRouter();
+        $router
+            ->setContainer($this->container)
+            ->setMiddlewareDispatcher($this->container->get(MiddlewareDispatcher::class))
+            ->setStrategy($strategy);
+
         Route::init($router);
 
         // Load application routes

@@ -19,7 +19,7 @@ return [
         SqlInjectionMiddleware::class,
         FileInclusionMiddleware::class,
         // TODO: Fix and Enable Rate Limiting Middleware
-        // RateLimitMiddleware::class,
+//        RateLimitMiddleware::class,
     ],
 
     // Middleware groups
@@ -33,7 +33,7 @@ return [
         // Add your API middleware here
         'api' => [
             RateLimitMiddleware::class,
-            SqlInjectionMiddleware::class,
+            CorsMiddleware::class,
         ],
     ],
 
@@ -41,6 +41,7 @@ return [
     'route' => [
         'csrf' => CsrfMiddleware::class,
         'cors' => CorsMiddleware::class,
+        'rate-limit' => RateLimitMiddleware::class,
         // 'auth' => [
         //     // Add your auth middleware here
         // ],
@@ -52,9 +53,6 @@ return [
         // ],
         // 'throttle' => [
         //     // Add your throttle middleware here
-        // ],
-        // 'cors' => [
-        //     // Add your CORS middleware here
         // ],
         // 'logging' => [
         //     // Add your logging middleware here

@@ -16,5 +16,5 @@ enum ApiVersion: string
      * Version 1 of the API.
      * This is the initial version and may include basic features and functionalities.
      */
-    const V1 = 'v1';
+    const string V1 = 'v1';
 }

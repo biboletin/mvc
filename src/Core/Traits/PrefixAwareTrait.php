@@ -9,7 +9,7 @@ trait PrefixAwareTrait
      *
      * @var string
      */
-    protected string $prefix;
+    protected string $prefix = '';
 
     /**
      * Set prefix
@@ -20,7 +20,7 @@ trait PrefixAwareTrait
      */
     public function setPrefix(string $prefix): void
     {
-        $this->prefix = $prefix;
+        $this->prefix = !empty($prefix) ? $prefix : '';
     }
 
     /**

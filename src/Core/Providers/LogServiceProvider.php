@@ -10,7 +10,9 @@ use Bibo\Mvc\Core\Logger\Formatter\LineFormatter;
 use Bibo\Mvc\Core\Logger\Handler\RotatingFileHandler;
 use Bibo\Mvc\Core\Logger\Logger;
 use Bibo\Mvc\Core\Logger\LogManager;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 
 /**
  * Class LogServiceProvider
@@ -29,33 +31,36 @@ class LogServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $config = $this->container->get(ConfigHandler::class);
+        try {
+            $config = $this->container->get(ConfigHandler::class);
 
-        $loggers = [
-            'app' => $this->createLogger(
-                $config,
-                'app',
-                'error.log',
-                new LineFormatter(
-                    $config->get('log.date_format'),
-                    $config->get('log.include_context')
-                )
-            ),
+            $loggers = [
+                'app' => $this->createLogger(
+                    $config,
+                    'app',
+                    'error.log',
+                    new LineFormatter(
+                        $config->get('log.date_format'),
+                        $config->get('log.include_context')
+                    )
+                ),
 
-            'security' => $this->createLogger(
-                $config,
-                'security',
-                'error.json',
-                new JsonFormatter(
-                    $config->get('log.date_format'),
-                    $config->get('log.channels.security.pretty_print')
-                )
-            ),
-        ];
+                'security' => $this->createLogger(
+                    $config,
+                    'security',
+                    'error.json',
+                    new JsonFormatter(
+                        $config->get('log.date_format'),
+                        $config->get('log.channels.security.pretty_print')
+                    )
+                ),
+            ];
 
-        $this->container->set(LogManager::class, function () use ($loggers) {
-            return new LogManager($loggers);
-        });
+            $this->container->set(LogManager::class, function () use ($loggers) {
+                return new LogManager($loggers);
+            });
+        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
+        }
     }
 
     /**
@@ -95,9 +100,12 @@ class LogServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container
-            ->get(LogManager::class)
-            ->get('app')
-            ->debug(__CLASS__ . ' booted successfully');
+        try {
+            $this->container
+                ->get(LogManager::class)
+                ->get('app')
+                ->debug(__CLASS__ . ' booted successfully');
+        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
+        }
     }
 }

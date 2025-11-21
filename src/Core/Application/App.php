@@ -5,11 +5,15 @@ namespace Bibo\Mvc\Core\Application;
 use Bibo\App\Middleware\ErrorMiddleware;
 use Bibo\Mvc\Core\Error\Error;
 use Bibo\Mvc\Core\Error\ErrorResponseFactory;
+use Bibo\Mvc\Core\Exception\Custom\Http\MethodNotAllowedException;
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
+use Bibo\Mvc\Core\Logger\LogManager;
 use Bibo\Mvc\Core\Request\BaseRequest;
 use Bibo\Mvc\Core\Response\ResponseEmitter;
 use Bibo\Mvc\Core\Router\BaseRouter;
 use Bibo\Mvc\Core\Traits\NameAwareTrait;
+use Bibo\Mvc\Core\Traits\PrefixAwareTrait;
+use Bibo\Mvc\Core\Traits\VersionAwareTrait;
 use JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -25,6 +29,8 @@ use Throwable;
 class App
 {
     use NameAwareTrait;
+    use PrefixAwareTrait;
+    use VersionAwareTrait;
 
     /**
      * Container

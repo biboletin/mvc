@@ -2,51 +2,49 @@
 
 namespace Bibo\Mvc\Core\Middleware;
 
-use Bibo\Mvc\Core\Interfaces\MiddlewareInterface;
-use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-
-// use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use RuntimeException;
+use ReflectionClass;
+use ReflectionException;
 
 /**
- * Class MiddlewareDispatcher
+ * PSR-15 Middleware Dispatcher
  *
- * Handles registration, resolution, and dispatching of PSR-15 middlewares.
- * Allows combining global middleware, route-specific middleware, and
- * middleware groups into a single execution stack for HTTP requests.
+ * - Accepts middleware as:
+ *   - MiddlewareInterface instances,
+ *   - callable(Request, RequestHandler): Response (wrapped automatically),
+ *   - class FQCN strings (resolved from container or new'ed),
+ *   - alias strings that map to a class in routeMiddleware,
+ *   - group names that expand to arrays of middleware.
+ *
+ * - Supports global middleware, groups and route aliases.
  */
-class MiddlewareDispatcher
+final class MiddlewareDispatcher
 {
-    /**
-     * @var array<int, string|MiddlewareInterface> List of global middleware applied to every request
-     */
-    protected array $global = [];
-
-    /**
-     * @var array<string, array<int, string|MiddlewareInterface>> Middleware groups
-     * Groups allow multiple middlewares to be applied under a single alias.
-     */
-    protected array $groups = [];
-
-    /**
-     * @var array<string, string|MiddlewareInterface> Route-specific middleware
-     * Key is the alias, value is the middleware class or instance.
-     */
-    protected array $routeMiddleware = [];
-
-    /**
-     * @var ContainerInterface Dependency injection container used to resolve middleware instances
-     */
     private ContainerInterface $container;
 
     /**
-     * MiddlewareDispatcher constructor.
-     *
-     * @param ContainerInterface $container PSR-11 container for dependency injection
+     * @var array<int, string|MiddlewareInterface|callable>
+     */
+    private array $global = [];
+
+    /**
+     * @var array<string, array<int, string|MiddlewareInterface|callable>>
+     */
+    private array $groups = [];
+
+    /**
+     * @var array<string, string|MiddlewareInterface|callable>
+     */
+    private array $routeMiddleware = [];
+
+    /**
+     * Construct with PSR-11 container.
      */
     public function __construct(ContainerInterface $container)
     {
@@ -54,11 +52,9 @@ class MiddlewareDispatcher
     }
 
     /**
-     * Register an array of global middleware applied to all requests.
+     * Register global middleware (applied to all requests).
      *
-     * @param array<int, string|MiddlewareInterface> $middleware Array of middleware class names or instances
-     *
-     * @return void
+     * @param array<int, string|MiddlewareInterface|callable> $middleware
      */
     public function registerGlobal(array $middleware): void
     {
@@ -67,12 +63,9 @@ class MiddlewareDispatcher
 
     /**
      * Define a middleware group.
-     * A group allows combining multiple middlewares under a single alias.
      *
-     * @param string                                 $group       Name of the middleware group
-     * @param array<int, string|MiddlewareInterface> $middlewares Array of middleware class names or instances
-     *
-     * @return void
+     * @param string $group
+     * @param array<int, string|MiddlewareInterface|callable> $middlewares
      */
     public function defineGroup(string $group, array $middlewares): void
     {
@@ -80,12 +73,9 @@ class MiddlewareDispatcher
     }
 
     /**
-     * Register route-specific middleware.
-     * Middleware can be referenced by its alias when defining a route.
+     * Register route middleware aliases.
      *
-     * @param array<string, string|MiddlewareInterface> $middleware Key is alias, value is class or instance
-     *
-     * @return void
+     * @param array<string, string|MiddlewareInterface|callable> $middleware
      */
     public function registerRouteMiddleware(array $middleware): void
     {
@@ -93,172 +83,258 @@ class MiddlewareDispatcher
     }
 
     /**
-     * Dispatch the middleware stack for a given request.
-     * This method merges global middleware and route-specific middleware,
-     * wraps them around the core request handler, and executes them in order.
+     * Dispatch middleware stack for a given request.
      *
-     * @param ServerRequestInterface                 $request     The current HTTP request
-     * @param callable                               $coreHandler Core request handler that produces the final response
-     * @param array<int, string|MiddlewareInterface> $middlewares Middleware aliases or classes for this route
+     * @param ServerRequestInterface $request
+     * @param callable(ServerRequestInterface): ResponseInterface $coreHandler
+     * @param array<int, string|MiddlewareInterface|callable> $routeMiddlewares Route-level middleware (aliases / classes / instances)
      *
-     * @return ResponseInterface The response returned after all middleware has been processed
+     * @return ResponseInterface
      *
-     * @throws Exception If a middleware cannot be resolved or does not implement MiddlewareInterface
+     * @throws RuntimeException
      * @throws ContainerExceptionInterface
      */
-    public function dispatch(
-        ServerRequestInterface $request,
-        callable $coreHandler,
-        array $middlewares = []
-    ): ResponseInterface {
-        // Merge global middleware with route-specific middleware
-        $allMiddleware = array_merge($this->global, $middlewares);
+    public function dispatch(ServerRequestInterface $request, callable $coreHandler, array $routeMiddlewares = []): ResponseInterface
+    {
+        // Build combined stack: global first, then route-specific
+        $stack = array_merge($this->global, $routeMiddlewares);
 
-        // Wrap a core handler in a basic RequestHandler
+        // Resolve to array of MiddlewareInterface instances
+        $resolved = $this->resolveMiddlewareStack($stack);
+
+        // Build PSR-15 chain: wrap core handler
         $handler = new class ($coreHandler) implements RequestHandlerInterface {
-            private $coreHandler;
+            private $core;
 
-            public function __construct(callable $coreHandler)
+            public function __construct(callable $core)
             {
-                $this->coreHandler = $coreHandler;
+                $this->core = $core;
             }
 
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                // Core handler produces the final response
-                return ($this->coreHandler)($request);
+                return ($this->core)($request);
             }
         };
 
-        // Wrap each middleware around the previous handler in reverse order
-        foreach (array_reverse($this->resolveMiddlewareStack($allMiddleware)) as $middleware) {
-            $handler = new class ($middleware, $handler) implements RequestHandlerInterface {
-                private MiddlewareInterface $middleware;
-                private RequestHandlerInterface $nextHandler;
-
-                public function __construct(MiddlewareInterface $middleware, RequestHandlerInterface $nextHandler)
-                {
-                    $this->middleware   = $middleware;
-                    $this->nextHandler  = $nextHandler;
-                }
-
-                public function handle(ServerRequestInterface $request): ResponseInterface
-                {
-                    return $this->middleware->process($request, $this->nextHandler);
-                }
-            };
+        // Build pipeline in reverse order
+        foreach (array_reverse($resolved) as $middleware) {
+            $handler = $this->wrapMiddleware($middleware, $handler);
         }
 
-        // Execute the full middleware stack
         return $handler->handle($request);
     }
 
     /**
-     * Expand + resolve middleware stack.
+     * Resolve an arbitrary stack (groups, aliases, instances, callables) into MiddlewareInterface[].
      *
-     * @param array $middlewares Aliases, class names, groups, or instances
+     * - Recursively expands groups.
+     * - Accepts objects (instances) directly.
+     *
+     * @param array<int, string|MiddlewareInterface|callable> $stack
      *
      * @return MiddlewareInterface[]
-     * @throws Exception*@throws ContainerExceptionInterface
+     *
+     * @throws RuntimeException
      * @throws ContainerExceptionInterface
      */
-    protected function resolveMiddlewareStack(array $middlewares): array
+    private function resolveMiddlewareStack(array $stack): array
     {
         $resolved = [];
 
-        foreach ($middlewares as $middleware) {
-            if ($middleware instanceof MiddlewareInterface) {
-                $resolved[] = $middleware;
+        foreach ($stack as $item) {
+            // Already an instance: accept
+            if ($item instanceof MiddlewareInterface) {
+                $resolved[] = $item;
                 continue;
             }
 
-            // Expand group
-            if (isset($this->groups[$middleware])) {
-                foreach ($this->groups[$middleware] as $groupMiddleware) {
-                    $resolved = array_merge(
-                        $resolved,
-                        $this->resolveMiddlewareStack([$groupMiddleware]) // recursion
-                    );
+            // Callable: wrap later
+            if (is_callable($item)) {
+                $resolved[] = $this->wrapCallableAsMiddleware($item);
+                continue;
+            }
+
+            // Strings: could be group, route alias, or FQCN
+            if (is_string($item)) {
+                // Group expand
+                if (isset($this->groups[$item]) && is_array($this->groups[$item])) {
+                    // recursion: expand group items and merge
+                    $resolved = array_merge($resolved, $this->resolveMiddlewareStack($this->groups[$item]));
+                    continue;
                 }
+
+                // Route alias
+                if (isset($this->routeMiddleware[$item])) {
+                    $aliasTarget = $this->routeMiddleware[$item];
+                    // alias target could be instance, callable, or string
+                    if ($aliasTarget instanceof MiddlewareInterface) {
+                        $resolved[] = $aliasTarget;
+                        continue;
+                    }
+                    if (is_callable($aliasTarget)) {
+                        $resolved[] = $this->wrapCallableAsMiddleware($aliasTarget);
+                        continue;
+                    }
+                    if (is_string($aliasTarget)) {
+                        $resolved[] = $this->instantiateMiddleware($aliasTarget);
+                        continue;
+                    }
+
+                    throw new RuntimeException('Invalid route middleware alias target for ' . $item . '"');
+                }
+
+                // Treat as FQCN
+                $resolved[] = $this->instantiateMiddleware($item);
                 continue;
             }
 
-            // Resolve alias
-            if (isset($this->routeMiddleware[$middleware])) {
-                $resolved[] = $this->resolveMiddleware($this->routeMiddleware[$middleware]);
-                continue;
-            }
-
-            // Assume FQCN
-            $resolved[] = $this->resolveMiddleware($middleware);
+            // Anything else is invalid
+            throw new RuntimeException('Invalid middleware type: ' . gettype($item));
         }
 
         return $resolved;
     }
 
     /**
-     * Instantiate middleware by class name (via container if possible).
+     * Instantiate middleware by class name (resolve via container if present).
      *
-     * @throws Exception|ContainerExceptionInterface
+     * If the container has the service, we use it. Otherwise we try to instantiate:
+     *  - if the class constructor accepts a ContainerInterface as first arg -> pass container
+     *  - else try no-arg constructor
+     *
+     * @param string $class
+     *
+     * @return MiddlewareInterface
+     *
+     * @throws RuntimeException on failure or if the result is not MiddlewareInterface
+     * @throws ContainerExceptionInterface|ReflectionException
      */
-    protected function instantiateMiddleware(string $middlewareClass): MiddlewareInterface
+    private function instantiateMiddleware(string $class): MiddlewareInterface
     {
-        if ($this->container->has($middlewareClass)) {
-            $instance = $this->container->get($middlewareClass);
+        // If container provides it, use container (allows full DI/autowiring)
+        if ($this->container->has($class)) {
+            $instance = $this->container->get($class);
         } else {
-            if (!class_exists($middlewareClass)) {
-                throw new Exception("Middleware class {$middlewareClass} not found");
+            // Not in container — try to instantiate safely
+            if (!class_exists($class)) {
+                throw new RuntimeException("Middleware class '{$class}' not found");
             }
-            $instance = new $middlewareClass($this->container);
+
+            try {
+                $ref = new ReflectionClass($class);
+            } catch (ReflectionException $e) {
+                throw new RuntimeException("Reflection failed for middleware '{$class}': " . $e->getMessage(), 0, $e);
+            }
+
+            if (!$ref->isInstantiable()) {
+                throw new RuntimeException("Middleware class '{$class}' is not instantiable");
+            }
+
+            $ctor = $ref->getConstructor();
+            if ($ctor === null || $ctor->getNumberOfParameters() === 0) {
+                $instance = $ref->newInstance();
+            } else {
+                // Try first to pass container if the first param expects it
+                $params = $ctor->getParameters();
+                $firstType = $params[0]->getType();
+                if ($firstType && !$firstType->isBuiltin() && $firstType instanceof \ReflectionNamedType
+                    && $firstType->getName() === ContainerInterface::class) {
+                    $instance = $ref->newInstance($this->container);
+                } else {
+                    // Fallback: try zero-arg (already failed) or try to instantiate without args -> error
+                    // We avoid trying to autowire here to keep dispatcher simple; encourage registering in the container.
+                    throw new RuntimeException(
+                        "Cannot instantiate middleware '{$class}' — constructor requires parameters. Register it in the container."
+                    );
+                }
+            }
         }
 
         if (!$instance instanceof MiddlewareInterface) {
-            throw new Exception("Middleware {$middlewareClass} must implement MiddlewareInterface");
+            throw new RuntimeException("Middleware '{$class}' must implement MiddlewareInterface");
         }
 
         return $instance;
     }
 
     /**
-     * Resolve middleware by alias, group, class, or instance.
+     * Wrap a callable into a MiddlewareInterface instance.
+     * The callable signature should be: function(ServerRequestInterface $req, RequestHandlerInterface $handler): ResponseInterface
      *
-     * @param  string|MiddlewareInterface $middleware
+     * @param callable $callable
      * @return MiddlewareInterface
-     *
-     * @throws Exception|ContainerExceptionInterface
      */
-    public function resolveMiddleware(string|MiddlewareInterface $middleware): MiddlewareInterface
+    private function wrapCallableAsMiddleware(callable $callable): MiddlewareInterface
     {
-        if ($middleware instanceof MiddlewareInterface) {
-            return $middleware;
-        }
+        return new class($callable) implements MiddlewareInterface {
+            private $callable;
 
-        // Alias
-        if (isset($this->routeMiddleware[$middleware])) {
-            return $this->instantiateMiddleware($this->routeMiddleware[$middleware]);
-        }
+            public function __construct(callable $callable)
+            {
+                $this->callable = $callable;
+            }
 
-        // Group (resolve first middleware in group or expand logic later)
-        if (isset($this->groups[$middleware])) {
-            $group = $this->groups[$middleware];
-            $middlewareClass = is_array($group) ? $group[0] : $group;
-            return $this->instantiateMiddleware($middlewareClass);
-        }
-
-        // Fallback: assume fully qualified class
-        return $this->instantiateMiddleware($middleware);
+            public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+            {
+                return ($this->callable)($request, $handler);
+            }
+        };
     }
 
+    /**
+     * Wrap a MiddlewareInterface into a RequestHandler which delegates to the middleware.
+     *
+     * @param MiddlewareInterface $middleware
+     * @param RequestHandlerInterface $next
+     * @return RequestHandlerInterface
+     */
+    private function wrapMiddleware(MiddlewareInterface $middleware, RequestHandlerInterface $next): RequestHandlerInterface
+    {
+        return new class($middleware, $next) implements RequestHandlerInterface {
+            private MiddlewareInterface $middleware;
+            private RequestHandlerInterface $next;
+
+            public function __construct(MiddlewareInterface $middleware, RequestHandlerInterface $next)
+            {
+                $this->middleware = $middleware;
+                $this->next = $next;
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                return $this->middleware->process($request, $this->next);
+            }
+        };
+    }
+
+    // Helper getters (optional)
+
+    /**
+     * Retrieve the list of global middleware instances.
+     *
+     * @return array An array of middleware instances.
+     */
     public function getGlobalMiddlewares(): array
     {
         return $this->global;
     }
 
-    public function getGroupMiddlewares(): array
+    /**
+     * Retrieve the list of groups.
+     *
+     * @return array The array of groups.
+     */
+    public function getGroups(): array
     {
         return $this->groups;
     }
 
+    /**
+     * Retrieves the middlewares associated with the route.
+     *
+     * @return array An array of route middlewares.
+     */
     public function getRouteMiddlewares(): array
     {
         return $this->routeMiddleware;

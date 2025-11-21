@@ -7,6 +7,7 @@ use Bibo\Mvc\Core\View\View;
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 
 /**
  * Class ViewServiceProvider
@@ -44,9 +45,12 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container
-            ->get(LogManager::class)
-            ->get('app')
-            ->debug(__CLASS__ . ' booted successfully');
+        try {
+            $this->container
+                ->get(LogManager::class)
+                ->get('app')
+                ->debug(__CLASS__ . ' booted successfully');
+        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
+        }
     }
 }

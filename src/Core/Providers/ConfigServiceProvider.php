@@ -83,7 +83,7 @@ class ConfigServiceProvider extends ServiceProvider
                 ->get(LogManager::class)
                 ->get('app')
                 ->debug(__CLASS__ . ' booted successfully');
-        } catch (NotFoundExceptionInterface|ReflectionException|ContainerExceptionInterface $e) {
+        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
         }
     }
 }

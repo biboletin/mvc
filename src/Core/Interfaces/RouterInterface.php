@@ -113,12 +113,13 @@ interface RouterInterface
     /**
      * Group routes
      *
-     * @param string   $prefix
+     * @param string $prefix
      * @param callable $callback
+     * @param string|array $groupMiddleware
      *
      * @return RouterInterface
      */
-    public function group(string $prefix, callable $callback): self;
+    public function group(string $prefix, callable $callback, string|array $groupMiddleware): self;
 
     /**
      * Redirect route

@@ -30,7 +30,7 @@ class StartupConfigServiceProvider extends ServiceProvider
             if (class_exists(Locale::class)) {
                 Locale::setDefault($config->get('app.locale'));
             }
-        } catch (NotFoundExceptionInterface|ReflectionException|ContainerExceptionInterface $e) {
+        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
         }
     }
 
@@ -47,7 +47,7 @@ class StartupConfigServiceProvider extends ServiceProvider
                 ->get(LogManager::class)
                 ->get('app')
                 ->debug(__CLASS__ . ' booted successfully');
-        } catch (NotFoundExceptionInterface|ReflectionException|ContainerExceptionInterface $e) {
+        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
         }
     }
 }

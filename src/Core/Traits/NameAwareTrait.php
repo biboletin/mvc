@@ -37,7 +37,7 @@ trait NameAwareTrait
      */
     public function getName(): string
     {
-        return $this->getPrefix() . $this->name;
+        return $this->name;
     }
 
     /**
@@ -49,7 +49,7 @@ trait NameAwareTrait
      */
     public function setName(string $name): self
     {
-        $this->name = $name;
+        $this->name = $this->getPrefix() . $name;
 
         return $this;
     }

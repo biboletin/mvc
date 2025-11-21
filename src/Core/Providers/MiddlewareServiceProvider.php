@@ -4,7 +4,9 @@ namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Logger\LogManager;
 use Bibo\Mvc\Core\Middleware\MiddlewareDispatcher;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 
 /**
  * Service provider for configuring and registering middleware.
@@ -29,10 +31,10 @@ class MiddlewareServiceProvider extends ServiceProvider
         $global = [];
         foreach ($config['global'] ?? [] as $class) {
             $global[] = new $class($this->container);
-            $dispatcher->registerGlobal($global);
 
             $this->container->set($class, fn () => new $class($this->container));
         }
+        $dispatcher->registerGlobal($global);
 
         // Register route middleware
         foreach ($config['route'] ?? [] as $alias => $class) {
@@ -62,9 +64,12 @@ class MiddlewareServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->container
-            ->get(LogManager::class)
-            ->get('app')
-            ->debug(__CLASS__ . ' booted successfully');
+        try {
+            $this->container
+                ->get(LogManager::class)
+                ->get('app')
+                ->debug(__CLASS__ . ' booted successfully');
+        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
+        }
     }
 }

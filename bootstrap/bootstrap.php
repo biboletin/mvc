@@ -45,11 +45,11 @@ $providers = [
     ResponseEmitterServiceProvider::class,
     ErrorServiceProvider::class,
     MiddlewareServiceProvider::class,
-    AppServiceProvider::class,
     FileCacheServiceProvider::class,
     RouteServiceProvider::class,
     ModelServiceProvider::class,
     ControllerServiceProvider::class,
+    AppServiceProvider::class,
 ];
 
 $container = $app->container();

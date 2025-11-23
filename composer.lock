@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "18f453552f88ef1b29925261612a3053",
+    "content-hash": "76d97abe0d846e470d4530ec3e3bbd58",
     "packages": [
         {
             "name": "psr/clock",
@@ -1232,12 +1232,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCompatibility/PHPCompatibility.git",
-                "reference": "ff4efdd80e094a81fd6329b570c9a632f21d42b4"
+                "reference": "fcb3f1a3c96000dfd694a5e56ec06f000b7ade5f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibility/zipball/ff4efdd80e094a81fd6329b570c9a632f21d42b4",
-                "reference": "ff4efdd80e094a81fd6329b570c9a632f21d42b4",
+                "url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibility/zipball/fcb3f1a3c96000dfd694a5e56ec06f000b7ade5f",
+                "reference": "fcb3f1a3c96000dfd694a5e56ec06f000b7ade5f",
                 "shasum": ""
             },
             "require": {
@@ -1318,7 +1318,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-10-30T20:24:19+00:00"
+            "time": "2025-11-22T03:50:43+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -1326,12 +1326,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSUtils.git",
-                "reference": "7f9e98d7d281ad4383895d2e90ad3cc3f54c7764"
+                "reference": "ba96d0ba8824acf21f056051b78d794d33eda008"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/7f9e98d7d281ad4383895d2e90ad3cc3f54c7764",
-                "reference": "7f9e98d7d281ad4383895d2e90ad3cc3f54c7764",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/ba96d0ba8824acf21f056051b78d794d33eda008",
+                "reference": "ba96d0ba8824acf21f056051b78d794d33eda008",
                 "shasum": ""
             },
             "require": {
@@ -1412,7 +1412,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-11-18T06:45:04+00:00"
+            "time": "2025-11-21T19:31:22+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -1803,12 +1803,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "96e762fc0650a1f9ec0ca382558febbf98ba53d0"
+                "reference": "fc53696465916d82b1ec1f19cbdba3a16788646c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/96e762fc0650a1f9ec0ca382558febbf98ba53d0",
-                "reference": "96e762fc0650a1f9ec0ca382558febbf98ba53d0",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/fc53696465916d82b1ec1f19cbdba3a16788646c",
+                "reference": "fc53696465916d82b1ec1f19cbdba3a16788646c",
                 "shasum": ""
             },
             "require": {
@@ -1904,7 +1904,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-11-16T10:18:42+00:00"
+            "time": "2025-11-21T12:57:15+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -3313,7 +3313,7 @@
         "ext-openssl": "*",
         "ext-bz2": "*",
         "ext-intl": "*",
-        "ext-http": "*"
+        "ext-pdo": "*"
     },
     "platform-dev": {},
     "plugin-api-version": "2.9.0"

@@ -1,107 +1,114 @@
 <?php
 
 /**
- * Database configuration
+ * Connection configuration
  */
 
 return [
 
-    'mysql' => [
+    /*
+     * Connection driver
+     */
 
-        /*
-         * Database driver
-         */
+    'driver' => get_env('db.driver', 'mysql'),
 
-        'driver' => 'mysql',
+    /*
+     * Connection host
+     */
 
-        /*
-         * Database host
-         */
+    'host' => get_env('db.host', '127.0.0.1'),
 
-        'host' => $_ENV['DB_HOST'] ?? 'localhost',
+    /*
+     * Connection name
+     */
 
-        /*
-         * Database name
-         */
+    'database' => get_env('db.database', ''),
 
-        'database' => $_ENV['DB_DATABASE'] ?? 'example',
+    /*
+     * Connection username
+     */
 
-        /*
-         * Database username
-         */
+    'username' => get_env('db.username', 'root'),
 
-        'username' => $_ENV['DB_USERNAME'] ?? 'root',
+    /*
+     * Connection password
+     */
 
-        /*
-         * Database password
-         */
+    'password' => get_env('db.password', ''),
 
-        'password' => $_ENV['DB_PASSWORD'] ?? '',
+    /*
+     * Connection port
+     */
 
-        /*
-         * Database port
-         */
+    'port' => get_env('db.port', 3306),
 
-        'port' => $_ENV['DB_PORT'] ?? 3306,
+    /*
+     * Connection charset
+     */
 
-        /*
-         * Database charset
-         */
+    'charset' => get_env('db.charset', 'utf8mb4'),
 
-        'charset' => 'utf8mb4',
+    /*
+     * Connection collation
+     */
 
-        /*
-         * Database collation
-         */
+    'collation' => get_env('db.collation', 'utf8mb4_unicode_ci'),
 
-        'collation' => 'utf8mb4_unicode_ci',
+    /*
+     * Connection prefix
+     */
 
-        /*
-         * Database prefix
-         */
+    'prefix' => get_env('db.prefix', ''),
 
-        'prefix' => '',
+    /*
+     * Connection strict mode
+     */
 
-        /*
-         * Database strict mode
-         */
+    'strict' => get_env('db.strict', false),
 
-        'strict' => true,
+    /*
+     * Connection options
+     */
 
-        /*
-         * Database engine
-         */
+    'options' => get_env('db.options', [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+        PDO::ATTR_EMULATE_PREPARES => false,
+        PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
+        PDO::ATTR_STRINGIFY_FETCHES => false,
+        PDO::ATTR_PERSISTENT => false,
+        // PDO::MYSQL_ATTR_SSL_CA => '/path/to/ca.pem',
+        // PDO::MYSQL_ATTR_SSL_CERT => '/path/to/client-cert.pem',
+        // PDO::MYSQL_ATTR_SSL_KEY => '/path/to/client-key.pem',
+    ]),
 
-        'engine' => null,
+    /*
+     * Connection timezone
+     */
 
-        /*
-         * Database options
-         */
+    'timezone' => get_env('db.timezone', 'UTC'),
 
-        'options' => [],
+    /*
+     * Connection locale
+     */
 
-        /*
-         * Database timezone
-         */
+    'locale' => get_env('db.locale', 'en'),
 
-        'timezone' => 'UTC',
+    /*
+     * Connection fallback locale
+     */
 
-        /*
-         * Database locale
-         */
+    'fallback_locale' => get_env('db.fallback_locale', 'en'),
 
-        'locale' => 'en',
+    /*
+     * Connection fallback timezone
+     */
 
-        /*
-         * Database fallback locale
-         */
+    'fallback_timezone' => get_env('db.fallback_timezone', 'UTC'),
 
-        'fallback_locale' => 'en',
+    /*
+     * Max retries for connection
+     */
 
-        /*
-         * Database fallback timezone
-         */
-
-        'fallback_timezone' => 'UTC',
-    ],
+    'max_retries' => get_env('db.max_retries', 3),
 ];

@@ -2,6 +2,7 @@
 
 use Bibo\Mvc\Core\Providers\CookieJarServiceProvider;
 use Bibo\Mvc\Core\Providers\CookieServiceProvider;
+use Bibo\Mvc\Core\Providers\DatabaseServiceProvider;
 use Bibo\Mvc\Core\Providers\EnumServiceProvider;
 use Bibo\Mvc\Core\Providers\AppServiceProvider;
 use Bibo\Mvc\Core\Providers\ConfigServiceProvider;
@@ -32,6 +33,7 @@ $providers = [
     ScriptExecutionTimerServiceProvider::class,
     RequestServiceProvider::class,
     ConfigServiceProvider::class,
+    DatabaseServiceProvider::class,
     StartupConfigServiceProvider::class,
     ResolverServiceProvider::class,
     CookieServiceProvider::class,

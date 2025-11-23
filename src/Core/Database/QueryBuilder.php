@@ -2,14 +2,10 @@
 
 namespace Bibo\Mvc\Core\Database;
 
-class Sql
+class QueryBuilder
 {
     private string $sql;
-    private array $params;
-    private string $type;
-    private string $table;
-    private string $alias;
-    private string $schema;
+
     public function __construct()
     {
     }

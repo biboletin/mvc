@@ -14,16 +14,16 @@ use Bibo\Mvc\Core\Exception\AppException;
 class DatabaseException extends AppException
 {
     /**
-     * HTTP status code for Database Error
+     * HTTP status code for Connection Error
      *
      * @var int
      */
     protected $code = 500;
 
     /**
-     * Default error message for Database Error
+     * Default error message for Connection Error
      *
      * @var string
      */
-    protected $message = 'Database Error';
+    protected $message = 'Connection Error';
 }

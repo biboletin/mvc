@@ -8,18 +8,18 @@ use PDO;
 use PDOException;
 
 /**
- * Class MySqlDriver
+ * Class PostgreSqlDriver
  *
- * Implements a database driver for MySQL (and MariaDB) using PDO.
+ * Implements a database driver for PostgreSQL using PDO.
  * Handles connection, disconnection, PDO attributes, and provides helper methods
  * for retrieving driver and database information.
  *
  * @package Bibo\Mvc\Core\Database\Drivers
  */
-class MySqlDriver implements DriverInterface, PdoDriverInterface
+class PostgreSqlDriver implements DriverInterface, PdoDriverInterface
 {
     /**
-     * The PDO instance representing the MySQL connection.
+     * The PDO instance representing the PostgreSQL connection.
      *
      * @var PDO|null
      */
@@ -33,18 +33,11 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
     private string $dsn;
 
     /**
-     * MySQL-specific configuration options such as username, password, charset, timezone, strict mode, and PDO options.
+     * PostgreSQL-specific configuration options such as username, password, schema, timezone, and PDO options.
      *
      * @var array
      */
     private array $config;
-
-    /**
-     * Additional PDO attributes stored.
-     *
-     * @var array
-     */
-    private array $attributes = [];
 
     /**
      * The last error message encountered during connection attempts.
@@ -61,13 +54,6 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
     private int $errorCode = 0;
 
     /**
-     * The PDO error info string, if available.
-     *
-     * @var string
-     */
-    private string $errorInfo = '';
-
-    /**
      * Maximum number of connection retry attempts before throwing an exception.
      *
      * @var int
@@ -79,8 +65,8 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
      *
      * Initializes the DSN, configuration, and maximum retry attempts.
      *
-     * @param string $dsn DSN string for PDO
-     * @param array $config Configuration array with database connection details
+     * @param string $dsn PostgreSQL DSN string
+     * @param array $config Configuration array containing connection details
      */
     public function __construct(string $dsn, array $config)
     {
@@ -90,10 +76,10 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
     }
 
     /**
-     * Establishes a PDO connection to the MySQL database.
+     * Establishes a PDO connection to the PostgreSQL database.
      *
      * Handles retries with exponential backoff in case of connection failure.
-     * Optionally sets SQL strict mode and session timezone if provided in the configuration.
+     * Optionally sets search_path (schema) and timezone if provided in the configuration.
      *
      * @return PDO The connected PDO instance
      * @throws PDOException if all retry attempts fail
@@ -105,9 +91,11 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
         }
 
         $attempts = 0;
+
         while ($attempts < $this->maxRetries) {
             try {
                 $options = $this->prepareOptions($this->config['options'] ?? []);
+
                 $this->pdo = new PDO(
                     $this->dsn,
                     $this->config['username'] ?? null,
@@ -115,14 +103,14 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
                     $options
                 );
 
-                // Apply strict mode if configured
-                if (!empty($this->config['strict'])) {
-                    $this->pdo->exec("SET SESSION sql_mode='STRICT_ALL_TABLES'");
+                // Set schema (search_path) if provided
+                if (!empty($this->config['schema'])) {
+                    $this->pdo->exec('SET search_path TO ' . $this->pdo->quote($this->config['schema']));
                 }
 
-                // Apply timezone if configured
+                // Set timezone if provided
                 if (!empty($this->config['timezone'])) {
-                    $this->pdo->exec('SET time_zone = ' . $this->pdo->quote($this->config['timezone']));
+                    $this->pdo->exec('SET TIMEZONE ' . $this->pdo->quote($this->config['timezone']));
                 }
 
                 return $this->pdo;
@@ -130,40 +118,50 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
                 $this->lastError = $e->getMessage();
                 $this->errorCode = $e->getCode();
                 $attempts++;
-                // Exponential backoff in seconds (0.5, 1, 2, ...)
+                // Exponential backoff (0.5s, 1s, 2s, ...)
                 usleep((int)(pow(2, $attempts - 1) * 500_000));
             }
         }
 
         throw new PDOException(
-            'Failed to connect to MySQL after ' . $this->maxRetries . ' attempts: ' . $this->lastError
+            'Failed to connect to PostgreSQL after ' .
+            $this->maxRetries . ' attempts: ' . $this->lastError,
+            $this->errorCode
         );
     }
 
     /**
-     * Prepares PDO options by merging user-provided options with MySQL-safe defaults.
+     * Prepare PDO options, merging provided options with PostgreSQL-safe defaults.
+     *
+     * Avoids MySQL-specific attributes and ensures safe defaults.
      *
      * @param string|array $options PDO options array or comma-separated string
      *
-     * @return array Prepared PDO options
+     * @return array
      */
     private function prepareOptions(string|array $options): array
     {
-        $optionsToArray = is_string($options)
-            ? array_map('trim', preg_split('/\s*,\s*/', $options, -1, PREG_SPLIT_NO_EMPTY))
-            : $options;
+        if (is_string($options)) {
+            $options = array_map('trim', preg_split('/\s*,\s*/', $options));
+        }
+
+        if (!is_array($options)) {
+            $options = [];
+        }
 
         $defaultOptions = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
             PDO::ATTR_EMULATE_PREPARES   => false,
+            PDO::ATTR_STRINGIFY_FETCHES  => false,
+            PDO::ATTR_PERSISTENT         => false,
         ];
 
-        return $optionsToArray + $defaultOptions;
+        return $options + $defaultOptions;
     }
 
     /**
-     * Disconnects from the database.
+     * Disconnects from the PostgreSQL database.
      *
      * @return void
      */
@@ -179,17 +177,19 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
      */
     public function getDriverName(): string
     {
-        return 'mysql';
+        return 'pgsql';
     }
 
     /**
-     * Returns the PDO driver name.
+     * Returns the PDO client version.
      *
      * @return string
      */
     public function getDriverVersion(): string
     {
-        return $this->pdo ? $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) : 'unknown';
+        return $this->pdo
+            ? $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION)
+            : 'unknown';
     }
 
     /**
@@ -203,27 +203,31 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
     }
 
     /**
-     * Returns the MySQL server version.
+     * Returns the server version of PostgreSQL.
      *
      * @return string
      */
     public function getDatabaseVersion(): string
     {
-        return $this->pdo ? $this->pdo->getAttribute(PDO::ATTR_SERVER_VERSION) : 'unknown';
+        return $this->pdo
+            ? $this->pdo->getAttribute(PDO::ATTR_SERVER_VERSION)
+            : 'unknown';
     }
 
     /**
-     * Returns detailed information about the MySQL server.
+     * Returns detailed server information.
      *
      * @return string
      */
     public function getServerInfo(): string
     {
-        return $this->pdo ? $this->pdo->getAttribute(PDO::ATTR_SERVER_INFO) : '';
+        return $this->pdo
+            ? $this->pdo->getAttribute(PDO::ATTR_SERVER_INFO)
+            : '';
     }
 
     /**
-     * Returns the MySQL server version (redundant with getDatabaseVersion).
+     * Returns the server version string (redundant with getDatabaseVersion).
      *
      * @return string
      */
@@ -249,21 +253,23 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
      */
     public function getAttributes(): array
     {
-        return $this->pdo ? [
-            PDO::ATTR_AUTOCOMMIT     => $this->pdo->getAttribute(PDO::ATTR_AUTOCOMMIT),
-            PDO::ATTR_CASE           => $this->pdo->getAttribute(PDO::ATTR_CASE),
+        if (!$this->pdo) {
+            return [];
+        }
+
+        return [
+            PDO::ATTR_AUTOCOMMIT    => $this->pdo->getAttribute(PDO::ATTR_AUTOCOMMIT),
             PDO::ATTR_CLIENT_VERSION => $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION),
-        ] : [];
+            PDO::ATTR_DRIVER_NAME   => $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME),
+        ];
     }
 
     /**
      * Sets a PDO attribute.
      *
-     * @param int $attribute PDO::ATTR_* constant
-     *
-     * @param mixed $value
-     *
-     * @return bool True if the attribute was set successfully
+     * @param  int $attribute PDO::ATTR_* constant
+     * @param  mixed $value
+     * @return bool True on success
      */
     public function setAttribute(int $attribute, mixed $value): bool
     {
@@ -273,8 +279,7 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
     /**
      * Retrieves a PDO attribute.
      *
-     * @param int $attribute PDO::ATTR_* constant
-     *
+     * @param  int $attribute PDO::ATTR_* constant
      * @return mixed
      */
     public function getAttribute(int $attribute): mixed
@@ -285,7 +290,7 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
     /**
      * Returns the last error message from connection attempts.
      *
-     * @return string Last error message or empty string if none
+     * @return string
      */
     public function getLastError(): string
     {

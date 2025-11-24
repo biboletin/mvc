@@ -1232,12 +1232,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCompatibility/PHPCompatibility.git",
-                "reference": "fcb3f1a3c96000dfd694a5e56ec06f000b7ade5f"
+                "reference": "376ce421e86f81d83f777df4b3ee183199b1bc6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibility/zipball/fcb3f1a3c96000dfd694a5e56ec06f000b7ade5f",
-                "reference": "fcb3f1a3c96000dfd694a5e56ec06f000b7ade5f",
+                "url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibility/zipball/376ce421e86f81d83f777df4b3ee183199b1bc6f",
+                "reference": "376ce421e86f81d83f777df4b3ee183199b1bc6f",
                 "shasum": ""
             },
             "require": {
@@ -1251,7 +1251,7 @@
             "require-dev": {
                 "php-parallel-lint/php-console-highlighter": "^1.0.0",
                 "php-parallel-lint/php-parallel-lint": "^1.4.0",
-                "phpcsstandards/phpcsdevcs": "^1.1.6",
+                "phpcsstandards/phpcsdevcs": "^1.2.0",
                 "phpcsstandards/phpcsdevtools": "^1.2.3",
                 "phpunit/phpunit": "^4.8.36 || ^5.7.21 || ^6.0 || ^7.0 || ^8.0 || ^9.3.4 || ^10.5.32 || ^11.3.3",
                 "yoast/phpunit-polyfills": "^1.1.5 || ^2.0.5 || ^3.1.0"
@@ -1318,7 +1318,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-11-22T03:50:43+00:00"
+            "time": "2025-11-24T19:58:49+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -1326,12 +1326,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSUtils.git",
-                "reference": "ba96d0ba8824acf21f056051b78d794d33eda008"
+                "reference": "698232ea6f8c2098384164d045940147a9e8a456"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/ba96d0ba8824acf21f056051b78d794d33eda008",
-                "reference": "ba96d0ba8824acf21f056051b78d794d33eda008",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/698232ea6f8c2098384164d045940147a9e8a456",
+                "reference": "698232ea6f8c2098384164d045940147a9e8a456",
                 "shasum": ""
             },
             "require": {
@@ -1412,7 +1412,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-11-21T19:31:22+00:00"
+            "time": "2025-11-24T07:56:30+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -3020,12 +3020,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "b24645570ef73d320d22ee04a5798ba319f755ed"
+                "reference": "c4adbbc16dc75a090040901f305657c3a675a8f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/b24645570ef73d320d22ee04a5798ba319f755ed",
-                "reference": "b24645570ef73d320d22ee04a5798ba319f755ed",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/c4adbbc16dc75a090040901f305657c3a675a8f3",
+                "reference": "c4adbbc16dc75a090040901f305657c3a675a8f3",
                 "shasum": ""
             },
             "require": {
@@ -3092,7 +3092,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-11-18T05:46:24+00:00"
+            "time": "2025-11-24T08:57:09+00:00"
         },
         {
             "name": "staabm/side-effects-detector",

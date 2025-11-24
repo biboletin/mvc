@@ -1,114 +1,233 @@
 <?php
 
 /**
- * Connection configuration
+ * Database connection configuration.
+ *
+ * This configuration supports multiple database drivers using canonical keys:
+ * - MySQL / MariaDB  => 'mysql'
+ * - PostgreSQL       => 'pgsql'
+ * - SQLite           => 'sqlite'
+ *
+ * Driver aliases like 'mariadb', 'postgres', 'postgresql', 'sqlite3'
+ * are resolved using DriverFactory::resolve().
  */
 
 return [
 
     /*
-     * Connection driver
+     * Selected database driver.
+     * Can be an alias ('mariadb', 'postgresql') or canonical ('mysql', 'pgsql', 'sqlite').
+     * Used by DriverFactory to select the correct driver class and configuration.
      */
 
     'driver' => get_env('db.driver', 'mysql'),
 
     /*
-     * Connection host
+     * Canonical MySQL / MariaDB configuration
      */
 
-    'host' => get_env('db.host', '127.0.0.1'),
+    'mysql' => [
+
+        /*
+         * Database host or IP address
+         */
+
+        'host' => get_env('db.host', '127.0.0.1'),
+
+        /*
+         * Database name
+         */
+
+        'database' => get_env('db.database', ''),
+
+        /*
+         * Username for database authentication
+         */
+
+        'username' => get_env('db.username', 'root'),
+
+        /*
+         * Password for database authentication
+         */
+
+        'password' => get_env('db.password', ''),
+
+        /*
+         * Database port (default MySQL port)
+         */
+
+        'port' => get_env('db.port', 3306),
+
+        /*
+         * Character set for connection
+         */
+
+        'charset' => get_env('db.charset', 'utf8mb4'),
+
+        /*
+         * Collation for connection (MySQL-specific)
+         */
+
+        'collation' => get_env('db.collation', 'utf8mb4_unicode_ci'),
+
+        /*
+         * Table prefix (useful for multi-tenancy or shared DB)
+         */
+
+        'prefix' => get_env('db.prefix', ''),
+
+        /*
+         * Strict mode enables more strict SQL behavior (throws errors for warnings)
+         */
+
+        'strict' => get_env('db.strict', false),
+
+        /*
+         * Timezone for session
+         */
+
+        'timezone' => get_env('db.timezone', 'UTC'),
+
+        /*
+         * Locale for application-specific formatting
+         */
+
+        'locale' => get_env('db.locale', 'en'),
+
+        /*
+         * Fallback locale if the primary locale fails
+         */
+
+        'fallback_locale' => get_env('db.fallback_locale', 'en'),
+
+        /*
+         * Fallback timezone if the primary timezone is invalid
+         */
+
+        'fallback_timezone' => get_env('db.fallback_timezone', 'UTC'),
+
+        /*
+         * PDO options for connection
+         */
+
+        'options' => [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,        // Throw exceptions on errors
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,    // Return results as objects
+            PDO::ATTR_EMULATE_PREPARES => false,               // Use native prepared statements
+            PDO::ATTR_STRINGIFY_FETCHES => false,              // Keep numeric types
+            PDO::ATTR_PERSISTENT => false,                     // Disable persistent connections
+        ],
+
+        /*
+         * Number of retries when connecting fails
+         */
+
+        'max_retries' => get_env('db.max_retries', 3),
+    ],
 
     /*
-     * Connection name
+     * Canonical PostgreSQL configuration
      */
 
-    'database' => get_env('db.database', ''),
+    'pgsql' => [
+
+        /*
+         * Database host or IP address
+         */
+
+        'host' => get_env('db.host', '127.0.0.1'),
+
+        /*
+         * Database name
+         */
+
+        'database' => get_env('db.database', ''),
+
+        /*
+         * Username for database authentication
+         */
+
+        'username' => get_env('db.username', 'postgres'),
+
+        /*
+         * Password for database authentication
+         */
+
+        'password' => get_env('db.password', ''),
+
+        /*
+         * Database port (default MySQL port)
+         * Default PostgreSQL port
+         */
+
+        'port' => get_env('db.port', 5432),
+
+        /*
+         * Character set for connection
+         * PostgreSQL uses UTF-8
+         */
+
+        'charset' => get_env('db.charset', 'utf8'),
+
+        /*
+         * PostgreSQL schema
+         */
+
+        'schema' => get_env('db.schema', 'public'),
+
+        /*
+         * PDO options for connection
+         */
+
+        'options' => [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+            PDO::ATTR_EMULATE_PREPARES => false,   // Use native prepares for PostgreSQL
+            PDO::ATTR_STRINGIFY_FETCHES => false,
+            PDO::ATTR_PERSISTENT => false,
+        ],
+
+        /*
+         * Number of retries when connecting fails
+         */
+
+        'max_retries' => get_env('db.max_retries', 3),
+    ],
 
     /*
-     * Connection username
+     * Canonical SQLite configuration
      */
 
-    'username' => get_env('db.username', 'root'),
+    'sqlite' => [
+
+        /*
+         * Database file name (stored under DATABASE_PATH + name + ".sqlite")
+         */
+
+        'database' => get_env('db.database', 'database'),
+
+        /*
+         * PDO options for connection
+         */
+
+        'options' => [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+            PDO::ATTR_EMULATE_PREPARES => true,  // SQLite benefit: must emulate
+            PDO::ATTR_STRINGIFY_FETCHES => false,
+            PDO::ATTR_PERSISTENT => false,
+        ],
+
+        /*
+         * Number of retries when connecting fails
+         */
+
+        'max_retries' => get_env('db.max_retries', 3),
+    ],
 
     /*
-     * Connection password
+     * Redis configuration placeholder (future support)
      */
 
-    'password' => get_env('db.password', ''),
-
-    /*
-     * Connection port
-     */
-
-    'port' => get_env('db.port', 3306),
-
-    /*
-     * Connection charset
-     */
-
-    'charset' => get_env('db.charset', 'utf8mb4'),
-
-    /*
-     * Connection collation
-     */
-
-    'collation' => get_env('db.collation', 'utf8mb4_unicode_ci'),
-
-    /*
-     * Connection prefix
-     */
-
-    'prefix' => get_env('db.prefix', ''),
-
-    /*
-     * Connection strict mode
-     */
-
-    'strict' => get_env('db.strict', false),
-
-    /*
-     * Connection options
-     */
-
-    'options' => get_env('db.options', [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
-        PDO::ATTR_EMULATE_PREPARES => false,
-        PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
-        PDO::ATTR_STRINGIFY_FETCHES => false,
-        PDO::ATTR_PERSISTENT => false,
-        // PDO::MYSQL_ATTR_SSL_CA => '/path/to/ca.pem',
-        // PDO::MYSQL_ATTR_SSL_CERT => '/path/to/client-cert.pem',
-        // PDO::MYSQL_ATTR_SSL_KEY => '/path/to/client-key.pem',
-    ]),
-
-    /*
-     * Connection timezone
-     */
-
-    'timezone' => get_env('db.timezone', 'UTC'),
-
-    /*
-     * Connection locale
-     */
-
-    'locale' => get_env('db.locale', 'en'),
-
-    /*
-     * Connection fallback locale
-     */
-
-    'fallback_locale' => get_env('db.fallback_locale', 'en'),
-
-    /*
-     * Connection fallback timezone
-     */
-
-    'fallback_timezone' => get_env('db.fallback_timezone', 'UTC'),
-
-    /*
-     * Max retries for connection
-     */
-
-    'max_retries' => get_env('db.max_retries', 3),
+    'redis' => [],
 ];

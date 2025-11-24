@@ -6,6 +6,7 @@ use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Database\Connection\DsnBuilder;
 use Bibo\Mvc\Core\Database\DriverFactory;
 use Bibo\Mvc\Core\Logger\LogManager;
+use PDO;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
@@ -14,48 +15,38 @@ class DatabaseServiceProvider extends ServiceProvider
 {
     /**
      * Register service provider
-     *
-     * @return void
-     * @throws ReflectionException
      */
     public function register(): void
     {
         try {
-            $config = $this->container->get(ConfigHandler::class);
+            $dbDriver = config('db.driver');
 
-            $settings = [
-                'driver' => config('db.driver'),
-                'host' => config('db.host'),
-                'port' => config('db.port'),
-                'database' => config('db.database'),
-                'username' => config('db.username'),
-                'password' => config('db.password'),
-                'charset' => config('db.charset'),
-                'collation' => config('db.collation'),
-                'prefix' => config('db.prefix'),
-                'strict' => config('db.strict'),
-                'options' => config('db.options'),
-                'timezone' => config('db.timezone'),
-                'locale' => config('db.locale'),
-                'fallback_locale' => config('db.fallback_locale'),
-                'fallback_timezone' => config('db.fallback_timezone'),
-                'max_retries' => config('db.max_retries'),
-            ];
+            // Normalize driver name (pgsql|postgres|postgresql → pgsql)
+            $canonical = DriverFactory::resolve($dbDriver);
 
-            $factory = new DriverFactory(new DsnBuilder(), $settings);
+            // Load config for a normalized key
+            $settings = config('db.' . $canonical);
+            $settings['driver'] = $canonical;
+
+            // Build driver
+            $dsn  = new DsnBuilder();
+            $factory = new DriverFactory($dsn, $settings);
+
             $driver = $factory->create();
             $db = $driver->connect();
 
-
-dd($config, $factory, $driver, $db);
-        } catch (NotFoundExceptionInterface|ReflectionException|ContainerExceptionInterface $e) {
+            // Register DB connection in container
+            $this->container->set(PDO::class, function () use ($db) {
+                return $db;
+            });
+        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
+            // You should handle or log this
+            throw $e;
         }
     }
 
     /**
-     * Boot Connection
-     *
-     * @throws NotFoundExceptionInterface
+     * Boot provider
      */
     public function boot(): void
     {
@@ -64,7 +55,7 @@ dd($config, $factory, $driver, $db);
                 ->get(LogManager::class)
                 ->get('app')
                 ->debug(__CLASS__ . ' booted successfully');
-        } catch (NotFoundExceptionInterface|ReflectionException|ContainerExceptionInterface $e) {
+        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
         }
     }
 }

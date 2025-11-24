@@ -6,19 +6,34 @@ use InvalidArgumentException;
 
 /**
  * Class DsnBuilder
- * Builds a Data Source Name (DSN) based on the provided configuration.
- * Supports MySQL, PostgreSQL, and SQLite databases.
+ *
+ * Builds a Data Source Name (DSN) string from a configuration array.
+ * Supports MySQL, PostgreSQL, and SQLite.
+ *
+ * Usage:
+ * ```php
+ * $builder = new DsnBuilder();
+ * $dsn = $builder->build([
+ *     'driver' => 'mysql',
+ *     'host' => '127.0.0.1',
+ *     'port' => 3306,
+ *     'database' => 'test',
+ *     'charset' => 'utf8mb4'
+ * ]);
+ * ```
  *
  * @package Bibo\Mvc\Core\Database\Connection
  */
 class DsnBuilder
 {
     /**
-     * Builds a Data Source Name (DSN) based on the provided configuration.
+     * Builds a DSN string based on the provided configuration.
      *
-     * @param array $config
+     * @param array $config Database configuration array with keys like 'driver', 'host', 'port', 'database', etc.
      *
-     * @return string
+     * @return string The DSN string suitable for PDO connection.
+     *
+     * @throws InvalidArgumentException If the driver is unsupported.
      */
     public function build(array $config = []): string
     {
@@ -33,7 +48,9 @@ class DsnBuilder
     }
 
     /**
-     * Builds a MySQL Data Source Name (DSN) based on the provided configuration.
+     * Builds a MySQL DSN string.
+     *
+     * Example: "mysql:host=127.0.0.1;port=3306;dbname=test;charset=utf8mb4"
      *
      * @param array $config
      *
@@ -46,12 +63,14 @@ class DsnBuilder
             $config['host'],
             $config['port'],
             $config['database'],
-            $config['charset'],
+            $config['charset']
         );
     }
 
     /**
-     * Builds a PostgreSQL Data Source Name (DSN) based on the provided configuration.
+     * Builds a PostgreSQL DSN string.
+     *
+     * Example: "pgsql:host=127.0.0.1;port=5432;dbname=test"
      *
      * @param array $config
      *
@@ -60,17 +79,18 @@ class DsnBuilder
     private function buildPostgres(array $config): string
     {
         return sprintf(
-            'pgsql:host=%s;port=%s;dbname=%s;user=%s;password=%s',
+            'pgsql:host=%s;port=%s;dbname=%s',
             $config['host'],
             $config['port'],
-            $config['database'],
-            $config['username'],
-            $config['password'],
+            $config['database']
         );
     }
 
     /**
-     * Builds an SQLite Data Source Name (DSN) based on the provided configuration.
+     * Builds an SQLite DSN string.
+     *
+     * If the SQLite database file does not exist, it creates an empty file.
+     * If no database is specified, the DSN will point to a file in DATABASE_PATH with ".sqlite" extension.
      *
      * @param array $config
      *
@@ -78,8 +98,13 @@ class DsnBuilder
      */
     private function buildSqlite(array $config): string
     {
-        $path = $config['database'] ?? ':memory:';
+        $databaseFile = $config['database'] ?? 'database';
+        $databasePath = DATABASE_PATH . $databaseFile . '.sqlite';
 
-        return sprintf('sqlite:%s', $path);
+        if (!file_exists($databasePath)) {
+            file_put_contents($databasePath, '');
+        }
+
+        return sprintf('sqlite:%s', $databasePath);
     }
 }

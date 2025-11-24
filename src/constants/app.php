@@ -58,6 +58,14 @@ if (!defined('CONFIG_PATH')) {
     define('CONFIG_PATH', realpath(__DIR__ . '/../../config') . DIRECTORY_SEPARATOR);
 }
 
+if (!defined('DATABASE_PATH')) {
+    /*
+     * Database directory path
+     */
+
+    define('DATABASE_PATH', realpath(__DIR__ . '/../../storage') . DIRECTORY_SEPARATOR);
+}
+
 if (!defined('ROUTES_PATH')) {
     /*
      * Routes directory path

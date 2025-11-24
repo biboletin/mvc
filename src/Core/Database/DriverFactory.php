@@ -5,37 +5,69 @@ namespace Bibo\Mvc\Core\Database;
 use Bibo\Mvc\Core\Database\Connection\DsnBuilder;
 use Bibo\Mvc\Core\Database\Contracts\DriverInterface;
 use Bibo\Mvc\Core\Database\Drivers\MySqlDriver;
-use Bibo\Mvc\Core\Database\Drivers\PgSqlDriver;
+use Bibo\Mvc\Core\Database\Drivers\PostgreSqlDriver;
 use Bibo\Mvc\Core\Database\Drivers\SqliteDriver;
 use InvalidArgumentException;
 
+/**
+ * Class DriverFactory
+ *
+ * Factory responsible for creating database driver instances
+ * based on the provided configuration and driver type.
+ *
+ * - Normalizes driver aliases (postgres, pgsql, sqlite3, mariadb, etc.)
+ * - Builds the DSN using DsnBuilder
+ * - Returns the correct driver class instance
+ *
+ * @package Bibo\Mvc\Core\Database
+ */
 class DriverFactory
 {
     /**
-     * Database configuration array.
+     * The configuration array for the database connection.
      *
      * @var array
      */
     private array $config;
 
     /**
-     * Data Source Name used for database connection.
+     * The DSN builder instance used to generate a full DSN string.
      *
      * @var DsnBuilder|null
      */
     private ?DsnBuilder $dsn = null;
 
     /**
-     * Constructor for the DriverFactory class.
-     * Initializes the DSN and configuration properties.
+     * Maps driver aliases to their canonical internal driver names.
      *
-     * @param DsnBuilder|null $dsn The DSN used for database connection.
-     * @param array $config The configuration array containing database connection details.
+     * @var array<string,string>
+     */
+    private static array $aliases = [
+        'mysql' => 'mysql',
+        'mariadb' => 'mysql',
+
+        'sqlite' => 'sqlite',
+        'sqlite3' => 'sqlite',
+
+        'pgsql' => 'pgsql',
+        'postgres' => 'pgsql',
+        'postgresql' => 'pgsql',
+
+        'redis' => 'redis', // For future support
+    ];
+
+    /**
+     * DriverFactory constructor.
+     *
+     * @param DsnBuilder|null $dsn    DSN builder used to generate valid DSN strings.
+     * @param array           $config Database configuration array.
+     *
+     * @throws InvalidArgumentException When DSN is not provided.
      */
     public function __construct(?DsnBuilder $dsn = null, array $config = [])
     {
         if ($dsn === null) {
-            throw new InvalidArgumentException('Database DSN cannot be null.');
+            throw new InvalidArgumentException('DsnBuilder instance cannot be null.');
         }
 
         $this->dsn = $dsn;
@@ -43,31 +75,57 @@ class DriverFactory
     }
 
     /**
-     * Creates and returns a database driver instance based on the configuration.
+     * Creates the correct database driver instance based on configuration.
      *
-     * @return DriverInterface The database driver instance corresponding to the specified driver in the configuration.
-     * @throws InvalidArgumentException If the specified database driver is unsupported.
+     * @return DriverInterface
+     *
+     * @throws InvalidArgumentException When driver is missing, unsupported, or DSN build fails.
      */
     public function create(): DriverInterface
     {
-        $driver = strtolower($this->config['driver']) ?? 'mysql';
+        if (!isset($this->config['driver'])) {
+            throw new InvalidArgumentException('Database driver is not defined in configuration.');
+        }
+
+        $driver = strtolower($this->resolve($this->config['driver']));
         $dsn = $this->dsn->build($this->config);
 
         return match ($driver) {
-            'pdo', 'mysql', 'mariadb' => new MySqlDriver($dsn, $this->config),
-            'pgsql', 'postgres', 'postgresql' => new PgSqlDriver($dsn, $this->config),
+            'mysql'  => new MySqlDriver($dsn, $this->config),
+            'pgsql'  => new PostgreSqlDriver($dsn, $this->config),
             'sqlite' => new SqliteDriver($dsn, $this->config),
-            default => throw new InvalidArgumentException('Unsupported database driver [' . $driver . ']'),
+
+            default => throw new InvalidArgumentException('Unsupported database driver [' . $driver . '}]'),
         };
     }
 
     /**
-     * Destructor for the DriverFactory class.
-     * Unsets the configuration and DSN properties to prevent memory leaks.
+     * Resolves a driver alias to its canonical driver name.
+     *
+     * Examples:
+     * - "postgres" → "pgsql"
+     * - "mariadb"  → "mysql"
+     * - "sqlite3"  → "sqlite"
+     *
+     * @param string $driver
+     *
+     * @return string Canonical driver name.
+     *
+     * @throws InvalidArgumentException When alias cannot be resolved.
+     */
+    public static function resolve(string $driver): string
+    {
+        return self::$aliases[strtolower($driver)]
+            ?? throw new InvalidArgumentException('Unknown driver alias: {' . $driver . '}');
+    }
+
+    /**
+     * Destructor - clears sensitive configuration data.
+     *
+     * Helps avoid keeping database credentials in memory.
      */
     public function __destruct()
     {
-        unset($this->config);
         $this->config = [];
         $this->dsn = null;
     }

@@ -13,7 +13,8 @@ if (!function_exists('formatBytes')) {
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = floor((strlen((string) $bytes) - 1) / 3);
-        return sprintf("%.{$decimals}f %s", $bytes / pow(1024, $factor), $units[$factor]);
+
+        return sprintf('%.' . $decimals . 'f %s', $bytes / pow(1024, $factor), $units[$factor]);
     }
 }
 
@@ -28,7 +29,7 @@ if (!function_exists('formatTime')) {
     function formatTime(int $seconds): string
     {
         if ($seconds < 60) {
-            return "{$seconds} seconds";
+            return '{' . $seconds . '} seconds';
         } elseif ($seconds < 3600) {
             return floor($seconds / 60) . ' minutes';
         } elseif ($seconds < 86400) {
@@ -51,6 +52,7 @@ if (!function_exists('formatDate')) {
     function formatDate(string $date, string $format = 'Y-m-d H:i:s'): string
     {
         $timestamp = strtotime($date);
+
         return date($format, $timestamp);
     }
 }
@@ -156,6 +158,7 @@ if (!function_exists('formatJson')) {
     function formatJson(string $json): string
     {
         $decoded = json_decode($json, true);
+
         return json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 }
@@ -174,6 +177,7 @@ if (!function_exists('formatXml')) {
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $dom->loadXML($xml);
+
         return $dom->saveXML();
     }
 }
@@ -192,6 +196,7 @@ if (!function_exists('formatHtml')) {
         @$dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
+
         return $dom->saveHTML();
     }
 }
@@ -207,8 +212,9 @@ if (!function_exists('formatUrl')) {
     function formatUrl(string $url): string
     {
         if (!preg_match('/^https?:\/\//', $url)) {
-            $url = 'http://' . $url;
+            $url = 'https://' . $url;
         }
+
         return rtrim($url, '/');
     }
 }
@@ -292,6 +298,7 @@ if (!function_exists('formatCsv')) {
         $output = fopen('php://temp', 'r+');
         fputcsv($output, $data, $delimiter);
         rewind($output);
+
         return stream_get_contents($output);
     }
 }

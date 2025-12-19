@@ -9,6 +9,8 @@
 
 $directories = [
     __DIR__ . '/../app',
+    __DIR__ . '/../bootstrap',
+    __DIR__ . '/../config',
     __DIR__ . '/../src',
 ];
 
@@ -17,12 +19,12 @@ $totalFiles = 0;
 
 foreach ($directories as $dir) {
     if (!is_dir($dir)) {
-        fwrite(STDERR, "Warning: Directory not found: $dir\n");
+        fwrite(STDERR, 'Warning: Directory not found: ' . $dir . "\n");
         continue;
     }
 
     $iterator = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS)
+        new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)
     );
 
     foreach ($iterator as $file) {
@@ -35,7 +37,7 @@ foreach ($directories as $dir) {
 
         $output = [];
         $returnVar = 0;
-        exec("php -l " . escapeshellarg($filePath) . " 2>&1", $output, $returnVar);
+        exec('php -l ' . escapeshellarg($filePath) . ' 2>&1', $output, $returnVar);
 
         if ($returnVar !== 0) {
             $errors[$filePath] = implode("\n", $output);
@@ -43,12 +45,12 @@ foreach ($directories as $dir) {
     }
 }
 
-echo "Checked $totalFiles PHP files.\n";
+echo 'Checked ' . $totalFiles . " PHP files.\n";
 
 if ($errors) {
-    echo "Syntax errors found in " . count($errors) . " file(s):\n\n";
+    echo 'Syntax errors found in ' . count($errors) . " file(s):\n\n";
     foreach ($errors as $file => $message) {
-        echo "File: $file\n";
+        echo 'File: ' . $file . "\n";
         echo $message . "\n\n";
     }
     exit(1);

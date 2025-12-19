@@ -822,12 +822,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "74899118027c9c94b067ff75077855dd5801302c"
+                "reference": "8a5510c83b88de4b672c57ca5d5b9cfeccf31d94"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/74899118027c9c94b067ff75077855dd5801302c",
-                "reference": "74899118027c9c94b067ff75077855dd5801302c",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/8a5510c83b88de4b672c57ca5d5b9cfeccf31d94",
+                "reference": "8a5510c83b88de4b672c57ca5d5b9cfeccf31d94",
                 "shasum": ""
             },
             "require": {
@@ -887,7 +887,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-10-29T15:58:22+00:00"
+            "time": "2025-12-14T11:27:56+00:00"
         }
     ],
     "packages-dev": [
@@ -1054,12 +1054,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "c97b23dce761ab3c913ee8ac5879af7a358f88de"
+                "reference": "8c360e27327c8bd29e1c57721574709d0d706118"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/c97b23dce761ab3c913ee8ac5879af7a358f88de",
-                "reference": "c97b23dce761ab3c913ee8ac5879af7a358f88de",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/8c360e27327c8bd29e1c57721574709d0d706118",
+                "reference": "8c360e27327c8bd29e1c57721574709d0d706118",
                 "shasum": ""
             },
             "require": {
@@ -1105,7 +1105,7 @@
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
                 "source": "https://github.com/nikic/PHP-Parser/tree/master"
             },
-            "time": "2025-10-26T16:58:55+00:00"
+            "time": "2025-12-06T20:24:35+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -1113,12 +1113,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phar-io/manifest.git",
-                "reference": "65f90285728eae4eae313b8b6ba11b2f5436038e"
+                "reference": "c581d4941e196459bf76c945a8ca922963a66708"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phar-io/manifest/zipball/65f90285728eae4eae313b8b6ba11b2f5436038e",
-                "reference": "65f90285728eae4eae313b8b6ba11b2f5436038e",
+                "url": "https://api.github.com/repos/phar-io/manifest/zipball/c581d4941e196459bf76c945a8ca922963a66708",
+                "reference": "c581d4941e196459bf76c945a8ca922963a66708",
                 "shasum": ""
             },
             "require": {
@@ -1173,7 +1173,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-07-05T08:48:25+00:00"
+            "time": "2025-11-27T15:23:09+00:00"
         },
         {
             "name": "phar-io/version",
@@ -1232,18 +1232,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCompatibility/PHPCompatibility.git",
-                "reference": "376ce421e86f81d83f777df4b3ee183199b1bc6f"
+                "reference": "019728861084036df44f58b31d2daa533d323a78"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibility/zipball/376ce421e86f81d83f777df4b3ee183199b1bc6f",
-                "reference": "376ce421e86f81d83f777df4b3ee183199b1bc6f",
+                "url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibility/zipball/019728861084036df44f58b31d2daa533d323a78",
+                "reference": "019728861084036df44f58b31d2daa533d323a78",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4",
+                "php": ">=7.2",
                 "phpcsstandards/phpcsutils": "^1.1.2",
-                "squizlabs/php_codesniffer": "^3.13.3 || ^4.0"
+                "squizlabs/php_codesniffer": "^4.0.1"
             },
             "replace": {
                 "wimg/php-compatibility": "*"
@@ -1253,11 +1253,8 @@
                 "php-parallel-lint/php-parallel-lint": "^1.4.0",
                 "phpcsstandards/phpcsdevcs": "^1.2.0",
                 "phpcsstandards/phpcsdevtools": "^1.2.3",
-                "phpunit/phpunit": "^4.8.36 || ^5.7.21 || ^6.0 || ^7.0 || ^8.0 || ^9.3.4 || ^10.5.32 || ^11.3.3",
+                "phpunit/phpunit": "^8.0 || ^9.3.4 || ^10.5.32 || ^11.3.3",
                 "yoast/phpunit-polyfills": "^1.1.5 || ^2.0.5 || ^3.1.0"
-            },
-            "suggest": {
-                "roave/security-advisories": "dev-master || Helps prevent installing dependencies with known security issues."
             },
             "default-branch": true,
             "type": "phpcodesniffer-standard",
@@ -1318,7 +1315,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-11-24T19:58:49+00:00"
+            "time": "2025-12-19T00:36:18+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -1326,12 +1323,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSUtils.git",
-                "reference": "698232ea6f8c2098384164d045940147a9e8a456"
+                "reference": "c216317e96c8b3f5932808f9b0f1f7a14e3bbf55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/698232ea6f8c2098384164d045940147a9e8a456",
-                "reference": "698232ea6f8c2098384164d045940147a9e8a456",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/c216317e96c8b3f5932808f9b0f1f7a14e3bbf55",
+                "reference": "c216317e96c8b3f5932808f9b0f1f7a14e3bbf55",
                 "shasum": ""
             },
             "require": {
@@ -1412,7 +1409,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-11-24T07:56:30+00:00"
+            "time": "2025-12-08T14:27:58+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -1420,19 +1417,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "59e6ffa3d6b3dd6590aff6d13496e582dd2e8163"
+                "reference": "c781c66bc87e6525689451f882c5e4f7b86aebe8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/59e6ffa3d6b3dd6590aff6d13496e582dd2e8163",
-                "reference": "59e6ffa3d6b3dd6590aff6d13496e582dd2e8163",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/c781c66bc87e6525689451f882c5e4f7b86aebe8",
+                "reference": "c781c66bc87e6525689451f882c5e4f7b86aebe8",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-libxml": "*",
                 "ext-xmlwriter": "*",
-                "nikic/php-parser": "^5.6.1",
+                "nikic/php-parser": "^5.7.0",
                 "php": ">=8.2",
                 "phpunit/php-file-iterator": "^5.1.0",
                 "phpunit/php-text-template": "^4.0.1",
@@ -1441,10 +1438,10 @@
                 "sebastian/environment": "^7.2.1",
                 "sebastian/lines-of-code": "^3.0.1",
                 "sebastian/version": "^5.0.2",
-                "theseer/tokenizer": "^1.2.3"
+                "theseer/tokenizer": "^1.3.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^11.5.35"
+                "phpunit/phpunit": "^11.5.46"
             },
             "suggest": {
                 "ext-pcov": "PHP extension that provides line coverage",
@@ -1502,7 +1499,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-11-16T10:16:47+00:00"
+            "time": "2025-12-19T18:26:53+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -1731,12 +1728,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-timer.git",
-                "reference": "97eee3cc4868bb1ae61a59cd95aff98c52d43def"
+                "reference": "297d0ed22e93b061dfa9697636255c6b4570786a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-timer/zipball/97eee3cc4868bb1ae61a59cd95aff98c52d43def",
-                "reference": "97eee3cc4868bb1ae61a59cd95aff98c52d43def",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-timer/zipball/297d0ed22e93b061dfa9697636255c6b4570786a",
+                "reference": "297d0ed22e93b061dfa9697636255c6b4570786a",
                 "shasum": ""
             },
             "require": {
@@ -1795,7 +1792,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-09-26T12:06:24+00:00"
+            "time": "2025-11-25T07:59:26+00:00"
         },
         {
             "name": "phpunit/phpunit",
@@ -1803,12 +1800,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "fc53696465916d82b1ec1f19cbdba3a16788646c"
+                "reference": "4c1619ddf0ddb33b523b3e720c1680449073b54e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/fc53696465916d82b1ec1f19cbdba3a16788646c",
-                "reference": "fc53696465916d82b1ec1f19cbdba3a16788646c",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4c1619ddf0ddb33b523b3e720c1680449073b54e",
+                "reference": "4c1619ddf0ddb33b523b3e720c1680449073b54e",
                 "shasum": ""
             },
             "require": {
@@ -1904,7 +1901,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-11-21T12:57:15+00:00"
+            "time": "2025-12-19T13:27:15+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -3020,12 +3017,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "c4adbbc16dc75a090040901f305657c3a675a8f3"
+                "reference": "4904d76679c02048314529c283d8f3906a71d167"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/c4adbbc16dc75a090040901f305657c3a675a8f3",
-                "reference": "c4adbbc16dc75a090040901f305657c3a675a8f3",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/4904d76679c02048314529c283d8f3906a71d167",
+                "reference": "4904d76679c02048314529c283d8f3906a71d167",
                 "shasum": ""
             },
             "require": {
@@ -3092,7 +3089,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-11-24T08:57:09+00:00"
+            "time": "2025-12-15T12:39:03+00:00"
         },
         {
             "name": "staabm/side-effects-detector",

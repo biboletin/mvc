@@ -9,6 +9,7 @@
         "psr-4": {
             "Bibo\\Mvc\\": "src/",
             "Bibo\\App\\": "app/",
+            "Plugins\\": "plugins/",
             "Tests\\": "tests/"
         },
         "files":[

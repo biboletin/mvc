@@ -2,9 +2,10 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Database\Connection\DsnBuilder;
+use Bibo\Mvc\Core\Database\Contracts\PdoDriverInterface;
 use Bibo\Mvc\Core\Database\DriverFactory;
+use Bibo\Mvc\Core\Database\QueryBuilder;
 use Bibo\Mvc\Core\Logger\LogManager;
 use PDO;
 use Psr\Container\ContainerExceptionInterface;
@@ -35,10 +36,20 @@ class DatabaseServiceProvider extends ServiceProvider
             $driver = $factory->create();
             $db = $driver->connect();
 
+            // Register pdo driver in container
+            $this->container->set(PdoDriverInterface::class, function () use ($driver) {
+                return $driver;
+            });
+
             // Register DB connection in container
             $this->container->set(PDO::class, function () use ($db) {
                 return $db;
             });
+
+            $this->container->set(QueryBuilder::class, function () {
+                return new QueryBuilder();
+            });
+
         } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
             // You should handle or log this
             throw $e;

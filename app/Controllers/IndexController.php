@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Bibo\App\Controllers;
 
 use Bibo\Mvc\Core\Controller\Controller;
+use Bibo\Mvc\Core\Database\Contracts\PdoDriverInterface;
+use Bibo\Mvc\Core\Database\QueryBuilder;
 use Bibo\Mvc\Core\Enums\CurlStrategyType;
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Request\BaseRequest;
 use Bibo\Mvc\Core\Response\JsonResponse;
 use Bibo\Mvc\Core\Rest\HttpClient;
 use JsonException;
+use PDO;
 
 /**
  * Index controller
@@ -31,7 +34,9 @@ class IndexController extends Controller
             'title' => 'Home Page',
             'name'  => 'Bibo Framework',
         ];
-
+        $res = new QueryBuilder($this->container->get(PdoDriverInterface::class));
+        $users = $res->select(['id', 'name'])->from('users');
+//dd($users, $users->get(), $users->raw());
         return $this->view('home', $data);
     }
 

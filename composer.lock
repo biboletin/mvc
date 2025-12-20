@@ -1800,12 +1800,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "4c1619ddf0ddb33b523b3e720c1680449073b54e"
+                "reference": "c05f01134cb7cbaabd1f4ee97210b1eec7f68705"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4c1619ddf0ddb33b523b3e720c1680449073b54e",
-                "reference": "4c1619ddf0ddb33b523b3e720c1680449073b54e",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c05f01134cb7cbaabd1f4ee97210b1eec7f68705",
+                "reference": "c05f01134cb7cbaabd1f4ee97210b1eec7f68705",
                 "shasum": ""
             },
             "require": {
@@ -1901,7 +1901,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-12-19T13:27:15+00:00"
+            "time": "2025-12-20T13:32:21+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -1909,12 +1909,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/cli-parser.git",
-                "reference": "3a073702d31bd8bb4f1a010793ac967c6dbc7c85"
+                "reference": "0cfd3d9f7249392204fbcffb4cda6e8f81ec97e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/cli-parser/zipball/3a073702d31bd8bb4f1a010793ac967c6dbc7c85",
-                "reference": "3a073702d31bd8bb4f1a010793ac967c6dbc7c85",
+                "url": "https://api.github.com/repos/sebastianbergmann/cli-parser/zipball/0cfd3d9f7249392204fbcffb4cda6e8f81ec97e1",
+                "reference": "0cfd3d9f7249392204fbcffb4cda6e8f81ec97e1",
                 "shasum": ""
             },
             "require": {
@@ -1970,7 +1970,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-09-26T09:03:29+00:00"
+            "time": "2025-12-20T08:58:08+00:00"
         },
         {
             "name": "sebastian/code-unit",

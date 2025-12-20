@@ -3,8 +3,8 @@
 namespace Bibo\Mvc\Core\Exception\Custom\Container;
 
 use Exception;
-use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
-class ContainerItemNotFoundException extends Exception implements ContainerExceptionInterface
+class ContainerItemNotFoundException extends Exception implements NotFoundExceptionInterface
 {
 }

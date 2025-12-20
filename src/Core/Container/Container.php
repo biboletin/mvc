@@ -39,7 +39,7 @@ use Throwable;
  * dependency resolution, providing the convenience of autowiring without
  * sacrificing control and explicit configurability.
  */
-#[AllowDynamicProperties]
+
 final class Container implements ContainerInterface
 {
     /**
@@ -93,13 +93,61 @@ final class Container implements ContainerInterface
      */
     private array $reflections = [];
 
+    /**
+     * List of prototypes that should not be shared.
+     * This is useful for services that require parameters,
+     * as they will be instantiated every time they are retrieved.
+     * Example:
+     *     $container->prototype(Database::class, fn(ContainerInterface $container) => new Database($container->get('config')));
+     *
+     * @var array<string, bool>
+     */
+    private array $prototypes = [];
+
+    /**
+     * List of factory-defined services that should not be shared.
+     * This is useful for services that require parameters,
+     * as they will be instantiated every time they are retrieved.
+     * Example:
+     *     $container->factory(Database::class, fn(ContainerInterface $container) => new Database($container->get('config')));
+     *
+     * @var array<string, bool>
+     */
     private array $nonShared = [];
+
+    /**
+     * Whether to autowire classes that do not have a binding.
+     * Defaults to true.
+     * Set to false to disable autowiring.
+     *
+     * @var bool
+     */
+    private bool $autowireAsSingleton = true;
+
+    /**
+     * Indicates whether the container is frozen (immutable).
+     *
+     * @var bool
+     */
+    private bool $frozen = false;
+
+    /**
+     * Parameters to be passed to the container when invoking callables.
+     * This is useful for passing configuration values to controllers or middleware.
+     * Example:
+     *     $container->call(function (LoggerInterface $logger) {
+     *         $logger->info('Hello world!');
+     *     }, ['config' => $config]);
+     *
+     * @var array<string, mixed>
+     */
+    private array $parameters = [];
 
     /**
      * Constructor
      *
      * @param array<string, Closure> $bindings
-     * @param array<string, string>  $aliases
+     * @param array<string, string> $aliases
      */
     public function __construct(array $bindings = [], array $aliases = [])
     {
@@ -109,7 +157,7 @@ final class Container implements ContainerInterface
 
         // ✔ Container should resolve itself
         $this->aliases[ContainerInterface::class] = self::class;
-        $this->bindings[self::class] = fn () => $this;
+        $this->bindings[self::class] = fn() => $this;
     }
 
     /**
@@ -153,23 +201,101 @@ final class Container implements ContainerInterface
 
         // autowire fallback
         if (class_exists($id)) {
-            return $this->instances[$id] = $this->resolve($id);
+            if (isset($this->prototypes[$id])) {
+                return $this->resolve($id);
+            }
+
+            return $this->instances[$id] ??= $this->resolve($id);
         }
 
         throw new ContainerItemNotFoundException("No entry found for '" . $id . "'");
     }
 
+    /**
+     * Retrieve a prototype service from the container.
+     * Prototypes are identical to singletons, except that they are not cached.
+     * This is useful for services that require parameters,
+     * as they will be instantiated every time they are retrieved.
+     * Example:
+     *     $container->prototype(Database::class, fn(ContainerInterface $container) => new Database($container->get('config')));
+     *
+     * @param string $class
+     *
+     * @return static
+     */
+    public function prototype(string $class): Container
+    {
+        $this->prototypes[$class] = true;
+
+        return $this;
+    }
+
+    /**
+     * Register a scalar parameter for constructor injection.
+     *
+     * Parameters are matched by constructor parameter name.
+     * Used for injecting configuration values (dsn, paths, flags, etc.).
+     *
+     * Example:
+     *   $container->parameter('dsn', 'mysql:host=localhost;dbname=test');
+     *
+     * @param string $name
+     * @param mixed $value
+     *
+     * @return $this
+     *
+     * @throws ContainerException
+     */
+    public function parameter(string $name, mixed $value): self
+    {
+        $this->assertNotFrozen();
+
+        $this->parameters[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Freeze the container, making it immutable.
+     *
+     * After freezing, no new bindings, aliases, or parameters
+     * can be registered.
+     *
+     * Intended for production use.
+     *
+     * @return void
+     */
+    public function freeze(): void
+    {
+        $this->frozen = true;
+    }
+
+    /**
+     * Ensure the container is not frozen.
+     *
+     * @throws ContainerException
+     */
+    private function assertNotFrozen(): void
+    {
+        if ($this->frozen) {
+            throw new ContainerException('Container is frozen and cannot be modified.');
+        }
+    }
 
     /**
      * Define a service in the container.
      *
-     * @param string  $id       Identifier of the entry.
+     * @param string $id Identifier of the entry.
      * @param Closure $concrete Factory closure that returns the service.
      *
      * @return $this
+     *
+     * @throws ContainerException
      */
     public function set(string $id, Closure $concrete): self
     {
+        $this->assertNotFrozen();
+
         $this->bindings[$id] = $concrete;
 
         return $this;
@@ -207,9 +333,13 @@ final class Container implements ContainerInterface
      * @param string $concrete
      *
      * @return $this
+     *
+     * @throws ContainerException
      */
     public function alias(string $abstract, string $concrete): self
     {
+        $this->assertNotFrozen();
+
         $this->aliases[$abstract] = $concrete;
 
         return $this;
@@ -222,13 +352,17 @@ final class Container implements ContainerInterface
      * stores resolved services. This method is provided for readability
      * and API clarity.
      *
-     * @param string  $id       Service identifier.
-     * @param Closure $factory  Factory that returns the service instance.
+     * @param string $id Service identifier.
+     * @param Closure $factory Factory that returns the service instance.
      *
      * @return $this
+     *
+     * @throws ContainerException
      */
     public function singleton(string $id, Closure $factory): self
     {
+        $this->assertNotFrozen();
+
         return $this->set($id, $factory);
     }
 
@@ -238,13 +372,17 @@ final class Container implements ContainerInterface
      * Unlike `set()` and `singleton()`, factory services are not cached
      * inside `$instances`, so each call to `get()` resolves a fresh object.
      *
-     * @param string  $id       Service identifier.
-     * @param Closure $factory  Factory invoked on each retrieval.
+     * @param string $id Service identifier.
+     * @param Closure $factory Factory invoked on each retrieval.
      *
      * @return $this
+     *
+     * @throws ContainerException
      */
     public function factory(string $id, Closure $factory): self
     {
+        $this->assertNotFrozen();
+
         $this->bindings[$id] = $factory;
         $this->nonShared[$id] = true;
 
@@ -333,12 +471,27 @@ final class Container implements ContainerInterface
         foreach ($constructor->getParameters() as $param) {
             $type = $param->getType();
 
+            $type = $param->getType();
+
+            // Built-in types (string, int, bool, array, etc.)
             if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
-                throw new ContainerException(
-                    'Cannot autowire parameter \\' .
-                    $param->getName() . ' in {' . $class . '} — invalid or missing type.'
-                );
+                $paramName = $param->getName();
+
+                // 1. explicit parameter binding
+                if (array_key_exists($paramName, $this->parameters)) {
+                    $dependencies[] = $this->parameters[$paramName];
+                    continue;
+                }
+
+                // 2. default value
+                if ($param->isDefaultValueAvailable()) {
+                    $dependencies[] = $param->getDefaultValue();
+                    continue;
+                }
+
+                throw new ContainerException('Cannot resolve scalar parameter ' . $paramName . ' in ' . $class);
             }
+
 
             $dependencies[] = $this->get($type->getName());
         }
@@ -356,9 +509,13 @@ final class Container implements ContainerInterface
      * @param string $id Identifier of the service to remove.
      *
      * @return void
+     *
+     * @throws ContainerException
      */
     public function remove(string $id): void
     {
+        $this->assertNotFrozen();
+
         unset($this->bindings[$id], $this->instances[$id]);
     }
 
@@ -409,7 +566,7 @@ final class Container implements ContainerInterface
                 continue;
             }
 
-            throw new ContainerException("Missing required parameter '{$name}'");
+            throw new ContainerException('Missing required parameter {' . $name . '}');
         }
 
         return $callable(...$args);
@@ -445,42 +602,16 @@ final class Container implements ContainerInterface
      * Magic method to set a binding in the container.
      * This allows you to use the container as an array-like structure.
      *
-     * @param string   $id
+     * @param string $id
      * @param callable $concrete
      *
      * @return void
+     *
+     * @throws ContainerException
      */
     public function __set(string $id, callable $concrete): void
     {
         $this->set($id, $concrete);
-    }
-
-    /**
-     * Magic method to get a service from the container.
-     * This allows you to use the container as an array-like structure.
-     * It retrieves the service by its identifier.
-     * If the service is not bound, it attempts to autowire it.
-     * This method throws an exception if the service is not found.
-     * It is useful for accessing services without explicitly calling the `get` method.
-     * It is important to note that this method should not be used for services that require parameters,
-     * as it will not handle parameter resolution.
-     * It is recommended to use the `get` method for services that require parameters.
-     * This method is also useful for accessing services that are registered as singletons,
-     * as it will return the same instance every time it is called.
-     * It is important to ensure that the service identifier is valid and that the service is properly registered in the container.
-     * This method is a convenient way to access services in the container without having to call the `get` method explicitly.
-     *
-     * @param string $id
-     *
-     * @return mixed
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws ReflectionException
-     */
-    public function __get(string $id)
-    {
-        return $this->get($id);
     }
 
     /**
@@ -509,40 +640,5 @@ final class Container implements ContainerInterface
     public function __unset(string $id): void
     {
         unset($this->bindings[$id], $this->instances[$id]);
-    }
-
-    /**
-     * Magic method to call a method on the container.
-     * This allows you to call methods on the container as if it were an object.
-     * It checks if the method exists in the container and calls it with the provided arguments.
-     * If the method does not exist, it throws a ContainerException.
-     * This method is useful for accessing container methods dynamically,
-     * such as when you want to call a method that is not explicitly defined in the container class.
-     *
-     * @param string $method
-     *                      The name of the method to call.
-     *                      This method should be a valid method name that exists in the container class.
-     *                      The method can be any public method defined in the container class.
-     * @param array  $args
-     *                    The arguments to pass to the method.
-     *                    This should be an array of arguments that the method expects.
-     *                    The arguments can be any type, including other services from the container.
-     *                    This method is useful for dynamically calling methods on the container,
-     *                    as it allows you to pass any number of arguments to the method.
-     *                    This method is also useful for calling methods that require parameters,
-     *                    as it allows you to pass the parameters directly to the method.
-     *                    This method is not intended for calling methods that require specific parameters,
-     *                    as it does not handle parameter resolution.
-     *
-     * @return mixed
-     * @throws ContainerException
-     */
-    public function __call(string $method, array $args): mixed
-    {
-        if (method_exists($this, $method)) {
-            return $this->$method(...$args);
-        }
-
-        throw new ContainerException("Method '$method' does not exist in the container.");
     }
 }

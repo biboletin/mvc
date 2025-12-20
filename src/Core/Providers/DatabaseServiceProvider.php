@@ -49,7 +49,6 @@ class DatabaseServiceProvider extends ServiceProvider
             $this->container->set(QueryBuilder::class, function () {
                 return new QueryBuilder();
             });
-
         } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
             // You should handle or log this
             throw $e;

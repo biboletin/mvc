@@ -10,7 +10,6 @@ use Bibo\Mvc\Core\Rest\Message\Request;
 use Bibo\Mvc\Core\Rest\Message\Response;
 use Bibo\Mvc\Core\Rest\Message\Stream;
 use Bibo\Mvc\Core\Rest\Message\Uri;
-use Bibo\Mvc\Core\Wrapper\Curl\CurlSingleWrapper;
 use Bibo\Mvc\Core\Wrapper\Curl\CurlStrategyFactory;
 use Bibo\Mvc\Core\Wrapper\CurlWrapper;
 use Closure;

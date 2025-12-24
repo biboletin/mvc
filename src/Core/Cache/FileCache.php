@@ -295,7 +295,7 @@ class FileCache implements CacheInterface
         $expiresAt = $this->getExpiresAt();
         if ($expiresAt instanceof DateTimeInterface && $expiresAt <= new DateTimeImmutable()) {
             // Cache expired → delete + return default
-            @unlink($filePath);
+            unlink($filePath);
             return $default;
         }
 
@@ -356,7 +356,7 @@ class FileCache implements CacheInterface
         if ($ttl instanceof DateInterval) {
             $this->setExpiresAt($now->add($ttl));
         } elseif (is_int($ttl)) {
-            $this->setExpiresAt($now->modify("+{$ttl} seconds"));
+            $this->setExpiresAt($now->modify('+' . $ttl . ' seconds'));
         } else {
             // no TTL could mean "forever" or "until manually cleared"
             $this->setExpiresAt(null);

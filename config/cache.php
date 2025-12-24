@@ -2,7 +2,6 @@
 
 /**
  * Cache configuration
- *
  * enabled: Enable or disable caching
  * driver: Cache driver to use (file, redis, memcached, etc.)
  * prefix: Prefix for cache keys

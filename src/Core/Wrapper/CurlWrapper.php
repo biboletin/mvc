@@ -19,23 +19,35 @@ use RuntimeException;
 class CurlWrapper implements CurlInterface
 {
     /**
+     * The cURL handle resource.
+     *
      * @var CurlInterface|null
      */
+
     protected ?CurlInterface $handle = null;
 
     /**
+     * HTTP headers.
+     *
      * @var array
      */
+
     protected array $headers = [];
 
     /**
+     * Response body.
+     *
      * @var string
      */
+
     protected string $body = '';
 
     /**
+     * Response headers.
+     *
      * @var array
      */
+
     protected array $responseHeaders = [];
 
     /**
@@ -155,7 +167,7 @@ class CurlWrapper implements CurlInterface
     /**
      * Executes the cURL request.
      *
-     * @return string The response body
+     * @return array The response body
      */
     public function execute(): array
     {
@@ -239,6 +251,8 @@ class CurlWrapper implements CurlInterface
     }
 
     /**
+     * Closes the cURL handle.
+     *
      * @return void
      */
     public function close(): void

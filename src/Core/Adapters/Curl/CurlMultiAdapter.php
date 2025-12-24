@@ -10,14 +10,28 @@ use Exception;
 
 class CurlMultiAdapter
 {
+    /**
+     * Curl Client
+     *
+     * @var CurlMultiWrapper
+     */
     protected CurlMultiWrapper $client;
 
+    /**
+     * Constructor
+     */
     public function __construct(CurlMultiWrapper $client)
     {
         $this->client = $client;
     }
 
     /**
+     * Send requests
+     *
+     * @param array $requests
+     *
+     * @return array
+     *
      * @throws Exception
      */
     public function sendRequests(array $requests): array

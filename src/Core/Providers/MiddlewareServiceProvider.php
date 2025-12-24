@@ -2,9 +2,10 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Mvc\Core\Logger\LogManager;
+use Bibo\Mvc\Core\Exception\Custom\Container\ContainerException;
 use Bibo\Mvc\Core\Middleware\MiddlewareDispatcher;
 use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 
@@ -20,24 +21,41 @@ class MiddlewareServiceProvider extends ServiceProvider
      * Register a middleware dispatcher and configure middleware from bootstrap.
      *
      * @return void
+     *
+     * @throws ContainerException
      */
     public function register(): void
     {
-        $dispatcher = new MiddlewareDispatcher($this->container);
+        $this->container->set(
+            MiddlewareDispatcher::class,
+            fn (ContainerInterface $container) => new MiddlewareDispatcher($container)
+        );
+    }
 
-        $config = require BOOTSTRAP_PATH . 'middleware.php';
+    /**
+     * Boot the service provider
+     *
+     * @return void
+     *
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     */
+    public function boot(): void
+    {
+        $dispatcher = $this->container->get(MiddlewareDispatcher::class);
+
+        $middlewares = require BOOTSTRAP_PATH . 'middleware.php';
 
         // Register global middleware
         $global = [];
-        foreach ($config['global'] ?? [] as $class) {
+        foreach ($middlewares['global'] ?? [] as $class) {
             $global[] = new $class($this->container);
-
-            $this->container->set($class, fn () => new $class($this->container));
         }
         $dispatcher->registerGlobal($global);
 
         // Register route middleware
-        foreach ($config['route'] ?? [] as $alias => $class) {
+        foreach ($middlewares['route'] ?? [] as $alias => $class) {
             $this->container->set($alias, fn () => new $class($this->container));
 
             $dispatcher->registerRouteMiddleware([
@@ -46,30 +64,9 @@ class MiddlewareServiceProvider extends ServiceProvider
         }
 
         // Register middleware groups
-        foreach ($config['groups'] ?? [] as $name => $group) {
+        foreach ($middlewares['groups'] ?? [] as $name => $group) {
             $instances = array_map(fn ($class) => new $class($this->container), $group);
             $dispatcher->defineGroup($name, $instances);
-        }
-
-        $this->container->set(MiddlewareDispatcher::class, function () use ($dispatcher) {
-            return $dispatcher;
-        });
-    }
-
-    /**
-     * Boot service provider.
-     *
-     * @return void
-     * @throws NotFoundExceptionInterface When the log manager service is not found.
-     */
-    public function boot(): void
-    {
-        try {
-            $this->container
-                ->get(LogManager::class)
-                ->get('app')
-                ->debug(__CLASS__ . ' booted successfully');
-        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
         }
     }
 }

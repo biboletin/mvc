@@ -14,16 +14,73 @@ use Throwable;
 
 class ErrorResponseFactory
 {
+    /**
+     * The view instance.
+     *
+     * @var View|null
+     */
     private ?View $view;
+
+    /**
+     * Debug mode
+     *
+     * @var bool
+     */
     private bool $debug;
 
-    public function __construct(?View $view = null, bool $debug = false)
+    /**
+     * Set the view instance.
+     *
+     * @param View|null $view
+     *
+     * @return void
+     */
+    public function setView(?View $view = null): void
     {
         $this->view = $view;
+    }
+
+    /**
+     * Get the view instance.
+     *
+     * @return View|null
+     */
+    public function getView(): ?View
+    {
+        return $this->view;
+    }
+
+    /**
+     * Check debug mode
+     *
+     * @return bool
+     */
+    public function isDebug(): bool
+    {
+        return $this->debug;
+    }
+
+    /**
+     * Set debug mode
+     *
+     * @param bool $debug
+     *
+     * @return void
+     */
+    public function setDebug(bool $debug): void
+    {
         $this->debug = $debug;
     }
 
     /**
+     * Create a new error response.
+     *
+     * @param array $errorData
+     * @param ServerRequestInterface $request
+     * @param int $status
+     *
+     * @return ResponseInterface
+     *
      * @throws NotFoundException
      */
     public function createResponse(
@@ -45,6 +102,13 @@ class ErrorResponseFactory
     }
 
     /**
+     * Create a new error response from an exception.
+     *
+     * @param Throwable $exception
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     *
      * @throws NotFoundException
      */
     public function createFromException(Throwable $exception, ServerRequestInterface $request): ResponseInterface
@@ -83,6 +147,14 @@ class ErrorResponseFactory
         return $this->createResponse($errorData, $request, $status);
     }
 
+    /**
+     * Create a new JSON response.
+     *
+     * @param array $errorData
+     * @param int $status
+     *
+     * @return ResponseInterface
+     */
     private function createJsonResponse(array $errorData, int $status): ResponseInterface
     {
         $response = new Response();
@@ -100,6 +172,14 @@ class ErrorResponseFactory
         return $response;
     }
 
+    /**
+     * Create a new text response.
+     *
+     * @param array $errorData
+     * @param int $status
+     *
+     * @return ResponseInterface
+     */
     private function createTextResponse(array $errorData, int $status): ResponseInterface
     {
         $response = new Response();
@@ -116,6 +196,13 @@ class ErrorResponseFactory
     }
 
     /**
+     * Create a new HTML response.
+     *
+     * @param array $errorData
+     * @param int $status
+     *
+     * @return ResponseInterface
+     *
      * @throws NotFoundException
      */
     private function createHtmlResponse(array $errorData, int $status): ResponseInterface
@@ -138,6 +225,13 @@ class ErrorResponseFactory
         return $response;
     }
 
+    /**
+     * Build plain text error message from error data.
+     *
+     * @param array $data
+     *
+     * @return string
+     */
     private function buildPlainText(array $data): string
     {
         if (isset($data['trace'])) {

@@ -2,9 +2,6 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Mvc\Core\Logger\LogManager;
-use Psr\Container\NotFoundExceptionInterface;
-
 class ModelServiceProvider extends ServiceProvider
 {
     /**
@@ -14,17 +11,13 @@ class ModelServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->container->set('models', fn () => null);
+//        $this->container->set('models', fn () => null);
     }
 
     /**
-     * @throws NotFoundExceptionInterface
+     * Boot the service provider
      */
     public function boot(): void
     {
-        $this->container
-            ->get(LogManager::class)
-            ->get('app')
-            ->debug(__CLASS__ . ' booted successfully');
     }
 }

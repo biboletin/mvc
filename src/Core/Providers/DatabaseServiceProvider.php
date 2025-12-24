@@ -2,70 +2,67 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
+use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Database\Connection\DsnBuilder;
 use Bibo\Mvc\Core\Database\Contracts\PdoDriverInterface;
 use Bibo\Mvc\Core\Database\DriverFactory;
 use Bibo\Mvc\Core\Database\QueryBuilder;
-use Bibo\Mvc\Core\Logger\LogManager;
+use Bibo\Mvc\Core\Exception\Custom\Container\ContainerException;
 use PDO;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use ReflectionException;
 
 class DatabaseServiceProvider extends ServiceProvider
 {
     /**
      * Register service provider
+     *
+     * @return void
+     *
+     * @throws ContainerException
      */
     public function register(): void
     {
-        try {
-            $dbDriver = config('db.driver');
+        $this->container->set(DsnBuilder::class, fn () => new DsnBuilder());
+        $this->container->set(DriverFactory::class, fn () => new DriverFactory());
+
+        // Register pdo driver in container
+        $this->container->set(PdoDriverInterface::class, function ($container) {
+            $config = $container->get(ConfigHandler::class);
+            $driverName = $config->get('db.driver');
 
             // Normalize driver name (pgsql|postgres|postgresql → pgsql)
-            $canonical = DriverFactory::resolve($dbDriver);
+            $driverFactory = $container->get(DriverFactory::class);
+            $canonical = $driverFactory->resolve($driverName);
 
             // Load config for a normalized key
-            $settings = config('db.' . $canonical);
+            $settings = $config->get('db.' . $canonical);
             $settings['driver'] = $canonical;
 
             // Build driver
-            $dsn  = new DsnBuilder();
-            $factory = new DriverFactory($dsn, $settings);
+            $dsn = $container->get(DsnBuilder::class);
 
-            $driver = $factory->create();
-            $db = $driver->connect();
+            $factory = $container->get(DriverFactory::class);
+            $factory->setDsn($dsn);
+            $factory->setConfig($settings);
 
-            // Register pdo driver in container
-            $this->container->set(PdoDriverInterface::class, function () use ($driver) {
-                return $driver;
-            });
+            return $factory->create();
+        });
 
-            // Register DB connection in container
-            $this->container->set(PDO::class, function () use ($db) {
-                return $db;
-            });
+        // Register DB connection in container
+        $this->container->set(PDO::class, function ($container) {
+            $driver = $container->get(PdoDriverInterface::class);
 
-            $this->container->set(QueryBuilder::class, function () {
-                return new QueryBuilder();
-            });
-        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
-            // You should handle or log this
-            throw $e;
-        }
+            return $driver->connect();
+        });
+
+        $this->container->set(QueryBuilder::class, fn () => new QueryBuilder());
     }
 
     /**
-     * Boot provider
+     * Boot the service provider
+     *
+     * @return void
      */
     public function boot(): void
     {
-        try {
-            $this->container
-                ->get(LogManager::class)
-                ->get('app')
-                ->debug(__CLASS__ . ' booted successfully');
-        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
-        }
     }
 }

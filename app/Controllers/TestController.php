@@ -9,6 +9,8 @@ use JsonException;
 class TestController extends Controller
 {
     /**
+     * Ping action
+     *
      * @throws JsonException
      */
     public function ping(): JsonResponse

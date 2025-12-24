@@ -3,6 +3,7 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Config\ConfigHandler;
+use Bibo\Mvc\Core\Exception\Custom\Container\ContainerException;
 use Bibo\Mvc\Core\Interfaces\ConfigInterface;
 use Bibo\Mvc\Core\Interfaces\FormatterInterface;
 use Bibo\Mvc\Core\Logger\Formatter\JSONFormatter;
@@ -27,40 +28,12 @@ class LogServiceProvider extends ServiceProvider
      * Register service provider
      *
      * @return void
-     * @throws NotFoundExceptionInterface
+     *
+     * @throws ContainerException
      */
     public function register(): void
     {
-        try {
-            $config = $this->container->get(ConfigHandler::class);
-
-            $loggers = [
-                'app' => $this->createLogger(
-                    $config,
-                    'app',
-                    'error.log',
-                    new LineFormatter(
-                        $config->get('log.date_format'),
-                        $config->get('log.include_context')
-                    )
-                ),
-
-                'security' => $this->createLogger(
-                    $config,
-                    'security',
-                    'error.json',
-                    new JsonFormatter(
-                        $config->get('log.date_format'),
-                        $config->get('log.channels.security.pretty_print')
-                    )
-                ),
-            ];
-
-            $this->container->set(LogManager::class, function () use ($loggers) {
-                return new LogManager($loggers);
-            });
-        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
-        }
+        $this->container->set(LogManager::class, fn () => new LogManager());
     }
 
     /**
@@ -97,15 +70,38 @@ class LogServiceProvider extends ServiceProvider
      * Boot service provider
      *
      * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
      */
     public function boot(): void
     {
-        try {
-            $this->container
-                ->get(LogManager::class)
-                ->get('app')
-                ->debug(__CLASS__ . ' booted successfully');
-        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
-        }
+        $config = $this->container->get(ConfigHandler::class);
+        $manager = $this->container->get(LogManager::class);
+
+        $manager->add(
+            'app',
+            $this->createLogger(
+                $config,
+                'app',
+                'error.log',
+                new LineFormatter(
+                    $config->get('log.date_format'),
+                    $config->get('log.include_context')
+                )
+            )
+        );
+
+        $manager->add(
+            'security',
+            $this->createLogger(
+                $config,
+                'security',
+                'error.json',
+                new JsonFormatter(
+                    $config->get('log.date_format'),
+                    $config->get('log.channels.security.pretty_print')
+                )
+            )
+        );
     }
 }

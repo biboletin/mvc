@@ -7,9 +7,11 @@
 */
 
 return [
+
     /*
      * Placeholder API
      */
+
     'placeholder' => [
         'url' => 'https://jsonplaceholder.typicode.com',
         'key' => 'your_api_key',
@@ -40,6 +42,7 @@ return [
     /*
      * Cloudflare API
      */
+
     'cloudflare' => [
         'url' => 'https://api.cloudflare.com/client/v4',
         'key' => 'your_api_key',
@@ -50,6 +53,7 @@ return [
     /*
      * OpenWeatherMap API
      */
+
     'weather' => [
         'url' => 'https://api.openweathermap.org/data/2.5/weather',
         'key' => 'your_api_key',
@@ -77,6 +81,7 @@ return [
     /*
      * SSL Checker API
      */
+
     'sslchecker' => [
         'url' => 'https://api.sslshopper.com/sslchecker',
         'key' => 'your_api_key',
@@ -99,6 +104,7 @@ return [
     /*
      * VirusTotal API
      */
+
     'virustotal' => [
         'url' => 'https://www.virustotal.com/vtapi/v2',
         'key' => 'your_api_key',

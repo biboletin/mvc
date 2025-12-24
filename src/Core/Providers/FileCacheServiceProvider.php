@@ -5,8 +5,10 @@ namespace Bibo\Mvc\Core\Providers;
 use Bibo\Mvc\Core\Cache\FileCache;
 use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Crypto\Crypto;
-use Bibo\Mvc\Core\Logger\LogManager;
+use Bibo\Mvc\Core\Exception\Custom\Container\ContainerException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 
 class FileCacheServiceProvider extends ServiceProvider
 {
@@ -15,34 +17,31 @@ class FileCacheServiceProvider extends ServiceProvider
      *
      * @return void
      *
-     * @throws NotFoundExceptionInterface
+     * @throws ContainerException
      */
     public function register(): void
     {
-        $config = $this->container->get(ConfigHandler::class);
-        $crypto = $this->container->get(Crypto::class);
-
-        $fileCache = new FileCache(CACHE_PATH);
-        $fileCache->setCrypto($crypto);
-        $fileCache->setCachePrefix($config->get('cache.prefix'));
-        $fileCache->setEncryption($config->get('cache.encryption'));
-        $fileCache->setTtl($config->get('cache.ttl'));
-
-        $this->container->set(FileCache::class, function () use ($fileCache) {
-            return $fileCache;
-        });
+        $this->container->set(FileCache::class, fn () => new FileCache(CACHE_PATH));
     }
 
     /**
      * Boot the service provider
      *
+     * @return void
+     *
      * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
      */
     public function boot(): void
     {
-        $this->container
-            ->get(LogManager::class)
-            ->get('app')
-            ->debug(__CLASS__ . ' booted successfully');
+        $config = $this->container->get(ConfigHandler::class);
+        $crypto = $this->container->get(Crypto::class);
+
+        $fileCache = $this->container->get(FileCache::class);
+        $fileCache->setCrypto($crypto);
+        $fileCache->setCachePrefix($config->get('cache.prefix'));
+        $fileCache->setEncryption($config->get('cache.encryption'));
+        $fileCache->setTtl($config->get('cache.ttl'));
     }
 }

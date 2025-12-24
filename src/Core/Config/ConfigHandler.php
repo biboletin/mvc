@@ -58,6 +58,7 @@ class ConfigHandler implements ConfigInterface
      * @param CacheInterface $cache The file cache instance to use for caching configuration
      *
      * @return void
+     *
      * @throws InvalidArgumentException
      */
     public function setFileCaching(CacheInterface $cache): void
@@ -169,7 +170,7 @@ class ConfigHandler implements ConfigInterface
 
         $configFiles = glob($this->configPath . '*.php') ?? [];
         if ($configFiles === false) {
-            throw new ConfigException("Failed to read configuration directory: {$this->configPath}");
+            throw new ConfigException('Failed to read configuration directory: ' . $this->configPath);
         }
 
         $config = [];
@@ -197,6 +198,7 @@ class ConfigHandler implements ConfigInterface
      * Attempt to load configuration from cache.
      *
      * @return bool True if loaded from cache, false otherwise
+     *
      * @throws InvalidArgumentException
      */
     private function loadFromCache(): bool
@@ -248,6 +250,7 @@ class ConfigHandler implements ConfigInterface
      * Cache the current configuration.
      *
      * @return bool True on success, false on failure
+     *
      * @throws InvalidArgumentException
      */
     private function cacheConfig(): bool
@@ -291,6 +294,7 @@ class ConfigHandler implements ConfigInterface
      * @param string $file The path to the configuration file
      *
      * @return void
+     *
      * @throws ConfigException If the file does not exist or cannot be read
      */
     public function loadFromFile(string $file): void
@@ -326,7 +330,8 @@ class ConfigHandler implements ConfigInterface
             // $this->config[$key] = $value;
             $_ENV[$key] = $value;
             $_SERVER[$key] = $value;
-            putenv("$key=$value");
+
+            putenv($key . '=' . $value);
         }
 
         // $this->cacheConfig();

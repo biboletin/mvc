@@ -60,18 +60,18 @@ class EncryptedSessionHandler implements SessionHandlerInterface
     private const string FILE_SUFFIX = '.session';
 
     /**
-     * Constructor.
+     * Set the crypto service used for encrypt/decrypt operations.
      *
-     * @param Crypto $crypto Crypto abstraction responsible for encrypt/decrypt.
+     * @param Crypto $crypto
+     *
+     * @return void
      */
-    public function __construct(Crypto $crypto)
+    public function setCrypto(Crypto $crypto): void
     {
         $this->crypto = $crypto;
     }
 
     /**
-     * {@inheritDoc}
-     *
      * Ensure the path exists and is writable. Save path is normalized to remove
      * trailing directory separator.
      *
@@ -108,8 +108,6 @@ class EncryptedSessionHandler implements SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * No-op here but kept for completeness.
      *
      * @return bool Always true
@@ -120,8 +118,6 @@ class EncryptedSessionHandler implements SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * Read session payload from disk, decrypt and uncompress if configured.
      * On any failure we return an empty string (per PHP contract) and attempt
      * to remove obviously corrupt files.
@@ -185,16 +181,16 @@ class EncryptedSessionHandler implements SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * Write session payload to disk. The write is performed atomically by
      * writing to a temporary file and renaming to final location. Exclusive
      * lock is obtained while writing.
      *
-     * @param string $id   Session id
+     * @param string $id Session id
      * @param string $data Serialized session data
      *
      * @return bool True on success, false on failure
+     *
+     * @throws RandomException
      */
     public function write(string $id, string $data): bool
     {
@@ -249,8 +245,6 @@ class EncryptedSessionHandler implements SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * Remove the session file associated with the given id.
      *
      * @param string $id Session id
@@ -273,8 +267,6 @@ class EncryptedSessionHandler implements SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * Garbage collect old session files. Returns number of deleted files.
      *
      * @param int $max_lifetime Maximum lifetime in seconds
@@ -316,7 +308,8 @@ class EncryptedSessionHandler implements SessionHandlerInterface
     /**
      * Produce a consistent file path for a session id.
      *
-     * @param  string $id Session id
+     * @param string $id Session id
+     *
      * @return string Absolute file path
      */
     private function getFilePath(string $id): string
@@ -327,7 +320,8 @@ class EncryptedSessionHandler implements SessionHandlerInterface
     /**
      * Validate session id to minimize security risks (path traversal etc.).
      *
-     * @param  string $id
+     * @param string $id
+     *
      * @return bool
      */
     private function isValidId(string $id): bool

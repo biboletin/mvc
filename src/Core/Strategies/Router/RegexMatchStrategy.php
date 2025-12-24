@@ -3,31 +3,37 @@
 namespace Bibo\Mvc\Core\Strategies\Router;
 
 use Bibo\Mvc\Core\Abstracts\AbstractMatchStrategy;
+use Bibo\Mvc\Core\Router\MatchedRoute;
 
 /**
- * Regex match routes class
+ * Regex-based route matching strategy.
+ *
+ * Matches routes defined with parameters such as:
+ *   /users/{id}
+ *   /posts/{slug:[a-z0-9\-]+}
+ *
+ * This strategy does NOT cache compiled regex patterns.
+ * It exists mainly for simplicity or as a fallback.
  */
 class RegexMatchStrategy extends AbstractMatchStrategy
 {
     /**
-     * Match regex routes
+     * Attempt to match a route using regex patterns.
      *
-     * @param string $method
-     * @param string $path
-     * @param array  $routes
+     * @param string $method HTTP method
+     * @param string $path   Normalized request path
+     * @param array  $routes Registered route definitions
      *
-     * @return array|null
+     * @return MatchedRoute|null
      */
-    public function match(string $method, string $path, array $routes): ?array
+    public function match(string $method, string $path, array $routes): ?MatchedRoute
     {
         foreach ($routes as $route) {
-            $routePattern = $this->convertRouteToRegex($route['route']);
+            $regex = $this->convertRouteToRegex($route['route']);
 
-            if ($route['method'] === $method && preg_match($routePattern, $path, $matches)) {
-                return [
-                    'handler' => $route['handler'],
-                    'params' => array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY),
-                ];
+            if (preg_match($regex, $path, $matches)) {
+                $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+                return $this->buildMatchedRoute($method, $route, $params);
             }
         }
 
@@ -35,7 +41,11 @@ class RegexMatchStrategy extends AbstractMatchStrategy
     }
 
     /**
-     * Convert route to regex
+     * Convert a route definition into a regex pattern.
+     *
+     * Supported syntax:
+     *  - {param}
+     *  - {param:custom-regex}
      *
      * @param string $route
      *
@@ -43,12 +53,16 @@ class RegexMatchStrategy extends AbstractMatchStrategy
      */
     private function convertRouteToRegex(string $route): string
     {
-        // Match {param} or {param:regex}
-        $pattern = preg_replace_callback('/\{(\w+)(?::([^}]+))?\}/', function ($matches) {
-            $name = $matches[1];
-            $regex = $matches[2] ?? '[^/]+';
-            return "(?P<{$name}>{$regex})";
-        }, $route);
+        $pattern = preg_replace_callback(
+            '/\{(\w+)(?::([^}]+))?}/',
+            static function (array $matches): string {
+                $name  = $matches[1];
+                $regex = $matches[2] ?? '[^/]+';
+
+                return '(?P<' . $name . '>' . $regex . ')';
+            },
+            $route
+        );
 
         return '#^' . $pattern . '$#';
     }

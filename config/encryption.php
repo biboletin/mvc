@@ -23,6 +23,7 @@ return [
      * This should be a secure key that is kept secret and not hard-coded in the source code.
      * It can be set through environment variables or configuration files.
      */
+
     'key' => get_env('encryption.key', 'default_key'),
 
     /*
@@ -30,6 +31,7 @@ return [
      * This defines the encryption algorithm to be used, such as 'aes-256-cbc'.
      * It can be set through environment variables or configuration files.
      */
+
     'cipher' => get_env('encryption.cipher', 'aes-256-cbc'),
 
     /*
@@ -37,6 +39,7 @@ return [
      * This is an additional value that is combined with the key to enhance security.
      * It can be set through environment variables or configuration files.
      */
+
     'salt' => get_env('encryption.salt', 'default_salt'),
 
     /*
@@ -45,6 +48,7 @@ return [
      * making it more secure against brute-force attacks.
      * It can be set through environment variables or configuration files.
      */
+
     'cost' => get_env('encryption.cost', 12),
 
     /*
@@ -52,6 +56,7 @@ return [
      * This defines the number of iterations for the encryption algorithm, increasing security.
      * It can be set through environment variables or configuration files.
      */
+
     'rounds' => get_env('encryption.rounds', 10),
 
     /*
@@ -59,6 +64,7 @@ return [
      * This defines the length of the initialization vector used in the encryption process.
      * It can be set through environment variables or configuration files.
      */
+
     'iv_length' => get_env('encryption.iv_length', 16),
 
     /*
@@ -66,5 +72,6 @@ return [
      * This setting determines whether to use HMAC (Hash-based Message Authentication Code) for additional security.
      * It can be set through environment variables or configuration files.
      */
+
     'use_hmac' => get_env('encryption.use_hmac', true),
 ];

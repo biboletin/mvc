@@ -11,6 +11,8 @@
 namespace Bibo\Mvc\Core\Strategies\Router;
 
 use Bibo\Mvc\Core\Abstracts\AbstractMatchStrategy;
+use Bibo\Mvc\Core\Interfaces\RouteMatchingStrategyInterface;
+use Bibo\Mvc\Core\Router\MatchedRoute;
 
 /**
  * Composite strategy that tries multiple match strategies in sequence.
@@ -18,7 +20,9 @@ use Bibo\Mvc\Core\Abstracts\AbstractMatchStrategy;
 class CompositeMatchStrategy extends AbstractMatchStrategy
 {
     /**
-     * @var AbstractMatchStrategy[]
+     * Array of strategies
+     *
+     * @var RouteMatchingStrategyInterface[]
      */
     private array $strategies = [];
 
@@ -29,7 +33,7 @@ class CompositeMatchStrategy extends AbstractMatchStrategy
      *
      * @return void
      */
-    public function __construct(array $strategies = [])
+    public function __construct(iterable $strategies)
     {
         foreach ($strategies as $strategy) {
             $this->addStrategy($strategy);
@@ -39,7 +43,8 @@ class CompositeMatchStrategy extends AbstractMatchStrategy
     /**
      * Add a strategy
      *
-     * @param  AbstractMatchStrategy $strategy
+     * @param AbstractMatchStrategy $strategy
+     *
      * @return void
      */
     public function addStrategy(AbstractMatchStrategy $strategy): void
@@ -54,14 +59,14 @@ class CompositeMatchStrategy extends AbstractMatchStrategy
      * @param string $path
      * @param array  $routes
      *
-     * @return array|null
+     * @return MatchedRoute|null
      */
-    public function match(string $method, string $path, array $routes): ?array
+    public function match(string $method, string $path, array $routes): ?MatchedRoute
     {
         foreach ($this->strategies as $strategy) {
-            $result = $strategy->match($method, $path, $routes);
-            if ($result !== null) {
-                return $result;
+            $matched = $strategy->match($method, $path, $routes);
+            if ($matched !== null) {
+                return $matched;
             }
         }
 

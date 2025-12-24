@@ -2,6 +2,8 @@
 
 namespace Bibo\Mvc\Core\Interfaces;
 
+use Bibo\Mvc\Core\Router\MatchedRoute;
+
 /**
  * Defines the contract for route matching strategies.
  *
@@ -19,7 +21,7 @@ interface RouteMatchingStrategyInterface
      * @param string $path
      * @param array  $routes
      *
-     * @return array|null
+     * @return MatchedRoute|null
      */
-    public function match(string $method, string $path, array $routes): ?array;
+    public function match(string $method, string $path, array $routes): ?MatchedRoute;
 }

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Bibo\Mvc\Core\Wrapper\Curl;
 
 use Bibo\Mvc\Core\Enums\CurlStrategyType;
-use Bibo\Mvc\Core\Interfaces\CurlInterface;
 use InvalidArgumentException;
 
+/**
+ * CurlStrategyFactory
+ */
 class CurlStrategyFactory
 {
     /**

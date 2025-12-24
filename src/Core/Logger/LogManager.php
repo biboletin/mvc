@@ -2,7 +2,7 @@
 
 namespace Bibo\Mvc\Core\Logger;
 
-use http\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 
 /**
  * Manages a collection of named loggers and provides access to them.
@@ -24,43 +24,46 @@ class LogManager
     private array $loggers = [];
 
     /**
-     * Initialize the manager with a predefined set of loggers.
+     * Register a logger with the manager.
      *
-     * @param array<string, Logger> $loggers Associative array keyed by logger name.
+     * @param string $channel The logger name.
+     * @param Logger $logger The logger instance.
+     *
+     * @return void
      */
-    public function __construct(array $loggers)
+    public function add(string $channel, Logger $logger): void
     {
-        $this->loggers = $loggers;
+        $this->loggers[$channel] = $logger;
     }
 
     /**
      * Retrieve a logger by its registered name.
      *
-     * @param string $name The identifier of the desired logger.
+     * @param string $channel The identifier of the desired logger.
      *
      * @return Logger The logger instance associated with the given name.
      *
      * @throws InvalidArgumentException If the requested logger name is not registered.
      */
-    public function get(string $name): Logger
+    public function get(string $channel): Logger
     {
-        if (!isset($this->loggers[$name])) {
-            throw new InvalidArgumentException('Logger [' . $name . '] not defined.');
+        if (!isset($this->loggers[$channel])) {
+            throw new InvalidArgumentException('Logger [' . $channel . '] not defined.');
         }
 
-        return $this->loggers[$name];
+        return $this->loggers[$channel];
     }
 
     /**
      * Determine whether a logger with the given name exists.
      *
-     * @param string $name The logger name to check.
+     * @param string $channel The logger name to check.
      *
      * @return bool True if a logger is registered under the given name; otherwise false.
      */
-    public function has(string $name): bool
+    public function has(string $channel): bool
     {
-        return isset($this->loggers[$name]);
+        return isset($this->loggers[$channel]);
     }
 
     /**

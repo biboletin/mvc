@@ -4,17 +4,18 @@ namespace Bibo\Mvc\Core\Middleware;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 class MiddlewareRequestHandler implements RequestHandlerInterface
 {
-    private array $middleware;
-    private $controller;
+    private MiddlewareInterface $middleware;
+    private RequestHandlerInterface $next;
 
-    public function __construct(array $middleware, callable $controller)
+    public function __construct(MiddlewareInterface $middleware, RequestHandlerInterface $next)
     {
         $this->middleware = $middleware;
-        $this->controller = $controller;
+        $this->next = $next;
     }
 
     /**
@@ -27,11 +28,6 @@ class MiddlewareRequestHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        if (empty($this->middleware)) {
-            return call_user_func($this->controller, $request);
-        }
-        $middleware = array_shift($this->middleware);
-
-        return $middleware->process($request, $this);
+        return $this->middleware->process($request, $this->next);
     }
 }

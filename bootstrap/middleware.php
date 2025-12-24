@@ -13,11 +13,11 @@ return [
     // Global middleware
     // Add your global middleware here
     'global' => [
-        SessionMiddleware::class,
+//        SessionMiddleware::class,
         ErrorMiddleware::class,
-        XssMiddleware::class,
-        SqlInjectionMiddleware::class,
-        FileInclusionMiddleware::class,
+//        XssMiddleware::class,
+//        SqlInjectionMiddleware::class,
+//        FileInclusionMiddleware::class,
         // TODO: Fix and Enable Rate Limiting Middleware
 //        RateLimitMiddleware::class,
     ],
@@ -27,13 +27,13 @@ return [
         // Add your web middleware here
         'web' => [
             SqlInjectionMiddleware::class,
-            XssMiddleware::class,
+//            XssMiddleware::class,
         ],
 
         // Add your API middleware here
         'api' => [
-            RateLimitMiddleware::class,
-            CorsMiddleware::class,
+//            RateLimitMiddleware::class,
+//            CorsMiddleware::class,
         ],
     ],
 
@@ -42,6 +42,7 @@ return [
         'csrf' => CsrfMiddleware::class,
         'cors' => CorsMiddleware::class,
         'rate-limit' => RateLimitMiddleware::class,
+
         // 'auth' => [
         //     // Add your auth middleware here
         // ],

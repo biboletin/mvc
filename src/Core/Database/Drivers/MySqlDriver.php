@@ -96,6 +96,7 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
      * Optionally sets SQL strict mode and session timezone if provided in the configuration.
      *
      * @return PDO The connected PDO instance
+     *
      * @throws PDOException if all retry attempts fail
      */
     public function connect(): PDO
@@ -260,7 +261,6 @@ class MySqlDriver implements DriverInterface, PdoDriverInterface
      * Sets a PDO attribute.
      *
      * @param int $attribute PDO::ATTR_* constant
-     *
      * @param mixed $value
      *
      * @return bool True if the attribute was set successfully

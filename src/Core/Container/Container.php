@@ -2,7 +2,6 @@
 
 namespace Bibo\Mvc\Core\Container;
 
-use AllowDynamicProperties;
 use Bibo\Mvc\Core\Exception\Custom\Container\ContainerException;
 use Bibo\Mvc\Core\Exception\Custom\Container\ContainerItemNotFoundException;
 use Closure;
@@ -156,8 +155,8 @@ final class Container implements ContainerInterface
         $this->aliases = $aliases;
 
         // ✔ Container should resolve itself
-        $this->aliases[ContainerInterface::class] = self::class;
-        $this->bindings[self::class] = fn() => $this;
+        $this->instances[self::class] = $this;
+        $this->instances[ContainerInterface::class] = $this;
     }
 
     /**
@@ -195,6 +194,7 @@ final class Container implements ContainerInterface
 
                 return $object;
             } catch (Throwable $e) {
+                dd($e);
                 throw new ContainerException("Failed to resolve binding '" . $id . "'");
             }
         }

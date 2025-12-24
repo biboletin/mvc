@@ -3,12 +3,7 @@
 namespace Bibo\Mvc\Core\Facades;
 
 use Bibo\Mvc\Core\Enums\HttpStatus;
-use Bibo\Mvc\Core\Exception\Custom\Http\MethodNotAllowedException;
-use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Router\BaseRouter;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Facade route class
@@ -248,32 +243,5 @@ final class Route
     public function find(string $method, string $route): ?array
     {
         return self::getInstance()->find($method, $route);
-    }
-
-    /**
-     * Set route name
-     *
-     * @param string $name
-     *
-     * @return void
-     */
-    public function name(string $name): void
-    {
-        self::getInstance()->name($name);
-    }
-
-    /**
-     * Get routes
-     *
-     * @return array
-     */
-    public static function getRoutes(): array
-    {
-        return self::getInstance()->getRoutes();
-    }
-
-    public static function dump(): void
-    {
-        self::getInstance()->dump();
     }
 }

@@ -3,6 +3,7 @@
 namespace Bibo\Mvc\Core\Strategies\Router;
 
 use Bibo\Mvc\Core\Abstracts\AbstractMatchStrategy;
+use Bibo\Mvc\Core\Router\MatchedRoute;
 
 /**
  * Cached regex route matching class
@@ -21,36 +22,33 @@ class CachedRegexMatchStrategy extends AbstractMatchStrategy
      *
      * @param string $method
      * @param string $path
-     * @param array  $routes
+     * @param array $routes
      *
-     * @return array|null
+     * @return MatchedRoute|null
      */
-    public function match(string $method, string $path, array $routes): ?array
+    public function match(string $method, string $path, array $routes): ?MatchedRoute
     {
         foreach ($routes as $route) {
             if ($route['method'] !== $method) {
                 continue;
             }
 
-            $routePattern = $route['route'];
+            $pattern = $route['route'];
 
-            // Cache compiled regex
-            if (!isset($this->cache[$routePattern])) {
-                $this->cache[$routePattern] = $this->convertRouteToRegex($routePattern);
+            if (!isset($this->cache[$pattern])) {
+                $this->cache[$pattern] = $this->convertRouteToRegex($pattern);
             }
 
-            $regex = $this->cache[$routePattern];
+            if (preg_match($this->cache[$pattern], $path, $matches)) {
+                $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
 
-            if (preg_match($regex, $path, $matches)) {
-                return [
-                    'handler' => $route['handler'],
-                    'params'  => array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY),
-                ];
+                return $this->buildMatchedRoute($method, $route, $params);
             }
         }
 
         return null;
     }
+
 
     /**
      * Convert route to regex

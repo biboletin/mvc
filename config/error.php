@@ -1,7 +1,7 @@
 <?php
 
 /**
- * configuration for error handling in the application.
+ * Configuration for error handling in the application.
  *
  * This configuration file defines settings for error reporting, logging, and display.
  * It allows customization of how errors are handled based on the environment and application needs.

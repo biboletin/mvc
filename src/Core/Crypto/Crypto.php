@@ -64,36 +64,6 @@ class Crypto
     private bool $useHmac;
 
     /**
-     * Crypto constructor.
-     *
-     * Initializes the Crypto instance with a key, optional salt, cipher algorithm, and IV length.
-     *
-     * @param string $key             The encryption key.
-     * @param string $cipherAlgorithm The cipher algorithm to use for encryption and decryption.
-     * @param int    $ivLength        The length of the initialization vector (IV) in bytes. Defaults to 16.
-     * @param bool   $useHmac
-     */
-    public function __construct(
-        string $key,
-        string $cipherAlgorithm = 'aes-256-cbc',
-        int $ivLength = 16,
-        bool $useHmac = true
-    ) {
-        $this->key = $key;
-        $this->cipherAlgorithm = trim(strtolower($cipherAlgorithm));
-        $this->ivLength = $ivLength;
-
-        if (!in_array($this->cipherAlgorithm, openssl_get_cipher_methods(true))) {
-            throw new InvalidArgumentException(
-                'Invalid cipher algorithm provided: ' . $this->cipherAlgorithm
-            );
-        }
-
-        $this->ivLength = openssl_cipher_iv_length($this->cipherAlgorithm);
-        $this->useHmac = $useHmac;
-    }
-
-    /**
      * Getters for the properties.
      */
     /**
@@ -156,7 +126,8 @@ class Crypto
      * used in the encryption and decryption processes.
      * It is important to keep this key secure and not expose it publicly.
      *
-     * @param  string $key The encryption key to set.
+     * @param string $key The encryption key to set.
+     *
      * @throws InvalidArgumentException If the key is empty or invalid.
      */
     public function setKey(string $key): void
@@ -168,12 +139,20 @@ class Crypto
      * Sets the cipher algorithm to be used for encryption and decryption.
      * This method validates that the provided cipher algorithm is supported by OpenSSL.
      *
-     * @param  string $cipherAlgorithm The cipher algorithm to set.
+     * @param string $cipherAlgorithm The cipher algorithm to set.
+     *
      * @throws InvalidArgumentException If the cipher algorithm is not supported.
      */
     public function setCipherAlgorithm(string $cipherAlgorithm): void
     {
-        $this->cipherAlgorithm = strtolower($cipherAlgorithm);
+        $this->cipherAlgorithm = trim(strtolower($cipherAlgorithm));
+
+        if (!in_array($this->cipherAlgorithm, openssl_get_cipher_methods(true))) {
+            throw new InvalidArgumentException(
+                'Invalid cipher algorithm provided: ' . $this->cipherAlgorithm
+            );
+        }
+
         $this->ivLength = openssl_cipher_iv_length($this->cipherAlgorithm);
     }
 
@@ -181,7 +160,8 @@ class Crypto
      * Sets the length of the initialization vector (IV) in bytes.
      * This method allows customization of the IV length, which is used in the encryption process.
      *
-     * @param  int $ivLength The length of the IV in bytes.
+     * @param int $ivLength The length of the IV in bytes.
+     *
      * @throws InvalidArgumentException If the IV length is not valid for the cipher algorithm.
      */
     public function setIvLength(int $ivLength): void
@@ -206,12 +186,14 @@ class Crypto
     {
         return $this->useHmac;
     }
+
     /**
      * Encrypts the provided text using the specified cipher algorithm and returns the encrypted data.
      *
      * @param string $text The text to encrypt.
      *
      * @return string The encrypted text, base64-encoded with version information.
+     *
      * @throws EncryptException|RandomException If encryption fails.
      */
     public function encrypt(string $text): string

@@ -6,11 +6,12 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use RuntimeException;
+use Psr\Http\Server\RequestHandlerInterface;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionNamedType;
+use RuntimeException;
 
 /**
  * PSR-15 Middleware Dispatcher
@@ -26,25 +27,40 @@ use ReflectionException;
  */
 final class MiddlewareDispatcher
 {
+    /**
+     * Container instance.
+     *
+     * @var ContainerInterface
+     */
     private ContainerInterface $container;
 
     /**
+     * Global middleware stack.
+     *
      * @var array<int, string|MiddlewareInterface|callable>
      */
     private array $global = [];
 
     /**
+     * Middleware groups.
+     *
      * @var array<string, array<int, string|MiddlewareInterface|callable>>
      */
     private array $groups = [];
 
     /**
+     * Route-level middleware aliases.
+     *
      * @var array<string, string|MiddlewareInterface|callable>
      */
     private array $routeMiddleware = [];
 
     /**
-     * Construct with PSR-11 container.
+     * Constructor.
+     *
+     * @param ContainerInterface $container
+     *
+     * @return void
      */
     public function __construct(ContainerInterface $container)
     {
@@ -55,6 +71,8 @@ final class MiddlewareDispatcher
      * Register global middleware (applied to all requests).
      *
      * @param array<int, string|MiddlewareInterface|callable> $middleware
+     *
+     * @return void
      */
     public function registerGlobal(array $middleware): void
     {
@@ -66,6 +84,8 @@ final class MiddlewareDispatcher
      *
      * @param string $group
      * @param array<int, string|MiddlewareInterface|callable> $middlewares
+     *
+     * @return void
      */
     public function defineGroup(string $group, array $middlewares): void
     {
@@ -76,6 +96,8 @@ final class MiddlewareDispatcher
      * Register route middleware aliases.
      *
      * @param array<string, string|MiddlewareInterface|callable> $middleware
+     *
+     * @return void
      */
     public function registerRouteMiddleware(array $middleware): void
     {
@@ -93,9 +115,13 @@ final class MiddlewareDispatcher
      *
      * @throws RuntimeException
      * @throws ContainerExceptionInterface
+     * @throws ReflectionException
      */
-    public function dispatch(ServerRequestInterface $request, callable $coreHandler, array $routeMiddlewares = []): ResponseInterface
-    {
+    public function dispatch(
+        ServerRequestInterface $request,
+        callable $coreHandler,
+        array $routeMiddlewares = []
+    ): ResponseInterface {
         // Build combined stack: global first, then route-specific
         $stack = array_merge($this->global, $routeMiddlewares);
 
@@ -137,6 +163,7 @@ final class MiddlewareDispatcher
      *
      * @throws RuntimeException
      * @throws ContainerExceptionInterface
+     * @throws ReflectionException
      */
     private function resolveMiddlewareStack(array $stack): array
     {
@@ -167,7 +194,7 @@ final class MiddlewareDispatcher
                 // Route alias
                 if (isset($this->routeMiddleware[$item])) {
                     $aliasTarget = $this->routeMiddleware[$item];
-                    // alias target could be instance, callable, or string
+                    // an alias target could be instanced, callable, or string
                     if ($aliasTarget instanceof MiddlewareInterface) {
                         $resolved[] = $aliasTarget;
                         continue;
@@ -208,7 +235,8 @@ final class MiddlewareDispatcher
      * @return MiddlewareInterface
      *
      * @throws RuntimeException on failure or if the result is not MiddlewareInterface
-     * @throws ContainerExceptionInterface|ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
      */
     private function instantiateMiddleware(string $class): MiddlewareInterface
     {
@@ -218,17 +246,13 @@ final class MiddlewareDispatcher
         } else {
             // Not in container — try to instantiate safely
             if (!class_exists($class)) {
-                throw new RuntimeException("Middleware class '{$class}' not found");
+                throw new RuntimeException('Middleware class [' . $class . '] not found');
             }
 
-            try {
-                $ref = new ReflectionClass($class);
-            } catch (ReflectionException $e) {
-                throw new RuntimeException("Reflection failed for middleware '{$class}': " . $e->getMessage(), 0, $e);
-            }
+            $ref = new ReflectionClass($class);
 
             if (!$ref->isInstantiable()) {
-                throw new RuntimeException("Middleware class '{$class}' is not instantiable");
+                throw new RuntimeException('Middleware class [' . $class . '] is not instantiable');
             }
 
             $ctor = $ref->getConstructor();
@@ -238,21 +262,21 @@ final class MiddlewareDispatcher
                 // Try first to pass container if the first param expects it
                 $params = $ctor->getParameters();
                 $firstType = $params[0]->getType();
-                if ($firstType && !$firstType->isBuiltin() && $firstType instanceof \ReflectionNamedType
-                    && $firstType->getName() === ContainerInterface::class) {
+
+                if ($firstType instanceof ReflectionNamedType && !$firstType->isBuiltin() && is_a($firstType->getName(), ContainerInterface::class, true)) {
                     $instance = $ref->newInstance($this->container);
                 } else {
                     // Fallback: try zero-arg (already failed) or try to instantiate without args -> error
                     // We avoid trying to autowire here to keep dispatcher simple; encourage registering in the container.
                     throw new RuntimeException(
-                        "Cannot instantiate middleware '{$class}' — constructor requires parameters. Register it in the container."
+                        'Cannot instantiate middleware [' . $class . '] — constructor requires parameters. Register it in the container.'
                     );
                 }
             }
         }
 
         if (!$instance instanceof MiddlewareInterface) {
-            throw new RuntimeException("Middleware '{$class}' must implement MiddlewareInterface");
+            throw new RuntimeException('Middleware [' . $class . '] must implement MiddlewareInterface');
         }
 
         return $instance;
@@ -263,11 +287,13 @@ final class MiddlewareDispatcher
      * The callable signature should be: function(ServerRequestInterface $req, RequestHandlerInterface $handler): ResponseInterface
      *
      * @param callable $callable
+     *
      * @return MiddlewareInterface
      */
     private function wrapCallableAsMiddleware(callable $callable): MiddlewareInterface
     {
-        return new class($callable) implements MiddlewareInterface {
+        return new class ($callable) implements MiddlewareInterface
+        {
             private $callable;
 
             public function __construct(callable $callable)
@@ -287,11 +313,13 @@ final class MiddlewareDispatcher
      *
      * @param MiddlewareInterface $middleware
      * @param RequestHandlerInterface $next
+     *
      * @return RequestHandlerInterface
      */
     private function wrapMiddleware(MiddlewareInterface $middleware, RequestHandlerInterface $next): RequestHandlerInterface
     {
-        return new class($middleware, $next) implements RequestHandlerInterface {
+        return new class ($middleware, $next) implements RequestHandlerInterface
+        {
             private MiddlewareInterface $middleware;
             private RequestHandlerInterface $next;
 

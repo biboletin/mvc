@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Bibo\Mvc\Core\Wrapper\Curl;
 
 use Bibo\Mvc\Core\Exception\Custom\Http\MethodNotSupportedException;
-use Bibo\Mvc\Core\Interfaces\CurlExtendedInterface;
 use Bibo\Mvc\Core\Interfaces\CurlInterface;
 use Bibo\Mvc\Core\Interfaces\CurlMultiInterface;
 use CurlHandle;
@@ -21,16 +20,22 @@ use RuntimeException;
 class CurlMultiWrapper extends AbstractCurlWrapper implements CurlMultiInterface
 {
     /**
+     * The cURL multi-handle resource.
+     *
      * @var mixed|CurlMultiHandle $multiHandle The cURL multi-handle resource
      */
     protected mixed $multiHandle;
 
     /**
+     * Array of CurlSingleWrapper instances added to this multi-handle.
+     *
      * @var CurlInterface[] $handlers Array of CurlInterface instances added to this multi-handle
      */
     protected array $handlers = [];
 
     /**
+     * Array of callbacks for each handle.
+     *
      * @var array<int, callable|null> $callbacks Array of callbacks for each handle
      */
     protected array $callbacks = [];
@@ -144,6 +149,11 @@ class CurlMultiWrapper extends AbstractCurlWrapper implements CurlMultiInterface
         return $responses;
     }
 
+    /**
+     * Get all responses from all added cURL requests.
+     *
+     * @return array
+     */
     public function getAllResponses(): array
     {
         $responses = [];
@@ -165,6 +175,11 @@ class CurlMultiWrapper extends AbstractCurlWrapper implements CurlMultiInterface
         return $responses;
     }
 
+    /**
+     * Get all response bodies from all added cURL requests.
+     *
+     * @return array
+     */
     public function getResponseBodies(): array
     {
         $bodies = [];
@@ -174,6 +189,11 @@ class CurlMultiWrapper extends AbstractCurlWrapper implements CurlMultiInterface
         return $bodies;
     }
 
+    /**
+     * Get all status codes from all added cURL requests.
+     *
+     * @return array
+     */
     public function getStatusCodes(): array
     {
         $codes = [];
@@ -192,6 +212,11 @@ class CurlMultiWrapper extends AbstractCurlWrapper implements CurlMultiInterface
         return $headers;
     }
 
+    /**
+     * Close the multi-handle and all associated cURL handles.
+     *
+     * @return void
+     */
     public function close(): void
     {
         foreach ($this->handlers as $handle) {
@@ -285,8 +310,7 @@ class CurlMultiWrapper extends AbstractCurlWrapper implements CurlMultiInterface
     public function getStatusCode(): int
     {
         throw new MethodNotSupportedException(
-            'getStatusCode() is not supported in CurlMultiWrapper. Use getAllResponses ' .
-            'to get status codes of all requests.'
+            'getStatusCode() is not supported in CurlMultiWrapper. Use getAllResponses to get status codes of all requests.'
         );
     }
 
@@ -300,8 +324,7 @@ class CurlMultiWrapper extends AbstractCurlWrapper implements CurlMultiInterface
     public function getResponseHeaders(): array
     {
         throw new MethodNotSupportedException(
-            'getResponseHeaders() is not supported in CurlMultiWrapper. Use getAllResponses ' .
-            'to get headers of all requests.'
+            'getResponseHeaders() is not supported in CurlMultiWrapper. Use getAllResponses to get headers of all requests.'
         );
     }
 

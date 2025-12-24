@@ -10,16 +10,34 @@ use RecursiveIteratorIterator;
 
 class CheckSyntaxCommand implements CommandInterface
 {
+    /**
+     * Retrieves the name.
+     *
+     * @return string
+     */
     public function getName(): string
     {
         return 'check:syntax';
     }
 
+    /**
+     * Retrieves the description.
+     *
+     * @return string
+     */
     public function getDescription(): string
     {
         return 'Check PHP files in app/ and src/ for syntax errors.';
     }
 
+    /**
+     * Executes a specific task using the provided arguments and container.
+     *
+     * @param array              $args      An array of arguments to be processed during execution.
+     * @param ContainerInterface $container The service container used for dependency resolution.
+     *
+     * @return int The exit code of the command
+     */
     public function execute(array $args, ContainerInterface $container): int
     {
         $dirs = [
@@ -60,12 +78,12 @@ class CheckSyntaxCommand implements CommandInterface
         unset($dirs);
         unset($iterator);
 
-        echo "Checked $total files.\n";
+        echo 'Checked ' . $total . " files.\n";
 
         if ($errors) {
             echo "❌ Syntax errors found:\n";
             foreach ($errors as $file => $msg) {
-                echo "- $file\n$msg\n\n";
+                echo '- ' . $file . "\n" . $msg . "\n\n";
             }
 
             unset($errors);

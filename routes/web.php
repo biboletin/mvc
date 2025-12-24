@@ -9,10 +9,8 @@ use Bibo\Mvc\Core\Facades\Route;
 use Bibo\Mvc\Core\Request\BaseRequest;
 use Bibo\Mvc\Core\Response\JsonResponse;
 
-Route::get('/', [IndexController::class, 'index'])
-    ->name('home');
-
-
+Route::get('/', [IndexController::class, 'index']);
+/*
 Route::get('/api/ping', [TestController::class, 'ping'])
     ->name('api.ping')
     ->middleware(['cors']);
@@ -24,7 +22,7 @@ Route::get('/rest/ping', function () {
     ]);
 });
 
-Route::match(['GET', 'POST', 'options'], '/{api_prefix}/{api_version}/', [])->middleware('cors');
+Route::match(['GET', 'POST', 'OPTIONS'], '/{api_prefix}/{api_version}/', [])->middleware('cors');
 
 Route::resource('/rest', IndexController::class);
 
@@ -69,4 +67,5 @@ Route::get('/test', function (BaseRequest $request) {
 Route::get('/single', [IndexController::class, 'single']);
 
 Route::get('/multi', [IndexController::class, 'multi']);
-//Route::dump();
+
+*/

@@ -19,36 +19,42 @@ enum CipherAlgorithm: string
      * AES-128-CBC: AES with a 128-bit key in CBC mode.
      * Recommended for general use with proper IV management.
      */
+
     case AES_128_CBC = 'aes-128-cbc';
 
     /*
      * AES-192-CBC: AES with a 192-bit key in CBC mode.
      * Provides a higher security level than AES-128.
      */
+
     case AES_192_CBC = 'aes-192-cbc';
 
     /*
      * AES-256-CBC: AES with a 256-bit key in CBC mode.
      * Offers the highest security level among AES CBC modes.
      */
+
     case AES_256_CBC = 'aes-256-cbc';
 
     /*
      * AES-128-GCM: AES with a 128-bit key in GCM mode.
      * Provides authenticated encryption and is suitable for modern applications.
      */
+
     case AES_128_GCM = 'aes-128-gcm';
 
     /*
      * AES-192-GCM: AES with a 192-bit key in GCM mode.
      * Offers a balance between security and performance.
      */
+
     case AES_192_GCM = 'aes-192-gcm';
 
     /*
      * AES-256-GCM: AES with a 256-bit key in GCM mode.
      * Provides the highest security level and is recommended for sensitive data.
      */
+
     case AES_256_GCM = 'aes-256-gcm';
 
     // ✅ CHACHA20-POLY1305 (secure & recommended for mobile / CPU without AES acceleration)
@@ -59,6 +65,7 @@ enum CipherAlgorithm: string
      * Recommended for environments where AES is not available
      * or for mobile devices.
      */
+
     case CHACHA20_POLY1305 = 'chacha20-poly1305';
 
     // ✅ SM4 in GCM/CCM/CTR mode only (omit ECB, pad, or HMAC combos)
@@ -81,6 +88,7 @@ enum CipherAlgorithm: string
      * where authenticated encryption is required,
      * but the data size is large.
      */
+
     case SM4_GCM = 'sm4-gcm';
 
     /*
@@ -106,6 +114,7 @@ enum CipherAlgorithm: string
      * It is important to manage the nonce/IV properly
      * to avoid security issues.
      */
+
     case SM4_CCM = 'sm4-ccm';
 
     /*
@@ -123,6 +132,7 @@ enum CipherAlgorithm: string
      * for new applications due to potential security issues
      * with nonce reuse and lack of authentication.
      */
+
     case SM4_CTR = 'sm4-ctr';
 
     // ⚠️ Optional: CBC for SM4 (only if you trust padding/hmac handling)
@@ -134,5 +144,6 @@ enum CipherAlgorithm: string
      * for new applications due to potential security issues
      * with padding and IV reuse.
      */
+
     case SM4_CBC = 'sm4-cbc';
 }

@@ -12,11 +12,13 @@ enum CurlStrategyType: string
     /*
      * Single cURL handle strategy.
      */
+
     case SINGLE = 'single';
 
     /*
      * Multi cURL handle strategy.
      */
+
     case MULTI = 'multi';
 
     /**
@@ -31,7 +33,7 @@ enum CurlStrategyType: string
         return match (strtolower($value)) {
             'single' => self::SINGLE,
             'multi' => self::MULTI,
-            default => throw new InvalidArgumentException("Invalid strategy type: $value"),
+            default => throw new InvalidArgumentException('Invalid strategy type: ' . $value),
         };
     }
 }

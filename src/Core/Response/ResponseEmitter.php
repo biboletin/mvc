@@ -2,6 +2,7 @@
 
 namespace Bibo\Mvc\Core\Response;
 
+use Bibo\Mvc\Core\Enums\ResponseBufferSize;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -18,11 +19,20 @@ class ResponseEmitter
      * Note: This method uses native header() and echo/flush() calls and should
      * be invoked before any output has been sent.
      *
-     * @param  ResponseInterface $response The HTTP response to emit.
+     * @param ResponseInterface $response The HTTP response to emit.
+     *
      * @return void
      */
     public function emit(ResponseInterface $response): void
     {
+        if (PHP_SAPI === 'cli') {
+            return;
+        }
+
+        if (headers_sent()) {
+            return;
+        }
+
         // Send status line
         header(sprintf(
             'HTTP/%s %d %s',
@@ -40,7 +50,11 @@ class ResponseEmitter
 
         // Stream large body responses
         $body = $response->getBody();
-        $body->rewind();
+
+        if ($body->isSeekable()) {
+            $body->rewind();
+        }
+
         while (!$body->eof()) {
             echo $body->read(8192);
             flush();

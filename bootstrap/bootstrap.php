@@ -4,7 +4,6 @@ use Bibo\Mvc\Core\Providers\CookieJarServiceProvider;
 use Bibo\Mvc\Core\Providers\CookieServiceProvider;
 use Bibo\Mvc\Core\Providers\DatabaseServiceProvider;
 use Bibo\Mvc\Core\Providers\EnumServiceProvider;
-use Bibo\Mvc\Core\Providers\AppServiceProvider;
 use Bibo\Mvc\Core\Providers\ConfigServiceProvider;
 use Bibo\Mvc\Core\Providers\ControllerServiceProvider;
 use Bibo\Mvc\Core\Providers\CryptoServiceProvider;
@@ -19,27 +18,22 @@ use Bibo\Mvc\Core\Providers\ResponseEmitterServiceProvider;
 use Bibo\Mvc\Core\Providers\RouteServiceProvider;
 use Bibo\Mvc\Core\Providers\ScriptExecutionTimerServiceProvider;
 use Bibo\Mvc\Core\Providers\SessionServiceProvider;
-use Bibo\Mvc\Core\Providers\StartupConfigServiceProvider;
+use Bibo\Mvc\Core\Providers\StartupServiceProvider;
 use Bibo\Mvc\Core\Providers\TemplateServiceProvider;
 use Bibo\Mvc\Core\Providers\ViewServiceProvider;
-use Bibo\Mvc\Core\Providers\ServiceProvider;
-
-if (!isset($app)) {
-    throw new RuntimeException('App not configured');
-}
 
 // Core service providers
-$providers = [
+return [
     ScriptExecutionTimerServiceProvider::class,
     RequestServiceProvider::class,
     ConfigServiceProvider::class,
+    LogServiceProvider::class,
     DatabaseServiceProvider::class,
-    StartupConfigServiceProvider::class,
+    StartupServiceProvider::class,
     ResolverServiceProvider::class,
     CookieServiceProvider::class,
     CookieJarServiceProvider::class,
     EnumServiceProvider::class,
-    LogServiceProvider::class,
     CryptoServiceProvider::class,
     SessionServiceProvider::class,
     TemplateServiceProvider::class,
@@ -51,20 +45,4 @@ $providers = [
     RouteServiceProvider::class,
     ModelServiceProvider::class,
     ControllerServiceProvider::class,
-    AppServiceProvider::class,
 ];
-
-$container = $app->container();
-$registeredProviders = [];
-
-foreach ($providers as $providerClass) {
-    $provider = new $providerClass($container);
-    $provider->register();
-    $registeredProviders[] = $provider;
-}
-
-foreach ($registeredProviders as $provider) {
-    if ($provider instanceof ServiceProvider) {
-        $provider->boot();
-    }
-}

@@ -7,6 +7,7 @@ use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Response\JsonResponse;
 use Bibo\Mvc\Core\Response\RedirectResponse;
 use JsonException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -18,9 +19,13 @@ class Controller extends AbstractController
     /**
      * Create a new controller instance.
      *
-     * @param ContainerInterface|null $container Optional DI container.
+     * @param ContainerInterface $container
+     *
+     * @return void
+     *
+     * @throws ContainerExceptionInterface If resolving the entry fails.
      */
-    public function __construct(?ContainerInterface $container = null)
+    public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
     }
@@ -32,6 +37,7 @@ class Controller extends AbstractController
      * @param array  $data Variables to pass to the view.
      *
      * @return string Rendered HTML.
+     *
      * @throws NotFoundException If the view cannot be located.
      */
     protected function view(string $view, array $data = []): string
@@ -47,6 +53,7 @@ class Controller extends AbstractController
      * @param array|null $headers Additional headers.
      *
      * @return JsonResponse
+     *
      * @throws JsonException If the payload cannot be encoded.
      */
     protected function json(mixed $data, ?int $status = 200, ?array $headers = []): JsonResponse
@@ -66,14 +73,5 @@ class Controller extends AbstractController
     protected function redirect(string $url, int $status = 302, array $headers = []): RedirectResponse
     {
         return new RedirectResponse($url, $status, $headers);
-    }
-
-    /**
-     * Controller destructor: help GC by releasing references.
-     */
-    public function __destruct()
-    {
-        $this->view = null;
-        $this->container = null;
     }
 }

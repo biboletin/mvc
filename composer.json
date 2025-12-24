@@ -53,7 +53,8 @@
         "ext-openssl": "*",
         "ext-bz2": "*",
         "ext-intl": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-http": "*"
     },
     "config": {
         "allow-plugins": {

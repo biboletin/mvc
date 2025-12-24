@@ -5,9 +5,10 @@ namespace Bibo\Mvc\Core\Providers;
 use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Cookie\CookieHandler;
 use Bibo\Mvc\Core\Crypto\Crypto;
-use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
-use Bibo\Mvc\Core\Logger\LogManager;
+use Bibo\Mvc\Core\Exception\Custom\Container\ContainerException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 
 class CookieServiceProvider extends ServiceProvider
 {
@@ -16,20 +17,28 @@ class CookieServiceProvider extends ServiceProvider
      *
      * @return void
      *
-     * @throws NotFoundExceptionInterface
-     * @throws DecryptException
+     * @throws ContainerException
      */
     public function register(): void
     {
+        $this->container->set(CookieHandler::class, fn () => new CookieHandler());
+    }
+
+    /**
+     * Boot service provider
+     *
+     * @return void
+     *
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     */
+    public function boot(): void
+    {
         $config = $this->container->get(ConfigHandler::class);
 
-        $crypto = new Crypto(
-            $config->get('encryption.key'),
-            $config->get('encryption.cipher'),
-            $config->get('encryption.iv_length'),
-            $config->get('encryption.use_hmac')
-        );
-        $cookie = new CookieHandler();
+        $crypto = new Crypto();
+        $cookie = $this->container->get(CookieHandler::class);
         $cookie->setCrypto($crypto);
         $cookie->setName($config->get('cookie.name'));
         $cookie->setPrefix($config->get('cookie.prefix'));
@@ -41,22 +50,5 @@ class CookieServiceProvider extends ServiceProvider
         $cookie->setSameSite($config->get('cookie.samesite'));
         $cookie->setEncrypted($config->get('cookie.encrypted'));
         $cookie->setPartitioned($config->get('cookie.partitioned'));
-
-        $this->container->set(CookieHandler::class, function () use ($cookie) {
-            return $cookie;
-        });
-    }
-
-    /**
-     * Boot service
-     *
-     * @throws NotFoundExceptionInterface
-     */
-    public function boot(): void
-    {
-        $this->container
-            ->get(LogManager::class)
-            ->get('app')
-            ->debug(__CLASS__ . ' booted successfully');
     }
 }

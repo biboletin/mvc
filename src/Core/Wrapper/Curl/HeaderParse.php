@@ -7,7 +7,8 @@ class HeaderParse
     /**
      * Parses raw HTTP response headers into an associative array.
      *
-     * @param  string $rawHeaders Raw header string (e.g., from cURL's header output).
+     * @param string $rawHeaders Raw header string (e.g., from cURL's header output).
+     *
      * @return array Parsed headers in ['Header-Name' => ['value1', 'value2']] format.
      */
     public static function parse(string $rawHeaders): array
@@ -26,7 +27,7 @@ class HeaderParse
                 $name = trim($name);
                 $value = trim($value);
 
-                // Normalize: handle multiple values for same header (e.g., Set-Cookie)
+                // Normalize: handle multiple values for the same header (e.g., Set-Cookie)
                 $lower = strtolower($name);
                 if (!isset($headers[$lower])) {
                     $headers[$lower] = [

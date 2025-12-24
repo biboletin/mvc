@@ -16,7 +16,7 @@ trait UrlHelper
      *
      * @return string Path portion without scheme/host/query.
      */
-    public function getPath(): mixed
+    public function getPath(): string
     {
         return $this->getUri()->getPath();
     }
@@ -94,7 +94,8 @@ trait UrlHelper
      *
      * Performs a prefix match (e.g., 'en' matches 'en-US').
      *
-     * @param  string[] $available List of available language codes/locales.
+     * @param string[] $available List of available language codes/locales.
+     *
      * @return string|null The preferred available language or null if none match.
      */
     public function getPreferredLanguage(array $available): mixed

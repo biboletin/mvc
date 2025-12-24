@@ -3,8 +3,8 @@
 namespace Bibo\Mvc\Core\Providers;
 
 use Bibo\Mvc\Core\Controller\Controller;
-use Bibo\Mvc\Core\Logger\LogManager;
-use Psr\Container\NotFoundExceptionInterface;
+use Bibo\Mvc\Core\Exception\Custom\Container\ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Service provider responsible for registering the base Controller instance
@@ -19,27 +19,18 @@ class ControllerServiceProvider extends ServiceProvider
      * controllers depending on the base Controller can resolve it easily.
      *
      * @return void
+     *
+     * @throws ContainerException
      */
     public function register(): void
     {
-        $controller = new Controller($this->container);
-
-        $this->container->set(Controller::class, function () use ($controller) {
-            return $controller;
-        });
+        $this->container->set(Controller::class, fn (ContainerInterface $container) => new Controller($container));
     }
 
     /**
-     * Boot the provider and log successful initialization.
-     *
-     * @throws NotFoundExceptionInterface When the log manager service is not found.
-     * @return void
+     * Boot the service provider
      */
     public function boot(): void
     {
-        $this->container
-            ->get(LogManager::class)
-            ->get('app')
-            ->debug(__CLASS__ . ' booted successfully');
     }
 }

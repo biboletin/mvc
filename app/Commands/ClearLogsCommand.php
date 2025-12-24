@@ -34,7 +34,7 @@ class ClearLogsCommand implements CommandInterface
             }
         }
 
-        echo "✅ Deleted $count log file(s).\n";
+        echo '✅ Deleted ' . $count . " log file(s).\n";
         return 0;
     }
 }

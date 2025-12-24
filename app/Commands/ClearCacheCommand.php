@@ -42,7 +42,8 @@ class ClearCacheCommand implements CommandInterface
             }
         }
 
-        echo "✅ Cleared $count cached files.\n";
+        echo '✅ Cleared ' . $count . " cached files.\n";
+
         return 0;
     }
 }

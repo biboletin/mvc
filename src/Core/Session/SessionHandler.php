@@ -34,19 +34,46 @@ class SessionHandler
     protected bool $started = false;
 
     /**
-     * Constructor.
-     * Sets up the session handler with the provided options.
-     * Throws RuntimeException on failure.
+     * Sets the custom session save handler.
      *
-     * @param SessionHandlerInterface $handler The custom session save handler implementation.
-     * @param array $options Optional configuration for session INI directives.
+     * @param SessionHandlerInterface $handler
+     *
+     * @return void
      */
-    public function __construct(SessionHandlerInterface $handler, array $options = [])
+    public function setHandler(SessionHandlerInterface $handler): void
     {
         $this->handler = $handler;
-
-        $this->configure($options);
         $this->registerHandler();
+    }
+
+    /**
+     * Returns the custom session save handler.
+     *
+     * @return SessionHandlerInterface
+     */
+    public function getHandler(): SessionHandlerInterface
+    {
+        return $this->handler;
+    }
+
+    /**
+     * Returns whether the session has been started.
+     *
+     * @return bool
+     */
+    public function isStarted(): bool
+    {
+        return $this->started;
+    }
+
+    /**
+     * Sets the INI-level configuration for PHP's session behavior.
+     *
+     * @param array $options Key-value pairs of INI options. E.g. ['cookie_lifetime' => 3600, 'gc_maxlifetime' => 86400]'
+     */
+    public function setOptions(array $options): void
+    {
+        $this->configure($options);
     }
 
     /**

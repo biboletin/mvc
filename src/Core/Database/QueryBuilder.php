@@ -2,7 +2,6 @@
 
 namespace Bibo\Mvc\Core\Database;
 
-use Bibo\Mvc\Core\Container\Container;
 use Bibo\Mvc\Core\Database\Contracts\PdoDriverInterface;
 
 class QueryBuilder

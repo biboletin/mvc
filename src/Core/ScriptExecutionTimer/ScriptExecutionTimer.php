@@ -73,7 +73,7 @@ class ScriptExecutionTimer
     public function stop(string $name): void
     {
         if (!isset($this->timers[$name])) {
-            throw new InvalidArgumentException("Timer with name '$name' has not been started.");
+            throw new InvalidArgumentException('Timer with name ' . $name . ' has not been started.');
         }
 
         $end = microtime(true);
@@ -97,7 +97,7 @@ class ScriptExecutionTimer
     public function getDuration(string $name): float
     {
         if (!isset($this->durations[$name])) {
-            throw new InvalidArgumentException("Timer with name '$name' has not been stopped or does not exist.");
+            throw new InvalidArgumentException('Timer with name ' . $name . ' has not been stopped or does not exist.');
         }
         return $this->durations[$name];
     }
@@ -243,10 +243,13 @@ class ScriptExecutionTimer
     {
         $units = ['B', 'KB', 'MB', 'GB'];
         $i = 0;
-        while ($bytes >= 1024 && $i < count($units) - 1) {
+        $countUnits = count($units);
+
+        while ($bytes >= 1024 && $i < $countUnits - 1) {
             $bytes /= 1024;
             $i++;
         }
+
         return sprintf('%.2f %s', $bytes, $units[$i]);
     }
 

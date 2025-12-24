@@ -116,9 +116,8 @@ class BaseRequest implements ServerRequestInterface
     /**
      * Constructor
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct()
     {
-        $this->container = $container;
         $this->protocolVersion = HttpProtocolVersion::V1->value;
         $this->method = HttpMethod::fromString($_SERVER['REQUEST_METHOD'])->value
             ?? HttpMethod::fromString('get')->value;
@@ -132,6 +131,18 @@ class BaseRequest implements ServerRequestInterface
         $this->queryParams = $_GET;
         $this->uploadedFiles = $_FILES;
         $this->parsedBody = $_POST;
+    }
+
+    /**
+     * Set container
+     *
+     * @param ContainerInterface $container
+     *
+     * @return void
+     */
+    public function setContainer(ContainerInterface $container): void
+    {
+        $this->container = $container;
     }
 
     /**

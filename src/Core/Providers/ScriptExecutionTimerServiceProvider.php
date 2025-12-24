@@ -2,9 +2,8 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Mvc\Core\Logger\LogManager;
+use Bibo\Mvc\Core\Exception\Custom\Container\ContainerException;
 use Bibo\Mvc\Core\ScriptExecutionTimer\ScriptExecutionTimer;
-use Psr\Container\NotFoundExceptionInterface;
 
 class ScriptExecutionTimerServiceProvider extends ServiceProvider
 {
@@ -12,27 +11,20 @@ class ScriptExecutionTimerServiceProvider extends ServiceProvider
      * Register service provider
      *
      * @return void
+     *
+     * @throws ContainerException
      */
     public function register(): void
     {
-        $scriptExecutionTimer = new ScriptExecutionTimer();
-
-        $this->container->set(ScriptExecutionTimer::class, function () use ($scriptExecutionTimer) {
-            return $scriptExecutionTimer;
-        });
+        $this->container->set(ScriptExecutionTimer::class, fn () => new ScriptExecutionTimer());
     }
 
     /**
      * Boot service provider
      *
      * @return void
-     * @throws NotFoundExceptionInterface
      */
     public function boot(): void
     {
-        $this->container
-            ->get(LogManager::class)
-            ->get('app')
-            ->debug(__CLASS__ . ' booted successfully');
     }
 }

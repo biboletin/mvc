@@ -19,6 +19,7 @@ enum RiskLevel: string
      * It can be used for tasks or issues that are not critical
      * and can be addressed at a later time.
      */
+
     case LOW = 'Low';
 
     /*
@@ -28,6 +29,7 @@ enum RiskLevel: string
      * It can be used for tasks or issues that require attention
      * but are not urgent.
      */
+
     case MEDIUM = 'Medium';
 
     /*
@@ -38,6 +40,7 @@ enum RiskLevel: string
      * serious threat or concern
      * and need to be addressed promptly.
      */
+
     case HIGH = 'High';
 
     /*
@@ -49,6 +52,7 @@ enum RiskLevel: string
      * and need to be resolved immediately
      * to prevent significant harm or loss.
      */
+
     case CRITICAL = 'Critical';
 
     /*
@@ -57,6 +61,7 @@ enum RiskLevel: string
      * or that the risk is negligible.
      * This is useful in scenarios where risk assessment
      */
+
     case NONE = 'None';
 
     /**

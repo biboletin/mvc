@@ -22,7 +22,6 @@
         <directory name="src" />
         <directory name="bootstrap" />
         <directory name="config" />
-        <directory name="install" />
         <directory name="routes" />
 		<file name="public/index.php" />
 		<ignoreFiles>

@@ -16,7 +16,8 @@ enum CryptoVersion: string
      * Version 1 of the cryptographic protocol.
      * This is the initial version and may have basic features.
      * It is suitable for legacy systems or applications
-     * that do not require advanced security features.
+     * that does not require advanced security features.
      */
+
     case V1 = 'v1';
 }

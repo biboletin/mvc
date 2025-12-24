@@ -76,6 +76,7 @@ class SqliteDriver implements DriverInterface, PdoDriverInterface
      * - Throws PDOException if connection fails.
      *
      * @return PDO The PDO instance representing the SQLite connection.
+     *
      * @throws PDOException
      */
     public function connect(): PDO
@@ -112,7 +113,8 @@ class SqliteDriver implements DriverInterface, PdoDriverInterface
     /**
      * Prepare PDO options array, merging defaults with user-supplied options.
      *
-     * @param  array|string $options
+     * @param array|string $options
+     *
      * @return array
      */
     private function prepareOptions(array|string $options): array
@@ -132,6 +134,8 @@ class SqliteDriver implements DriverInterface, PdoDriverInterface
 
     /**
      * Disconnects from SQLite by destroying the PDO instance.
+     *
+     * @return void
      */
     public function disconnect(): void
     {
@@ -236,8 +240,9 @@ class SqliteDriver implements DriverInterface, PdoDriverInterface
     /**
      * Sets a PDO attribute.
      *
-     * @param  int $attribute
-     * @param  mixed $value
+     * @param int $attribute
+     * @param mixed $value
+     *
      * @return bool
      */
     public function setAttribute(int $attribute, mixed $value): bool
@@ -248,7 +253,8 @@ class SqliteDriver implements DriverInterface, PdoDriverInterface
     /**
      * Retrieves a PDO attribute.
      *
-     * @param  int $attribute
+     * @param int $attribute
+     *
      * @return mixed
      */
     public function getAttribute(int $attribute): mixed

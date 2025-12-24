@@ -4,14 +4,39 @@ namespace Bibo\Mvc\Core\Model;
 
 abstract class Model
 {
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected static string $table;
 
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
     protected static string $primaryKey;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<string>
+     */
     protected static array $fillable = [];
 
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array<string>
+     */
     protected static array $hidden = [];
 
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array<string>
+     */
     protected static array $guarded = [];
 
 
@@ -26,7 +51,8 @@ abstract class Model
     /**
      * Find a model by its primary key.
      *
-     * @param  int $id The primary key value
+     * @param int $id The primary key value
+     *
      * @return static|null The model instance or null if not found
      */
     public static function find(int $id): ?static
@@ -49,7 +75,8 @@ abstract class Model
     /**
      * Create a new model with the given data.
      *
-     * @param  array<string, mixed> $data The data to create the model with
+     * @param array<string, mixed> $data The data to create the model with
+     *
      * @return static The created model instance
      */
     public static function create(array $data): static
@@ -61,7 +88,8 @@ abstract class Model
     /**
      * Update the model with the given data.
      *
-     * @param  array<string, mixed> $data The data to update the model with
+     * @param array<string, mixed> $data The data to update the model with
+     *
      * @return bool True if the update was successful, false otherwise
      */
     public static function update(array $data): bool
@@ -73,7 +101,8 @@ abstract class Model
     /**
      * Delete a model by its primary key.
      *
-     * @param  int $id The primary key value
+     * @param int $id The primary key value
+     *
      * @return bool True if the deletion was successful, false otherwise
      */
     public static function delete(int $id): bool
@@ -85,8 +114,9 @@ abstract class Model
     /**
      * Execute a raw SQL query.
      *
-     * @param  string $query The SQL query to execute
-     * @param  array<int|string, mixed> $params The parameters to bind to the query
+     * @param string $query The SQL query to execute
+     * @param array<int|string, mixed> $params The parameters to bind to the query
+     *
      * @return array<int, array<string, mixed>>|bool Array of results for SELECT queries, or boolean for other queries
      */
     public static function query(string $query, array $params): array|bool

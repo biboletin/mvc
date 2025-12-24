@@ -7,11 +7,9 @@ use Bibo\Mvc\Core\Cache\NullCache;
 use Bibo\Mvc\Core\Config\ConfigHandler;
 use Bibo\Mvc\Core\Crypto\Crypto;
 use Bibo\Mvc\Core\Exception\Custom\Application\ConfigException;
-use Bibo\Mvc\Core\Logger\LogManager;
-use Exception;
+use Bibo\Mvc\Core\Exception\Custom\Container\ContainerException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionException;
 
 class ConfigServiceProvider extends ServiceProvider
@@ -21,13 +19,25 @@ class ConfigServiceProvider extends ServiceProvider
      *
      * @return void
      *
-     * @throws Exception
-     * @throws InvalidArgumentException
+     * @throws ContainerException
      */
     public function register(): void
     {
+        // Register the config instance in the container
+        $this->container->set(ConfigHandler::class, fn () => new ConfigHandler());
+    }
+
+    /**
+     * Boot service provider
+     *
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     */
+    public function boot(): void
+    {
         // Create a config instance
-        $config = new ConfigHandler();
+        $config = $this->container->get(ConfigHandler::class);
         $config->setConfigPath();
 
         // Load the environment file if it exists
@@ -49,41 +59,13 @@ class ConfigServiceProvider extends ServiceProvider
         $cache->setEnabled($config->get('cache.enabled'));
         $cache->setCachePrefix($config->get('cache.prefix'));
         // Setup encryption for config caching
-        $crypto = new Crypto(
-            $config->get('encryption.key'),
-            $config->get('encryption.cipher'),
-            $config->get('encryption.iv_length'),
-            $config->get('encryption.use_hmac')
-        );
+        $crypto = new Crypto();
+
         $cache->setCrypto($crypto);
         $cache->setEncryption($config->get('cache.encryption'));
         $cache->setTtl($config->get('cache.ttl'));
         $cache->setUseCompression($config->get('cache.enable_compression'));
         $cache->setCompression($config->get('cache.compression'));
-
         $config->setFileCaching($cache);
-
-        // Register the config instance in the container
-        $this->container->set(ConfigHandler::class, function () use ($config) {
-            return $config;
-        });
-
-        unset($cache, $crypto);
-    }
-
-    /**
-     * Bootstrap application settings
-     *
-     * @throws NotFoundExceptionInterface
-     */
-    public function boot(): void
-    {
-        try {
-            $this->container
-                ->get(LogManager::class)
-                ->get('app')
-                ->debug(__CLASS__ . ' booted successfully');
-        } catch (NotFoundExceptionInterface | ReflectionException | ContainerExceptionInterface $e) {
-        }
     }
 }

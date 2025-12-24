@@ -13,10 +13,12 @@ use Bibo\Mvc\Core\Request\BaseRequest;
 use Bibo\Mvc\Core\Response\JsonResponse;
 use Bibo\Mvc\Core\Rest\HttpClient;
 use JsonException;
-use PDO;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Index controller
+ * Holds all the actions for the index page.
  */
 class IndexController extends Controller
 {
@@ -26,7 +28,10 @@ class IndexController extends Controller
      * @param BaseRequest $request
      *
      * @return string
+     *
      * @throws NotFoundException
+     * @throws NotFoundExceptionInterface If no entry is found for the identifier.
+     * @throws ContainerExceptionInterface If resolving the entry fails.
      */
     public function index(BaseRequest $request): string
     {
@@ -34,8 +39,8 @@ class IndexController extends Controller
             'title' => 'Home Page',
             'name'  => 'Bibo Framework',
         ];
-        $res = new QueryBuilder($this->container->get(PdoDriverInterface::class));
-        $users = $res->select(['id', 'name'])->from('users');
+//        $res = new QueryBuilder($this->container->get(PdoDriverInterface::class));
+//        $users = $res->select(['id', 'name'])->from('users');
 //dd($users, $users->get(), $users->raw());
         return $this->view('home', $data);
     }
@@ -44,6 +49,7 @@ class IndexController extends Controller
      * About
      *
      * @return string
+     *
      * @throws NotFoundException
      */
     public function about(): string
@@ -90,6 +96,11 @@ class IndexController extends Controller
         return 'Hello ' . $name . ' with id: ' . $id . ' from controller!';
     }
 
+    /**
+     * Single
+     *
+     * @return string
+     */
     public function single(): string
     {
         $client = new HttpClient(CurlStrategyType::SINGLE);

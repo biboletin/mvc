@@ -53,7 +53,7 @@ class HealthCheckCommand implements CommandInterface
         ];
 
         foreach ($dirs as $dir) {
-            $path = ROOT_PATH . "/storage/$dir";
+            $path = ROOT_PATH . '/storage/' . $dir;
             echo sprintf(
                 "- %-10s %s\n",
                 $dir . '/',

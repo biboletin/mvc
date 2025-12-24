@@ -82,6 +82,7 @@ class PostgreSqlDriver implements DriverInterface, PdoDriverInterface
      * Optionally sets search_path (schema) and timezone if provided in the configuration.
      *
      * @return PDO The connected PDO instance
+     *
      * @throws PDOException if all retry attempts fail
      */
     public function connect(): PDO
@@ -267,8 +268,9 @@ class PostgreSqlDriver implements DriverInterface, PdoDriverInterface
     /**
      * Sets a PDO attribute.
      *
-     * @param  int $attribute PDO::ATTR_* constant
-     * @param  mixed $value
+     * @param int $attribute PDO::ATTR_* constant
+     * @param mixed $value
+     *
      * @return bool True on success
      */
     public function setAttribute(int $attribute, mixed $value): bool
@@ -279,7 +281,8 @@ class PostgreSqlDriver implements DriverInterface, PdoDriverInterface
     /**
      * Retrieves a PDO attribute.
      *
-     * @param  int $attribute PDO::ATTR_* constant
+     * @param int $attribute PDO::ATTR_* constant
+     *
      * @return mixed
      */
     public function getAttribute(int $attribute): mixed

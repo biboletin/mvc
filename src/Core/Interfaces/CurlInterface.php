@@ -93,7 +93,7 @@ interface CurlInterface
      * This can be used for advanced operations or when direct access
      * to the cURL resource is needed.
      *
-     * @return mixed The cURL handle resource
+     * @return CurlHandle The cURL handle resource
      */
     public function getHandle(): CurlHandle;
 

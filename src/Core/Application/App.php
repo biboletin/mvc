@@ -2,31 +2,21 @@
 
 namespace Bibo\Mvc\Core\Application;
 
-use Bibo\App\Middleware\ErrorMiddleware;
-use Bibo\Mvc\Core\Error\Error;
-use Bibo\Mvc\Core\Error\ErrorResponseFactory;
-use Bibo\Mvc\Core\Exception\Custom\Http\MethodNotAllowedException;
-use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
-use Bibo\Mvc\Core\Logger\LogManager;
-use Bibo\Mvc\Core\Request\BaseRequest;
-use Bibo\Mvc\Core\Response\ResponseEmitter;
-use Bibo\Mvc\Core\Router\BaseRouter;
+use Bibo\Mvc\Core\Config\ConfigHandler;
+use Bibo\Mvc\Core\Exception\Custom\Container\ContainerException;
+use Bibo\Mvc\Core\Facades\Env;
+use Bibo\Mvc\Core\Interfaces\ServiceProviderInterface;
 use Bibo\Mvc\Core\Traits\NameAwareTrait;
 use Bibo\Mvc\Core\Traits\PrefixAwareTrait;
 use Bibo\Mvc\Core\Traits\VersionAwareTrait;
-use JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use Throwable;
 
 /**
  * App class
  */
-class App
+final class App
 {
     use NameAwareTrait;
     use PrefixAwareTrait;
@@ -40,6 +30,20 @@ class App
     private ContainerInterface $container;
 
     /**
+     * Providers
+     *
+     * @var array
+     */
+    private array $providers = [];
+
+    /**
+     * Indicates if the application has been booted
+     *
+     * @var bool
+     */
+    private bool $booted = false;
+
+    /**
      * Constructor
      *
      * @param ContainerInterface $container
@@ -47,6 +51,163 @@ class App
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+    }
+
+    // ------------------- Lifecycle -------------------
+
+    /**
+     * Bootstrap application
+     *
+     * @throws ContainerException
+     */
+    public function bootstrap(): void
+    {
+        $this->registerConfiguredProviders();
+        $this->registerBaseBindings();
+    }
+
+    /**
+     * Boot application
+     *
+     * @throws ContainerExceptionInterface
+     */
+    public function boot(): void
+    {
+        if ($this->booted) {
+            return;
+        }
+
+        foreach ($this->providers as $providerClass) {
+            $provider = new $providerClass($this->container());
+
+            if (!($provider instanceof ServiceProviderInterface)) {
+                throw new ContainerException($providerClass . ' must be instance of ServiceProviderInterface.');
+            }
+
+            $provider->register();
+            $provider->boot();
+
+            $this->container()->set($providerClass, fn () => $provider);
+        }
+
+        $this->booted = true;
+    }
+
+    /**
+     * Register base bindings
+     *
+     * @throws ContainerException
+     */
+    private function registerBaseBindings(): void
+    {
+        $this->container()->set(App::class, fn () => $this);
+    }
+
+    // ------------------- Providers -------------------
+
+    /**
+     * Register providers from bootstrap file
+     *
+     * @return void
+     */
+    public function registerConfiguredProviders(): void
+    {
+        $providers = include __DIR__ . '/../../../bootstrap/bootstrap.php';
+
+        $this->providers = $providers;
+    }
+
+    // ------------------- Environment -------------------
+
+    /**
+     * Get environment
+     *
+     * @return string
+     */
+    public function environment(): string
+    {
+        return Env::get()->value;
+    }
+
+    /**
+     * Check if the current environment is production.
+     *
+     * @return bool
+     */
+    public function isProduction(): bool
+    {
+        return Env::isProduction();
+    }
+
+    /**
+     * Check if the current environment is development.
+     *
+     * @return bool
+     */
+    public function isDevelopment(): bool
+    {
+        return Env::isDevelopment();
+    }
+
+    /**
+     * Check if the current environment is staging.
+     *
+     * @return bool
+     */
+    public function isStaging(): bool
+    {
+        return Env::isStaging();
+    }
+
+    /**
+     * Check if the current environment is testing.
+     *
+     * @return bool
+     */
+    public function runningUnitTests(): bool
+    {
+        return Env::isTesting();
+    }
+
+    /**
+     * Check if the application is running in the console.
+     *
+     * @return bool
+     */
+    public function runningInConsole(): bool
+    {
+        return PHP_SAPI === 'cli';
+    }
+
+    /**
+     * Get version
+     *
+     * @return string
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function version(): string
+    {
+        return $this->config('app.version', '1.0.0');
+    }
+
+    // ------------------- Config -------------------
+
+    /**
+     * Get config value
+     *
+     * @param string $key
+     * @param mixed $default
+     *
+     * @return mixed
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function config(string $key, mixed $default = null): mixed
+    {
+        return $this->container->get(ConfigHandler::class)->get($key, $default);
     }
 
     /**
@@ -72,58 +233,5 @@ class App
     public function get(string $item): mixed
     {
         return $this->container->get($item);
-    }
-
-    /**
-     * Run app
-     *
-     * @return void
-     * @throws JsonException
-     * @throws NotFoundExceptionInterface
-     * @throws ContainerExceptionInterface|NotFoundException
-     */
-    public function run(): void
-    {
-        $responseEmitter = $this->container->get(ResponseEmitter::class);
-
-        try {
-            // Get PSR-7 request
-            $request = $this->container->get(BaseRequest::class);
-            // Build the middleware stack
-            $router = $this->container->get(BaseRouter::class);
-            $errorMiddleware = $this->container->get(ErrorMiddleware::class);
-
-            // Dispatch the request through middleware
-            // Simplified: ErrorMiddleware wraps the router call
-            $response = $errorMiddleware->process(
-                $request,
-                new class ($router) implements RequestHandlerInterface {
-                    private BaseRouter $router;
-                    public function __construct($router)
-                    {
-                        $this->router = $router;
-                    }
-                    public function handle(ServerRequestInterface $request): ResponseInterface
-                    {
-                        // Router executes controller/action, may throw exceptions
-                        return $this->router->dispatch($request);
-                    }
-                }
-            );
-
-            // Emit final response
-            $responseEmitter->emit($response);
-        } catch (Throwable $e) {
-            // Last-resort fallback if middleware fails
-            $errorHandler = $this->container->get(Error::class);
-            $errorHandler->handleException($e);
-
-            $errorData = $errorHandler->normalize($e);
-            $factory = $this->container->get(ErrorResponseFactory::class);
-
-            // Pass the request if is available, or create a fake one
-            $response = $factory->createResponse($errorData, $request ?? new BaseRequest());
-            $responseEmitter->emit($response);
-        }
     }
 }

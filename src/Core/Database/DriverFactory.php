@@ -44,7 +44,7 @@ class DriverFactory
      */
     private static array $aliases = [
         'mysql' => 'mysql',
-        'mariadb' => 'mysql',
+        'mariadb' => 'mariadb',
 
         'sqlite' => 'sqlite',
         'sqlite3' => 'sqlite',
@@ -57,21 +57,53 @@ class DriverFactory
     ];
 
     /**
-     * DriverFactory constructor.
+     * Sets the DSN builder instance.
      *
-     * @param DsnBuilder|null $dsn    DSN builder used to generate valid DSN strings.
-     * @param array           $config Database configuration array.
+     * @param DsnBuilder|null $dsn DSN builder used to generate valid DSN strings.
      *
-     * @throws InvalidArgumentException When DSN is not provided.
+     * @return void
+     *
+     * @throws InvalidArgumentException When DSN is null.
      */
-    public function __construct(?DsnBuilder $dsn = null, array $config = [])
+    public function setDsn(?DsnBuilder $dsn = null): void
     {
         if ($dsn === null) {
             throw new InvalidArgumentException('DsnBuilder instance cannot be null.');
         }
 
         $this->dsn = $dsn;
+    }
+
+    /**
+     * Returns the DSN builder instance.
+     *
+     * @return DsnBuilder|null
+     */
+    public function getDsn(): ?DsnBuilder
+    {
+        return $this->dsn;
+    }
+
+    /**
+     * Sets the configuration array.
+     *
+     * @param array $config
+     *
+     * @return void
+     */
+    public function setConfig(array $config): void
+    {
         $this->config = $config;
+    }
+
+    /**
+     * Returns the configuration array.
+     *
+     * @return array
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
     }
 
     /**
@@ -91,7 +123,7 @@ class DriverFactory
         $dsn = $this->dsn->build($this->config);
 
         return match ($driver) {
-            'mysql'  => new MySqlDriver($dsn, $this->config),
+            'mysql', 'mariadb'  => new MySqlDriver($dsn, $this->config),
             'pgsql'  => new PostgreSqlDriver($dsn, $this->config),
             'sqlite' => new SqliteDriver($dsn, $this->config),
 
@@ -113,7 +145,7 @@ class DriverFactory
      *
      * @throws InvalidArgumentException When alias cannot be resolved.
      */
-    public static function resolve(string $driver): string
+    public function resolve(string $driver): string
     {
         return self::$aliases[strtolower($driver)]
             ?? throw new InvalidArgumentException('Unknown driver alias: {' . $driver . '}');

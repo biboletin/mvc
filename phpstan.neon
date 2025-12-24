@@ -6,7 +6,6 @@ parameters:
         - bootstrap
         - config
         - routes
-        - install
         - public/index.php
     earlyTerminatingMethodCalls:
         Nette\Application\UI\Presenter:

@@ -3,6 +3,7 @@
 namespace Bibo\Mvc\Core\Cookie;
 
 use Bibo\Mvc\Core\Crypto\Crypto;
+use Bibo\Mvc\Core\Exception\Custom\Crypto\DecryptException;
 use Bibo\Mvc\Core\Exception\Custom\Crypto\EncryptException;
 use Bibo\Mvc\Core\Traits\EncryptedAwareTrait;
 use Exception;
@@ -21,8 +22,14 @@ class CookieJarHandler
      *
      * @var array
      */
+
     protected array $cookies = [];
 
+    /**
+     * Cookie
+     *
+     * @var CookieHandler
+     */
     protected CookieHandler $cookie;
 
     /**
@@ -63,16 +70,35 @@ class CookieJarHandler
         $this->cookie = $cookie;
     }
 
+    /**
+     * Get cookie
+     *
+     * @return CookieHandler
+     */
     public function getCookie(): CookieHandler
     {
         return $this->cookie;
     }
 
+    /**
+     * Add cookie
+     *
+     * @param CookieHandler $cookie
+     *
+     * @return void
+     */
     public function add(CookieHandler $cookie): void
     {
         $this->cookies[$cookie->getName()] = $cookie;
     }
 
+    /**
+     * Get cookie by name
+     *
+     * @param string $name
+     *
+     * @return CookieHandler|null
+     */
     public function get(string $name): ?CookieHandler
     {
         $cookie = $this->cookies[$name] ?? null;
@@ -90,6 +116,11 @@ class CookieJarHandler
         return $cookie;
     }
 
+    /**
+     * Get all cookies
+     *
+     * @return CookieHandler[]
+     */
     public function all(): array
     {
         return array_map(function ($cookie) {
@@ -100,21 +131,55 @@ class CookieJarHandler
         }, $this->cookies);
     }
 
+    /**
+     * Check if cookie exists
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
     public function has(string $name): bool
     {
         return isset($this->cookies[$name]) && !$this->cookies[$name]->isExpired();
     }
 
+    /**
+     * Remove cookie
+     *
+     * @param string $name
+     *
+     * @return void
+     */
     public function remove(string $name): void
     {
         unset($this->cookies[$name]);
     }
 
+    /**
+     * Clear cookies
+     *
+     * @return void
+     */
     public function clear(): void
     {
         $this->cookies = [];
     }
 
+    /**
+     * Get cookie count
+     *
+     * @return int
+     */
+    public function count(): int
+    {
+        return count($this->cookies);
+    }
+
+    /**
+     * Get cookie headers
+     *
+     * @return string
+     */
     public function toHeader(): string
     {
         $parts = [];
@@ -127,6 +192,13 @@ class CookieJarHandler
         return 'Cookie: ' . implode('; ', $parts);
     }
 
+    /**
+     * Get cookie headers for cURL
+     *
+     * @return string
+     *
+     * @throws DecryptException
+     */
     public function toCurlHeader(): string
     {
         $parts = [];
@@ -140,6 +212,13 @@ class CookieJarHandler
     }
 
     /**
+     * Parse set cookie headers
+     *
+     * @param array $setCookieHeaders
+     * @param bool $decrypt
+     *
+     * @return void
+     *
      * @throws RandomException
      * @throws EncryptException
      */
@@ -201,6 +280,13 @@ class CookieJarHandler
         }
     }
 
+    /**
+     * Save cookies to file
+     *
+     * @param string $cookieFilePath
+     *
+     * @return bool
+     */
     public function saveToCurlFile(string $cookieFilePath): bool
     {
         $lines = [
@@ -233,6 +319,15 @@ class CookieJarHandler
         return file_put_contents($cookieFilePath, implode(PHP_EOL, $lines)) !== false;
     }
 
+    /**
+     * Save cookies to file
+     *
+     * @param string $path
+     *
+     * @return bool
+     *
+     * @throws DecryptException
+     */
     public function saveToFile(string $path): bool
     {
         $data = array_map(fn ($cookie) => $cookie->toArray(), $this->all());
@@ -241,6 +336,12 @@ class CookieJarHandler
     }
 
     /**
+     * Load cookies from a file
+     *
+     * @param string $path
+     *
+     * @return bool
+     *
      * @throws EncryptException
      * @throws RandomException
      */
@@ -266,12 +367,23 @@ class CookieJarHandler
         return true;
     }
 
+    /**
+     * Convert cookies to array
+     *
+     * @return array
+     */
     public function toArray(): array
     {
         return array_map(fn ($cookie) => $cookie->toArray(), $this->all());
     }
 
     /**
+     * Load cookies from array
+     *
+     * @param array $data
+     *
+     * @return void
+     *
      * @throws RandomException
      * @throws EncryptException
      */
@@ -284,6 +396,13 @@ class CookieJarHandler
         }
     }
 
+    /**
+     * Send cookies to client
+     *
+     * @return void
+     *
+     * @throws DecryptException
+     */
     public function send(): void
     {
         foreach ($this->all() as $cookie) {
@@ -303,6 +422,12 @@ class CookieJarHandler
     }
 
     /**
+     * Parse cookies from globals
+     *
+     * @param bool $decrypt
+     *
+     * @return void
+     *
      * @throws RandomException
      * @throws EncryptException
      */
@@ -325,6 +450,13 @@ class CookieJarHandler
     }
 
     /**
+     * Parse cookies from request
+     *
+     * @param ServerRequestInterface $request
+     * @param bool $decrypt
+     *
+     * @return void
+     *
      * @throws RandomException
      * @throws EncryptException
      */
@@ -346,6 +478,11 @@ class CookieJarHandler
         }
     }
 
+    /**
+     * Get set cookie headers
+     *
+     * @return string[]
+     */
     public function getSetCookieHeaders(): array
     {
         $headers = [];

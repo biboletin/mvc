@@ -24,6 +24,7 @@ enum HashAlgorithm: string
      * It is commonly used in various applications, including digital signatures and certificates.
      * It is considered secure and efficient for most use cases.
      */
+
     case SHA256 = 'sha256';
 
     /*
@@ -34,6 +35,7 @@ enum HashAlgorithm: string
      * needed.
      * * It is considered secure and provides a good compromise between speed and security.
      */
+
     case SHA384 = 'sha384';
 
     /*
@@ -44,8 +46,16 @@ enum HashAlgorithm: string
      * It is considered secure and provides the highest level of security among the three algorithms.
      * It is suitable for applications that require strong hashing and data integrity.
      */
+
     case SHA512 = 'sha512';
 
+    /**
+     * Returns the length of the hash output for the specified algorithm.
+     * This method returns the length of the hash output in bytes for the specified hash algorithm.
+     * The length is determined based on the specific hash algorithm used.
+     *
+     * @return int The length of the hash output in bytes.
+     */
     public function length(): int
     {
         return match ($this) {

@@ -23,6 +23,7 @@ enum ResponseBufferSize: int
      * It is a common choice for web applications that do not require
      * large data transfers.
      */
+
     case DEFAULT = 8192;
 
     /*
@@ -35,6 +36,7 @@ enum ResponseBufferSize: int
      * It helps to minimize memory overhead while still allowing
      * efficient data transfer.
      */
+
     case SMALL = 4096;
 
     /*
@@ -49,6 +51,7 @@ enum ResponseBufferSize: int
      * It is commonly used in web applications that need to handle
      * moderate amounts of data, such as JSON APIs or file downloads.
      */
+
     case LARGE = 16384;
 
     /*
@@ -60,6 +63,7 @@ enum ResponseBufferSize: int
      * is significantly larger than typical web pages or APIs.
      * It helps to ensure efficient data transfer while minimizing memory usage.
      */
+
     case EXTRA_LARGE = 32768;
 
     /*
@@ -72,6 +76,7 @@ enum ResponseBufferSize: int
      * is exceptionally large, such as in media streaming or large file transfers.
      * It helps to ensure efficient data transfer while minimizing memory overhead.
      */
+
     case CUSTOM = 65536;
 
     /**
@@ -177,11 +182,6 @@ enum ResponseBufferSize: int
             $size <= 256 * 1024 => self::EXTRA_LARGE,
             default => self::CUSTOM,
         };
-    }
-
-    protected static function getContentType(ResponseInterface $response): string
-    {
-        return $response->getHeaderLine('Content-Type') ?: 'text/html';
     }
 
     /**

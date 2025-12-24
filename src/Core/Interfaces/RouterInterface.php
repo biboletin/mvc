@@ -115,11 +115,11 @@ interface RouterInterface
      *
      * @param string $prefix
      * @param callable $callback
-     * @param string|array $groupMiddleware
+     * @param string|array $middleware
      *
      * @return RouterInterface
      */
-    public function group(string $prefix, callable $callback, string|array $groupMiddleware): self;
+    public function group(string $prefix, callable $callback, string|array $middleware): self;
 
     /**
      * Redirect route
@@ -141,41 +141,4 @@ interface RouterInterface
      * @return RouterInterface
      */
     public function resource(string $prefix, string $controller): self;
-
-    /**
-     * Match route
-     *
-     * @param BaseRequest $request
-     *
-     * @return ResponseInterface
-     */
-    public function dispatch(BaseRequest $request): ResponseInterface;
-
-    /**
-     * Add middleware
-     *
-     * @param string|array $middleware
-     *
-     * @return RouterInterface
-     */
-    public function middleware(string|array $middleware): self;
-
-    /**
-     * Find route
-     *
-     * @param string $method
-     * @param string $route
-     *
-     * @return array|null
-     */
-    public function find(string $method, string $route): ?array;
-
-    /**
-     * Set a route name
-     *
-     * @param string $name
-     *
-     * @return RouterInterface
-     */
-    public function name(string $name): self;
 }

@@ -2,8 +2,6 @@
 
 namespace Bibo\Mvc\Core\Session;
 
-use Bibo\Mvc\Core\Crypto\Crypto;
-
 /**
  * SessionManager
  *
@@ -35,10 +33,16 @@ class SessionManager
      */
     private const string META_KEY = '_meta';
 
-    public function __construct(SessionHandler $session, EncryptedSessionHandler $store)
+    /**
+     * Set the session handler and ensure meta structure exists.
+     *
+     * @param SessionHandler $session
+     *
+     * @return void
+     */
+    public function setSessionHandler(SessionHandler $session): void
     {
         $this->session = $session;
-        $this->store = $store;
 
         // ensure meta structure exists
         if (!$this->session->has(self::META_KEY)) {
@@ -49,6 +53,38 @@ class SessionManager
                 'ua' => $_SERVER['HTTP_USER_AGENT'] ?? '',
             ]);
         }
+    }
+
+    /**
+     * Convenience accessor for session handler.
+     *
+     * @return SessionHandler
+     */
+    public function getSessionHandler(): SessionHandler
+    {
+        return $this->session;
+    }
+
+    /**
+     * Set the underlying encrypted session store.
+     *
+     * @param EncryptedSessionHandler $store
+     *
+     * @return void
+     */
+    public function setStore(EncryptedSessionHandler $store): void
+    {
+        $this->store = $store;
+    }
+
+    /**
+     * Convenience accessor for encrypted session store.
+     *
+     * @return EncryptedSessionHandler
+     */
+    public function getStore(): EncryptedSessionHandler
+    {
+        return $this->store;
     }
 
     /**
@@ -99,6 +135,11 @@ class SessionManager
         $this->session->set(self::META_KEY, $meta);
     }
 
+    /**
+     * Get client IP address
+     *
+     * @return string
+     */
     private function getClientIp(): string
     {
         return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';

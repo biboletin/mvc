@@ -3,7 +3,6 @@
 namespace Bibo\Mvc\Core\View;
 
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
-use Bibo\Mvc\Core\Logger\LogManager;
 use Bibo\Mvc\Core\Template\Template;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;

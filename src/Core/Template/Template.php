@@ -5,6 +5,7 @@ namespace Bibo\Mvc\Core\Template;
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
 use Bibo\Mvc\Core\Interfaces\TemplateEngineInterface;
 use InvalidArgumentException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Template
@@ -31,13 +32,39 @@ class Template
     private TemplateEngineInterface $engine;
 
     /**
-     * Template constructor
+     * Container instance
+     *
+     * @var ContainerInterface
+     */
+    private ContainerInterface $container;
+
+    /**
+     * Constructor
+     *
+     * @param ContainerInterface $container
+     *
+     * @return void
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * Set the template engine instance
      *
      * @param TemplateEngineInterface $engine
+     *
+     * @return void
      */
-    public function __construct(TemplateEngineInterface $engine)
+    public function setEngine(TemplateEngineInterface $engine): void
     {
         $this->engine = $engine;
+    }
+
+    public function getEngine(): TemplateEngineInterface
+    {
+        return $this->engine;
     }
 
     /**

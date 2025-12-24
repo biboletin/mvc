@@ -17,7 +17,8 @@ trait RequestHelper
     /**
      * Check if the request's HTTP method matches the given method name (case-insensitive).
      *
-     * @param  string $method The HTTP method to compare against (e.g., GET, POST).
+     * @param string $method The HTTP method to compare against (e.g., GET, POST).
+     *
      * @return bool True if it matches, false otherwise.
      */
     public function isMethod(string $method): bool

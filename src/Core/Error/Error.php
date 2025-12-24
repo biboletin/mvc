@@ -3,7 +3,6 @@
 namespace Bibo\Mvc\Core\Error;
 
 use Bibo\Mvc\Core\Exception\Custom\Http\NotFoundException;
-use Bibo\Mvc\Core\Logger\LogManager;
 use Bibo\Mvc\Core\Request\BaseRequest;
 use Bibo\Mvc\Core\Response\ResponseEmitter;
 use ErrorException;
@@ -16,23 +15,41 @@ use Throwable;
 class Error
 {
     /**
+     * Logger instance
+     *
      * @var LoggerInterface|mixed
      */
     protected LoggerInterface $logger;
 
     /**
+     * Container instance
+     *
      * @var ContainerInterface
      */
     protected ContainerInterface $container;
 
     /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * Set container instance
+     *
+     * @param ContainerInterface $container
+     *
+     * @return void
      */
-    public function __construct(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container): void
     {
-        $this->logger = $container->get(LogManager::class)->get('app');
         $this->container = $container;
+    }
+
+    /**
+     * Set logger instance
+     *
+     * @param LoggerInterface $logger
+     *
+     * @return void
+     */
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -80,6 +97,7 @@ class Error
         }
 
         $response = $factory->createFromException($exception, $request);
+//dd($response, $exception);
         $emitter->emit($response);
     }
 
@@ -93,7 +111,7 @@ class Error
         $error = error_get_last();
 
         if ($error !== null && in_array($error['type'], $this->getFatalErrorTypes(), true)) {
-            $message = "{$error['message']} in {$error['file']} on line {$error['line']}";
+            $message = $error['message'] . ' in ' . $error['file'] . ' on line ' . $error['line'];
             $this->logger->error($message);
         }
     }

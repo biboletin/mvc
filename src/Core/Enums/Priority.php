@@ -17,6 +17,7 @@ enum Priority: string
      * This level indicates that the task or issue is not urgent
      * and can be addressed later.
      */
+
     case LOW = 'Low';
 
     /*
@@ -24,6 +25,7 @@ enum Priority: string
      * This level indicates that the task or issue should be addressed
      * but is not critical.
      */
+
     case MEDIUM = 'Medium';
 
     /*
@@ -31,6 +33,7 @@ enum Priority: string
      * This level indicates that the task or issue is important
      * and should be addressed as soon as possible.
      */
+
     case HIGH = 'High';
 
     /*
@@ -38,6 +41,7 @@ enum Priority: string
      * This level indicates that the task or issue is of utmost importance
      * and requires immediate attention.
      */
+
     case CRITICAL = 'Critical';
 
     /*
@@ -46,6 +50,7 @@ enum Priority: string
      * or that the priority is negligible.
      * This is useful in scenarios where priority assessment is not applicable.
      */
+
     case NONE = 'None';
 
     /*
@@ -53,6 +58,7 @@ enum Priority: string
      * This level indicates that the task or issue is extremely urgent
      * and needs to be addressed immediately to prevent significant harm or loss.
      */
+
     case URGENT = 'Urgent';
 
     /*
@@ -60,6 +66,7 @@ enum Priority: string
      * This level indicates that the task or issue requires immediate action
      * and cannot be delayed.
      */
+
     case IMMEDIATE = 'Immediate';
 
     /*
@@ -67,6 +74,7 @@ enum Priority: string
      * This level indicates that the task or issue is an emergency
      * and requires immediate and decisive action.
      */
+
     case EMERGENCY = 'Emergency';
 
     /*
@@ -74,6 +82,7 @@ enum Priority: string
      * This level indicates that the task or issue is blocking progress
      * and must be resolved before any further work can continue.
      */
+
     case BLOCKER = 'Blocker';
 
     /*
@@ -81,6 +90,7 @@ enum Priority: string
      * This level indicates that the task or issue is of minimal importance
      * and can be addressed at a later time without significant impact.
      */
+
     case TRIVIAL = 'Trivial';
 
     /*
@@ -88,6 +98,7 @@ enum Priority: string
      * This level indicates that the task or issue is not essential
      * and can be addressed if time permits.
      */
+
     case OPTIONAL = 'Optional';
 
     /*
@@ -95,6 +106,7 @@ enum Priority: string
      * This level can be used as a fallback or default value
      * when no specific priority is assigned.
      */
+
     case DEFAULT = 'Default';
 
     /*
@@ -102,6 +114,7 @@ enum Priority: string
      * This level indicates that the task or issue is of low importance
      * and can be addressed at a later time without significant impact.
      */
+
     case MINOR = 'Minor';
 
     /*
@@ -109,6 +122,7 @@ enum Priority: string
      * This level indicates that the task or issue is of significant importance
      * and should be addressed promptly, but is not as critical as high or urgent.
      */
+
     case MAJOR = 'Major';
 
     /*
@@ -116,6 +130,7 @@ enum Priority: string
      * This level indicates that the task or issue is very serious
      * and requires immediate attention, but is not as critical as emergency or blocker.
      */
+
     case SEVERE = 'Severe';
 
     /*
@@ -123,6 +138,7 @@ enum Priority: string
      * This level indicates that the task or issue is of critical importance
      * and requires immediate attention, but is categorized as high.
      */
+
     case CRITICAL_HIGH = 'Critical High';
 
     /*
@@ -130,6 +146,7 @@ enum Priority: string
      * This level indicates that the task or issue is of critical importance
      * but is categorized as low, meaning it requires attention but not immediately.
      */
+
     case CRITICAL_LOW = 'Critical Low';
 
     /*
@@ -137,6 +154,7 @@ enum Priority: string
      * This level indicates that the task or issue is of critical importance
      * and requires attention, but is categorized as medium.
      */
+
     case CRITICAL_MEDIUM = 'Critical Medium';
 
     /*
@@ -144,6 +162,7 @@ enum Priority: string
      * This level indicates that the task or issue is of critical importance
      * and requires immediate attention, categorized as urgent.
      */
+
     case CRITICAL_URGENT = 'Critical Urgent';
 
     /*
@@ -151,6 +170,7 @@ enum Priority: string
      * This level indicates that the task or issue is of critical importance
      * and requires immediate action, categorized as immediate.
      */
+
     case CRITICAL_IMMEDIATE = 'Critical Immediate';
 
     /**
@@ -166,7 +186,7 @@ enum Priority: string
      */
     public static function fromValue(string $value): self
     {
-        return match (strtolower($value)) {
+        $map = [
             'low' => self::LOW,
             'medium' => self::MEDIUM,
             'high' => self::HIGH,
@@ -187,7 +207,14 @@ enum Priority: string
             'critical medium' => self::CRITICAL_MEDIUM,
             'critical urgent' => self::CRITICAL_URGENT,
             'critical immediate' => self::CRITICAL_IMMEDIATE,
-            default => throw new InvalidArgumentException('Invalid Priority value: ' . $value),
-        };
+        ];
+
+        $key = strtolower($value);
+
+        if (!isset($map[$key])) {
+            throw new InvalidArgumentException('Invalid Priority value: ' . $value);
+        }
+
+        return $map[$key];
     }
 }

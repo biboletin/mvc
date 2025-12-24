@@ -2,10 +2,8 @@
 
 namespace Bibo\Mvc\Core\Providers;
 
-use Bibo\Mvc\Core\Enums\HttpStatus;
-use Bibo\Mvc\Core\Logger\LogManager;
+use Bibo\Mvc\Core\Exception\Custom\Container\ContainerException;
 use Bibo\Mvc\Core\Response\BaseResponse;
-use Psr\Container\NotFoundExceptionInterface;
 
 class ResponseServiceProvider extends ServiceProvider
 {
@@ -13,24 +11,20 @@ class ResponseServiceProvider extends ServiceProvider
      * Register service provider
      *
      * @return void
+     *
+     * @throws ContainerException
      */
     public function register(): void
     {
-        $response = new BaseResponse(HttpStatus::OK->value, []);
-
-        $this->container->set(BaseResponse::class, function () use ($response) {
-            return $response;
-        });
+        $this->container->set(BaseResponse::class, fn () => new BaseResponse());
     }
 
     /**
-     * @throws NotFoundExceptionInterface
+     * Boot the service provider
+     *
+     * @return void
      */
     public function boot(): void
     {
-        $this->container
-            ->get(LogManager::class)
-            ->get('app')
-            ->debug(__CLASS__ . ' booted successfully');
     }
 }

@@ -29,7 +29,7 @@
     "minimum-stability": "dev",
     "require-dev": {
         "symfony/var-dumper": "7.3.x-dev",
-        "phpunit/phpunit": "^11",
+        "phpunit/phpunit": "^11 || ^12",
         "phpcompatibility/php-compatibility": "^10.0@dev"
     },
     "require": {
